@@ -1,59 +1,75 @@
-# KjoCareFront
+# KJO Mind Care - Dashboard de Administración 🧠📊
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.3.
+Este dashboard fue desarrollado como parte del proyecto de bienestar emocional KJO Mind Care. Permite a administradores gestionar los recursos del sistema (blogs, usuarios, categorías, centros de salud, etc.) desde un entorno seguro, intuitivo y moderno. Actualmente, el backend ha sido migrado a Firebase para facilitar el escalado y simplificar la gestión de datos en tiempo real.
 
-## Development server
+## 🛠 Tecnologías Usadas
 
-To start a local development server, run:
+- Angular 19 (con standalone components)
+
+- Firebase (Auth, Firestore, Storage)
+
+- TailwindCSS + DaisyUI
+
+- OpenLayers (para mapas)
+
+- GitHub Actions (CI/CD)
+
+## 📦 Casos de Uso
+
+| Caso de Uso                    | Descripción                                                   | Rol           |
+|:-------------------------------|:--------------------------------------------------------------|:--------------|
+| Ver usuarios                   | Lista completa de usuarios registrados                        | Administrador |
+| Editar usuario                 | Actualizar nombre, estado o rol de un usuario                 | Administrador |
+| Mantener blog                  | Visualizar todos los blogs, crearlos, editarlos y eliminarlos | Administrador |
+| Mantener categorías            | Visualizar, crear, editar categorías                          | Administrador |
+| Mantener Comentarios           | Visualizar, crear, editar y eliminar comentarios de los blogs | Administrador |
+| Mantener centros de salud      | Visualizar, crear, editar y eliminar centros de salud         | Administrador |
+| Mantener estados de ánimo      | Visualizar, crear, editar estados de ánimo                    | Administrador |
+| Visualizar estadísticas de uso | Panel de métricas del sistema                                 | Administrador |
+
+## 🚀 Características del Dashboard
+
+- CRUD completo para blogs, usuarios, recursos de emergencia y centros de salud.
+
+- Mapa interactivo con OpenLayers para localizar centros de atención cercanos.
+
+- Visualización de métricas sobre el uso de la plataforma (usuarios, blogs, estados de ánimo).
+
+- Integración con Firebase Auth y Firestore.
+
+- Interfaz responsiva y amigable.
+
+## ⚙️ Configuración del proyecto
+
+- Primero clona el repositorio
+
+```bash
+git clone https://github.com/KJO-Tech/kjo-care-front
+```
+
+- Dirígete al directorio
+
+```bash
+cd kjo-care-front
+```
+
+[//]: # (- En la raíz del proyecto, crea un archivo .env con el siguiente contenido:)
+
+[//]: # ()
+[//]: # (```text)
+
+[//]: # (```)
+
+- Instala las dependencias con Bun
+
+```bash
+bun install
+```
+
+- Inicia la aplicación de Angular
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- La aplicación estará disponible en `http://localhost:4200`
