@@ -7,6 +7,13 @@ declare interface Env {
   NG_APP_KEYCLOAK_URL: string;
   NG_APP_KEYCLOAK_REALM: string;
   NG_APP_KEYCLOAK_CLIENT_ID: string;
+  NG_APP_FIREBASE_PROJECT_ID: string;
+  NG_APP_FIREBASE_APP_ID: string;
+  NG_APP_FIREBASE_API_KEY: string;
+  NG_APP_FIREBASE_AUTH_DOMAIN: string;
+  NG_APP_FIREBASE_MESSAGING_SENDER_ID: string;
+  NG_APP_FIREBASE_MEASUREMENT_ID: string;
+  NG_APP_FIREBASE_STORAGE_BUCKET: string;
 }
 
 // Choose how to access the environment variables.

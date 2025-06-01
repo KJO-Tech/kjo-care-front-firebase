@@ -7,9 +7,18 @@ import { httpTokenInterceptor } from './core/interceptors/http-token.interceptor
 import { NgxEchartsModule } from 'ngx-echarts';
 import * as echarts from 'echarts';
 
+import { firebaseProviders } from './core/config/firebase.config';
+import { provideClientHydration, withEventReplay, withHttpTransferCacheOptions } from '@angular/platform-browser';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+    ...firebaseProviders,
+    provideClientHydration(withHttpTransferCacheOptions({
+      includePostRequests: true
+    }),
+      withEventReplay()
+    ),
     provideRouter(routes,
       withViewTransitions({
         skipInitialTransition: false,
