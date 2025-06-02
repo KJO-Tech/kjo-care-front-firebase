@@ -5,14 +5,18 @@ import { authGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'auth/login',
     pathMatch: 'full'
   },
   {
-    path: 'home',
-    component: HomeComponent,
-    canActivate: [authGuard]
+    path: 'auth',
+    loadChildren: () => import('./modules/auth/auth.routes')
   },
+  // {
+  //   path: 'home',
+  //   component: HomeComponent,
+  //   canActivate: [authGuard]
+  // },
   {
     path: 'dashboard',
     loadComponent: () =>
@@ -34,5 +38,9 @@ export const routes: Routes = [
       { path: 'map', loadComponent: () => import('./modules/health-center-map/health-center-map.component') }
     ],
     canActivate: [authGuard]
+  },
+  {
+    path: '**',
+    redirectTo: 'home'
   }
 ];

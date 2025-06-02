@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { KeycloakService } from '../../../../modules/auth/services/keycloak.service';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'navbar-profile-button',
@@ -10,6 +11,7 @@ import { RouterLink } from '@angular/router';
   ]
 })
 export class ProfileButtonComponent {
+  private authService = inject(AuthService)
   private keycloakService = inject(KeycloakService);
 
   readonly userLetters = computed<string>(() => {
@@ -19,7 +21,7 @@ export class ProfileButtonComponent {
   });
 
   async logout() {
-    await this.keycloakService.logout();
+    await this.authService.logout();
   }
 
   async account() {

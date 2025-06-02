@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { KeycloakService } from '../../auth/services/keycloak.service';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -12,14 +13,19 @@ import { RouterLink } from '@angular/router';
 })
 export class HomeComponent {
 
- private keycloakService = inject(KeycloakService);
+  private authService = inject(AuthService)
+
+
+  user = this.authService.getUser();
+  userEmail = computed(() => this.user()?.email ?? 'Usuario');
+  isLoading = this.authService.isLoading;
 
   async logout() {
-    await this.keycloakService.logout();
+    await this.authService.logout();
   }
 
   async account() {
-    await this.keycloakService.goToAccountManagement();
+
   }
 
 }

@@ -15,6 +15,10 @@ const firebaseConfig = {
 
 export const firebaseProviders = [
   provideFirebaseApp(() => initializeApp(firebaseConfig)),
-  provideAuth(() => getAuth()),
+  provideAuth(() => {
+    const auth = getAuth()
+    auth.useDeviceLanguage()
+    return auth
+  }),
   provideFirestore(() => getFirestore())
 ];

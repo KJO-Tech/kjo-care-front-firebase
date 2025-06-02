@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-base-200 flex items-center justify-center">
+  <div class="card w-96 bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex justify-center mb-4">
+        <app-logo />
+      </div>
+
+      <!-- <h2 class="card-title text-2xl font-bold text-center mb-6">Registro</h2> -->
+
+      @if (error()) {
+        <div class="alert alert-error mb-4">
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form
+        [formGroup]="registerForm"
+        (ngSubmit)="onSubmit()"
+        class="space-y-4"
+      >
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Nombre Completo</span>
+          </label>
+          <input
+            type="text"
+            formControlName="fullName"
+            class="input input-bordered w-full"
+            placeholder="Introduce tu nombre completo"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Email</span>
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            class="input input-bordered w-full"
+            placeholder="Introduce tu correo electrónico"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Contraseña</span>
+          </label>
+          <input
+            type="password"
+            formControlName="password"
+            class="input input-bordered w-full"
+            placeholder="Introduce tu contraseña"
+          />
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Confirmar Contraseña</span>
+          </label>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            class="input input-bordered w-full"
+            placeholder="Introduce tu contraseña nuevamente"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-full"
+          [disabled]="loading() || !registerForm.valid"
+        >
+          @if (loading()) {
+            <span class="loading loading-spinner"></span>
+          }
+          Registrarse
+        </button>
+      </form>
+
+      <p class="text-center mt-4">
+        ¿Ya tienes cuenta?
+        <a routerLink="/auth/login" class="link link-primary">Inicia Sesión</a>
+      </p>
+    </div>
+  </div>
+</div>
