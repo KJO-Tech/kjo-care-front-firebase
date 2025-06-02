@@ -19,26 +19,18 @@ export default class RegisterComponent {
   error = signal<string | null>(null);
 
   registerForm = this.fb.nonNullable.group({
-    fullName: ['', [Validators.required]],
+    displayName: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', [Validators.required]]
   });
-
   async onSubmit() {
     if (this.registerForm.valid) {
-      const { email, password, confirmPassword } = this.registerForm.getRawValue();
-
-      if (password !== confirmPassword) {
-        this.error.set('Las contraseñas no coinciden');
-        return;
-      }
-
       try {
         this.loading.set(true);
-        await this.authService.register(email, password);
+        const { email, password, displayName } = this.registerForm.getRawValue();
+        await this.authService.register(email, password, displayName);
       } catch (error) {
-        this.error.set('Error al registrar usuario');
       } finally {
         this.loading.set(false);
       }

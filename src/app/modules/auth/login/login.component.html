@@ -5,16 +5,6 @@
         <app-logo />
       </div>
 
-      <!-- <h2 class="card-title text-2xl text-center font-bold  mb-6">
-        Iniciar Sesión
-      </h2> -->
-
-      @if (error()) {
-        <div class="alert alert-error mb-4">
-          <span>{{ error() }}</span>
-        </div>
-      }
-
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
         <div class="form-control">
           <label class="label">
@@ -24,8 +14,14 @@
             type="email"
             formControlName="email"
             class="input input-bordered w-full"
-            placeholder="example@email.com"
+            [class.input-error]="emailErrors"
+            placeholder="ejemplo@email.com"
           />
+          @if (emailErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{ emailErrors }}</span>
+            </label>
+          }
         </div>
 
         <div class="form-control">
@@ -36,8 +32,27 @@
             type="password"
             formControlName="password"
             class="input input-bordered w-full"
+            [class.input-error]="passwordErrors"
             placeholder="••••••••"
           />
+          @if (passwordErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{
+                passwordErrors
+              }}</span>
+            </label>
+          }
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="button"
+            class="btn btn-link btn-sm p-0 h-auto min-h-0 text-primary hover:text-primary-focus"
+            (click)="sendResetPasswordEmail()"
+            [disabled]="loading()"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
         </div>
 
         <button
@@ -55,6 +70,7 @@
       <div class="divider">O</div>
 
       <button
+        type="button"
         class="btn btn-outline w-full"
         (click)="loginWithGoogle()"
         [disabled]="loading()"
