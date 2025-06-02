@@ -5,6 +5,9 @@ import { AuthService } from '../../../core/services/auth.service';
 import { RouterLink } from '@angular/router';
 import { ICONS } from '../../../shared/icons';
 import { LogoComponent } from "../../../shared/components/logo.component";
+import { rxResource } from '@angular/core/rxjs-interop';
+import { NEVER } from 'rxjs';
+import { LoginEmail } from '../../../core/interfaces/auth-http.interface';
 
 @Component({
   selector: 'auth-login',
@@ -16,9 +19,18 @@ import { LogoComponent } from "../../../shared/components/logo.component";
 export default class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  protected readonly loadingGoogle = signal(false);
+  protected readonly loadingReset = signal(false);
 
   protected readonly ICONS = ICONS;
+
   protected readonly loading = signal(false);
+  readonly loginSignal = signal({ email: "", password: "" })
+  readonly loginResource = rxResource({
+    request: () => this.loginSignal(),
+    loader: () => this.isLoginEmpy(this.loginSignal()) ? NEVER : this.authService.loginWithEmail(this.loginSignal())
+  })
+
 
   protected readonly loginForm = this.fb.nonNullable.group({
     email: ['', [
@@ -50,30 +62,28 @@ export default class LoginComponent {
     return '';
   }
 
-  protected async onSubmit(): Promise<void> {
+  protected onSubmit(): void {
     if (this.loginForm.valid) {
-      try {
-        this.loading.set(true);
-        const { email, password } = this.loginForm.getRawValue();
-        await this.authService.loginWithEmail(email, password);
-      } finally {
-        this.loading.set(false);
-      }
+      this.loginSignal.set({
+        email: this.loginForm.value.email ?? '',
+        password: this.loginForm.value.password ?? ''
+      })
     } else {
       this.loginForm.markAllAsTouched();
     }
   }
-
-  protected async loginWithGoogle(): Promise<void> {
-    try {
-      this.loading.set(true);
-      await this.authService.loginWithGoogle();
-    } finally {
-      this.loading.set(false);
-    }
+  isLoginEmpy(login: LoginEmail): boolean {
+    return !login.email || !login.password
+  }
+  protected loginWithGoogle(): void {
+    this.loadingGoogle.set(true);
+    this.authService.loginWithGoogle().subscribe({
+      error: () => this.loadingGoogle.set(false),
+      complete: () => this.loadingGoogle.set(false)
+    });
   }
 
-  protected async sendResetPasswordEmail(): Promise<void> {
+  protected sendResetPasswordEmail(): void {
     const email = this.loginForm.get('email')?.value;
 
     if (!email || !this.loginForm.get('email')?.valid) {
@@ -81,11 +91,10 @@ export default class LoginComponent {
       return;
     }
 
-    try {
-      this.loading.set(true);
-      await this.authService.resetPassword(email);
-    } finally {
-      this.loading.set(false);
-    }
+    this.loadingReset.set(true);
+    this.authService.resetPassword(email).subscribe({
+      next: () => this.loadingReset.set(false),
+      error: () => this.loadingReset.set(false)
+    });
   }
 }

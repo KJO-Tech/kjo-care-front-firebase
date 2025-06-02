@@ -5,14 +5,6 @@
         <app-logo />
       </div>
 
-      <!-- <h2 class="card-title text-2xl font-bold text-center mb-6">Registro</h2> -->
-
-      @if (error()) {
-        <div class="alert alert-error mb-4">
-          <span>{{ error() }}</span>
-        </div>
-      }
-
       <form
         [formGroup]="registerForm"
         (ngSubmit)="onSubmit()"
@@ -26,8 +18,16 @@
             type="text"
             formControlName="displayName"
             class="input input-bordered w-full"
+            [class.input-error]="displayNameErrors"
             placeholder="Introduce tu nombre completo"
           />
+          @if (displayNameErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{
+                displayNameErrors
+              }}</span>
+            </label>
+          }
         </div>
 
         <div class="form-control">
@@ -38,8 +38,14 @@
             type="email"
             formControlName="email"
             class="input input-bordered w-full"
-            placeholder="Introduce tu correo electrónico"
+            [class.input-error]="emailErrors"
+            placeholder="ejemplo@email.com"
           />
+          @if (emailErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{ emailErrors }}</span>
+            </label>
+          }
         </div>
 
         <div class="form-control">
@@ -50,8 +56,16 @@
             type="password"
             formControlName="password"
             class="input input-bordered w-full"
-            placeholder="Introduce tu contraseña"
+            [class.input-error]="passwordErrors"
+            placeholder="••••••••"
           />
+          @if (passwordErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{
+                passwordErrors
+              }}</span>
+            </label>
+          }
         </div>
 
         <div class="form-control">
@@ -62,8 +76,16 @@
             type="password"
             formControlName="confirmPassword"
             class="input input-bordered w-full"
-            placeholder="Introduce tu contraseña nuevamente"
+            [class.input-error]="confirmPasswordErrors"
+            placeholder="••••••••"
           />
+          @if (confirmPasswordErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{
+                confirmPasswordErrors
+              }}</span>
+            </label>
+          }
         </div>
 
         <button

@@ -16,8 +16,8 @@ export class HomeComponent {
   private authService = inject(AuthService)
 
 
-  user = this.authService.getUser();
-  userEmail = computed(() => this.user()?.email ?? 'Usuario');
+  user = this.authService.currentUser();
+  userEmail = computed(() => this.user?.email ?? 'Usuario');
   isLoading = this.authService.isLoading;
 
   async logout() {

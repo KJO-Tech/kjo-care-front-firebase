@@ -73,16 +73,15 @@
         type="button"
         class="btn btn-outline w-full"
         (click)="loginWithGoogle()"
-        [disabled]="loading()"
+        [disabled]="loadingGoogle()"
       >
-        @if (loading()) {
+        @if (loadingGoogle()) {
           <span class="loading loading-spinner"></span>
         } @else {
           <img [src]="ICONS.google" alt="Google" class="w-4 h-4 mr-2" />
         }
         Continuar con Google
       </button>
-
       <p class="text-center mt-4">
         ¿No tienes cuenta?
         <a routerLink="/auth/register" class="link link-primary">Regístrate</a>

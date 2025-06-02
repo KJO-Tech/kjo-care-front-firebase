@@ -8,7 +8,7 @@ export function httpTokenInterceptor(
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
   const authService = inject(AuthService);
-  const currentUser = authService.getUser()();  
+  const currentUser = authService.currentUser();
 
   if (currentUser) {
     return from(currentUser.getIdToken()).pipe(
