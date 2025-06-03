@@ -20,8 +20,8 @@ export class ProfileButtonComponent {
     return firstName[0] + lastName[0];
   });
 
-  async logout() {
-    await this.authService.logout();
+  logout() {
+    this.authService.logout().subscribe();
   }
 
   async account() {

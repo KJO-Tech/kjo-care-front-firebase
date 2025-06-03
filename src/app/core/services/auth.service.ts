@@ -159,17 +159,19 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    this.setLoading(true);
-
-    return from(signOut(this.auth)).pipe(
-      switchMap(() => from(this.router.navigate(['/auth/login'])).pipe(
-        map(() => void 0)
-      )),
+    return from(Promise.all([
+      this.router.navigate(['/']),
+      signOut(this.auth)
+    ])).pipe(
+      map(() => void 0),
       catchError((error) => {
-        console.error('Error al cerrar sesión:', error);
+        this.toastService.addToast({
+          message: 'Error al cerrar sesión',
+          type: 'error',
+          duration: 3000
+        });
         return throwError(() => error);
-      }),
-      finalize(() => this.setLoading(false))
+      })
     );
   }
 
@@ -196,7 +198,17 @@ export class AuthService {
   }
 
   private handleAuthError(error: any): string {
-    let errorMessage = 'Ha ocurrido un error inesperado';
+    let errorMessage = 'Credenciales inválidas';
+    if (error.code) {
+      switch (error.code) {
+        case 'auth/too-many-requests':
+          errorMessage = 'Demasiados intentos. Por favor, intente más tarde';
+          break;
+        default:
+          errorMessage = 'Error en la autenticación. Por favor, verifique sus credenciales';
+          break;
+      }
+    }
     this.toastService.addToast({
       message: errorMessage,
       type: 'error',
