@@ -1,0 +1,91 @@
+<div class="min-h-screen bg-base-200 flex items-center justify-center">
+  <div class="card w-96 bg-base-100 shadow-xl">
+    <div class="card-body">
+      <div class="flex justify-center mb-4">
+        <app-logo />
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Email</span>
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            class="input input-bordered w-full"
+            [class.input-error]="emailErrors"
+            placeholder="ejemplo@email.com"
+          />
+          @if (emailErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{ emailErrors }}</span>
+            </label>
+          }
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Contraseña</span>
+          </label>
+          <input
+            type="password"
+            formControlName="password"
+            class="input input-bordered w-full"
+            [class.input-error]="passwordErrors"
+            placeholder="••••••••"
+          />
+          @if (passwordErrors) {
+            <label class="label">
+              <span class="label-text-alt text-error">{{
+                passwordErrors
+              }}</span>
+            </label>
+          }
+        </div>
+
+        <div class="flex justify-end">
+          <button
+            type="button"
+            class="btn btn-link btn-sm p-0 h-auto min-h-0 text-primary hover:text-primary-focus"
+            (click)="sendResetPasswordEmail()"
+            [disabled]="loading()"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-full"
+          [disabled]="loading() || !loginForm.valid"
+        >
+          @if (loading()) {
+            <span class="loading loading-spinner"></span>
+          }
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <div class="divider">O</div>
+
+      <button
+        type="button"
+        class="btn btn-outline w-full"
+        (click)="loginWithGoogle()"
+        [disabled]="loadingGoogle()"
+      >
+        @if (loadingGoogle()) {
+          <span class="loading loading-spinner"></span>
+        } @else {
+          <img [src]="ICONS.google" alt="Google" class="w-4 h-4 mr-2" />
+        }
+        Continuar con Google
+      </button>
+      <p class="text-center mt-4">
+        ¿No tienes cuenta?
+        <a routerLink="/auth/register" class="link link-primary">Regístrate</a>
+      </p>
+    </div>
+  </div>
+</div>

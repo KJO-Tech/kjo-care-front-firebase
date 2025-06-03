@@ -20,12 +20,8 @@ export class KeycloakService {
 
   private initKeycloak(): Keycloak {
     if (!this._keycloakInstance()) {
-      const keycloak = new Keycloak({
-        url: environment.keycloak.url,
-        realm: environment.keycloak.realm,
-        clientId: environment.keycloak.clientId
-      });
-      this._keycloakInstance.set(keycloak);
+
+      
     }
     return this._keycloakInstance()!;
   }
