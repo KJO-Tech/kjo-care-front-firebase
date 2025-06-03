@@ -49,15 +49,16 @@ export class AuthService {
   constructor() {
     this.auth.setPersistence(browserLocalPersistence);
 
-    effect(() => {
-      this.auth.onAuthStateChanged((user) => {
-        this.state.update(state => ({
-          ...state,
-          user,
-          error: null
-        }));
-      });
+    //* Comentando el bucle infinito
+    // effect(() => {
+    this.auth.onAuthStateChanged((user) => {
+      this.state.update(state => ({
+        ...state,
+        user,
+        error: null
+      }));
     });
+    // });
   }
 
   loginWithEmail(user: LoginEmail): Observable<LoginResponse> {
