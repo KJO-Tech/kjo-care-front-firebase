@@ -1,6 +1,8 @@
 export interface CloudinaryConfig {
   cloudName: string;
   uploadPreset: string;
+  apiKey: string;
+  apiSecret: string;
 }
 
 export interface CloudinaryResponse {

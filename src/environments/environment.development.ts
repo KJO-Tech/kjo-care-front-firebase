@@ -11,7 +11,9 @@ export const environment = {
     storageBucket: ""
   },
   cloudinary: {
-    cloudName: "dilzbcq8j",
-    uploadPreset: "kjo_mind_care"
+    cloudName: import.meta.env.NG_APP_CLOUDINARY_CLOUD_NAME,
+    uploadPreset: import.meta.env.NG_APP_CLOUDINARY_UPLOAD_PRESET,
+    apiKey: import.meta.env.NG_APP_CLOUDINARY_API_KEY,
+    apiSecret: import.meta.env.NG_APP_CLOUDINARY_API_SECRET
   }
 };

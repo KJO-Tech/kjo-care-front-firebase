@@ -17,6 +17,8 @@ declare interface Env {
 
   NG_APP_CLOUDINARY_CLOUD_NAME: string;
   NG_APP_CLOUDINARY_UPLOAD_PRESET: string;
+  NG_APP_CLOUDINARY_API_KEY: string;
+  NG_APP_CLOUDINARY_API_SECRET: string;
 }
 
 // Choose how to access the environment variables.
