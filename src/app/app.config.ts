@@ -9,10 +9,15 @@ import * as echarts from 'echarts';
 
 import { firebaseProviders } from './core/config/firebase.config';
 import { provideClientHydration, withEventReplay, withHttpTransferCacheOptions } from '@angular/platform-browser';
+import { STORAGE_PROVIDERS } from './core/config/storage.config';
+import { CLOUDINARY_CONFIG } from './core/config/cloudinary.config';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+    { provide: CLOUDINARY_CONFIG, useValue: environment.cloudinary },
+    ...STORAGE_PROVIDERS,
     ...firebaseProviders,
     provideClientHydration(withHttpTransferCacheOptions({
       includePostRequests: true

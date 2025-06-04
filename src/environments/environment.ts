@@ -9,5 +9,9 @@ export const environment = {
     messagingSenderId: import.meta.env.NG_APP_FIREBASE_MESSAGING_SENDER_ID,
     measurementId: import.meta.env.NG_APP_FIREBASE_MEASUREMENT_ID,
     storageBucket: import.meta.env.NG_APP_FIREBASE_STORAGE_BUCKET
+  },
+  cloudinary: {
+    cloudName: import.meta.env.NG_APP_CLOUDINARY_CLOUD_NAME,
+    uploadPreset: import.meta.env.NG_APP_CLOUDINARY_UPLOAD_PRESET
   }
 };
