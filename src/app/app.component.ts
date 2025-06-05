@@ -9,6 +9,4 @@ import { ToastComponent } from './shared/components/layout/toast/toast.component
   <router-outlet /> <app-toast/>
   `,
 })
-export class AppComponent {
-
-}
+export class AppComponent {}

@@ -37,7 +37,7 @@ export const routes: Routes = [
       { path: 'health-centers', loadComponent: () => import('./modules/health-center/health-center.component') },
       { path: 'map', loadComponent: () => import('./modules/health-center-map/health-center-map.component') }
     ],
-    canActivate: [authGuard]
+    // canActivate: [authGuard]
   },
   {
     path: '**',
