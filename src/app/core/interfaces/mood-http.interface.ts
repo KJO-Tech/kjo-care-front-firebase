@@ -1,12 +1,13 @@
 export interface MoodStateRequest {
   name: string,
   description: string,
-  image: string,
+  image?: string,
   color: string
+  materialIcon: string
 }
 
 export interface MoodStateResponse {
-  id: number,
+  id: string,
   name: string,
   description: string,
   image: string,
