@@ -1,4 +1,4 @@
-import { inject, Injectable} from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, catchError, from, map, switchMap, throwError } from 'rxjs';
 import type {
   MoodStateRequest,
@@ -6,7 +6,6 @@ import type {
 } from '../interfaces/mood-http.interface';
 import { collectionData, Firestore } from '@angular/fire/firestore';
 import { addDoc, collection, deleteDoc, doc, DocumentSnapshot, getDoc, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore';
-
 
 
 @Injectable({
@@ -24,7 +23,10 @@ export class MoodStateService {
     );
     return collectionData(moodsQuery, { idField: 'id' }).pipe(
       map(moods => moods as MoodStateResponse[]),
-      catchError(error => throwError(() => error))
+      catchError(error => {
+        console.error('Error al obtener los estados de ánimo:', error);
+        return throwError(() => error)
+      })
     );
   }
 

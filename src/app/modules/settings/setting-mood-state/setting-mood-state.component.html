@@ -120,9 +120,7 @@
       <div class="h-12 bg-base-200 rounded w-full"></div>
       <div class="h-12 bg-base-200 rounded w-full"></div>
     </div>
-  }
- 
-  @loading {
+  } @loading {
     <div class="flex justify-center p-4">
       <span class="loading loading-spinner loading-md text-primary"></span>
     </div>
@@ -149,38 +147,42 @@
   </div>
 </div>
 
-@defer (when (editingMood())) {
-  <!-- <app-mood-modal
+@defer (when editingMood()) {
+  <app-mood-modal
     [modalId]="'mood_editor_modal'"
     [mood]="editingMood()!"
     [isNewMood]="isNewMood()"
     (save)="handleSaveMood($event)"
     (cancel)="cancelEdit()"
-  ></app-mood-modal> -->
-} @placeholder {
-  <div class="skeleton h-64 w-full"></div>
+  ></app-mood-modal>
 }
 
-<dialog
-  id="delete_confirmation_modal"
-  class="modal modal-bottom sm:modal-middle"
->
-  <div class="modal-box">
-    <h3 class="font-bold text-lg">Confirmar eliminación</h3>
-    <p class="py-4">
-      ¿Estás seguro que deseas eliminar este estado de ánimo? Esta acción no se
-      puede deshacer.
-    </p>
-    <div class="modal-action">
-      <form method="dialog">
-        <button class="btn btn-outline mr-2">Cancelar</button>
-      </form>
-      <button class="btn btn-error" (click)="confirmDelete()">Eliminar</button>
+@defer (when showDeleteModal()) {
+  <dialog
+    id="delete_confirmation_modal"
+    class="modal modal-bottom sm:modal-middle"
+  >
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Confirmar eliminación</h3>
+      <p class="py-4">
+        ¿Estás seguro que deseas eliminar este estado de ánimo? Esta acción no
+        se puede deshacer.
+      </p>
+      <div class="modal-action">
+        <form method="dialog">
+          <button class="btn btn-outline mr-2" (click)="closeDeleteModal()">
+            Cancelar
+          </button>
+        </form>
+        <button class="btn btn-error" (click)="confirmDelete()">
+          Eliminar
+        </button>
+      </div>
     </div>
-  </div>
-</dialog>
+  </dialog>
+}
 
-@if (showSuccessToast()) {
+@defer (when showSuccessToast()) {
   <div class="toast toast-top toast-end z-[9999]">
     <div class="alert alert-success">
       <svg
