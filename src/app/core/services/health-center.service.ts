@@ -3,14 +3,13 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
 import { HealthCenterRequest, HealthCenterResponse } from '../interfaces/health-center-http.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HealthCenterService {
-  private baseUrl: string = environment.apiUrl + '/api/mind/emergency/centers';
+  private baseUrl: string = '/api/mind/emergency/centers';
 
   private http = inject(HttpClient);
 
