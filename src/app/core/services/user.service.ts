@@ -33,16 +33,24 @@ export class UserService {
   getAll(): Observable<UserResponse[]> {
     const usersQuery = query(
       this.usersCollection,
-      orderBy('createdTimestamp', 'desc')
+      orderBy('createdAt', 'desc')
     );
 
     return from(getDocs(usersQuery)).pipe(
       map(snapshot =>
-        snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdTimestamp: doc.data()['createdTimestamp']?.toMillis() || Date.now()
-        }) as UserResponse)
+        snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            displayName: data['displayName'] || data['email']?.split('@')[0] || 'Usuario',
+            email: data['email'],
+            createdAt: data['createdAt'],
+            enabled: data['enabled'] ?? true,
+            roles: data['roles'] || ['user'],
+            photoURL: data['photoURL'] || null,
+            uid: data['uid']
+          } as UserResponse;
+        })
       ),
       catchError(error => this.handleFirebaseError('Error al obtener usuarios', error))
     );
@@ -55,10 +63,16 @@ export class UserService {
       map(docSnap => {
         if (!docSnap.exists()) return null;
 
+        const data = docSnap.data();
         return {
           id: docSnap.id,
-          ...docSnap.data(),
-          createdTimestamp: docSnap.data()['createdTimestamp']?.toMillis() || Date.now()
+          displayName: data['displayName'],
+          email: data['email'],
+          createdAt: data['createdAt'],
+          enabled: data['enabled'] ?? true,
+          roles: data['roles'] || ['user'],
+          photoURL: data['photoURL'] || null,
+          uid: data['uid']
         } as UserResponse;
       }),
       catchError(error => this.handleFirebaseError('Error al obtener usuario', error))
@@ -69,16 +83,24 @@ export class UserService {
     const emailQuery = query(
       this.usersCollection,
       where('email', '==', email),
-      orderBy('createdTimestamp', 'desc')
+      orderBy('createdAt', 'desc')
     );
 
     return from(getDocs(emailQuery)).pipe(
       map(snapshot =>
-        snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdTimestamp: doc.data()['createdTimestamp']?.toMillis() || Date.now()
-        }) as UserResponse)
+        snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            displayName: data['displayName'],
+            email: data['email'],
+            createdAt: data['createdAt'],
+            enabled: data['enabled'] ?? true,
+            roles: data['roles'] || ['user'],
+            photoURL: data['photoURL'] || null,
+            uid: data['uid']
+          } as UserResponse;
+        })
       ),
       catchError(error => this.handleFirebaseError('Error al buscar usuario por email', error))
     );
@@ -86,21 +108,29 @@ export class UserService {
 
   create(request: Omit<UserRequest, 'id'>): Observable<UserResponse> {
     const userData = {
-      ...request,
-      createdTimestamp: serverTimestamp(),
+      displayName: request.displayName,
+      email: request.email,
+      roles: request.roles,
+      photoURL: request.photoURL || null,
+      uid: request.uid,
+      createdAt: serverTimestamp(),
       enabled: true,
       lastModified: serverTimestamp()
     }
     return from(addDoc(this.usersCollection, userData)).pipe(
       map(docRef => ({
         id: docRef.id,
-        ...request,
-        createdTimestamp: Date.now(),
+        displayName: request.displayName,
+        email: request.email,
+        roles: request.roles,
+        photoURL: request.photoURL || null,
+        uid: request.uid,
+        createdAt: new Date(),
         enabled: true
       }) as UserResponse),
       tap(() => {
         this.toastService.addToast({
-          message: `Usuario ${request.firstName} ${request.lastName} creado exitosamente `,
+          message: `Usuario ${request.displayName} creado exitosamente`,
           type: 'success',
           duration: 3000
         })
@@ -119,13 +149,16 @@ export class UserService {
     return from(updateDoc(userDoc, updateData)).pipe(
       map(() => ({
         id,
-        ...request,
-        createdTimestamp: Date.now(),
+        displayName: request.displayName || '',
+        email: request.email || '',
+        roles: request.roles || ['user'],
+        photoURL: request.photoURL || null,
+        createdAt: new Date(),
         enabled: true
       }) as UserResponse),
       tap(() => {
         this.toastService.addToast({
-          message: `Usuario ${request.firstName || ''} ${request.lastName || ''} actualizado exitosamente`,
+          message: `Usuario ${request.displayName} actualizado exitosamente`,
           type: 'success',
           duration: 3000
         })
@@ -197,7 +230,6 @@ export class UserService {
 
     let errorMessage = userMessage;
 
-    // Mapeo de errores específicos de Firebase
     if (error?.code) {
       switch (error.code) {
         case 'permission-denied':
@@ -231,16 +263,24 @@ export class UserService {
       this.usersCollection,
       where('roles', 'array-contains', role),
       where('enabled', '==', true),
-      orderBy('createdTimestamp', 'desc')
+      orderBy('createdAt', 'desc')
     );
 
     return from(getDocs(roleQuery)).pipe(
       map(snapshot =>
-        snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdTimestamp: doc.data()['createdTimestamp']?.toMillis() || Date.now()
-        }) as UserResponse)
+        snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            displayName: data['displayName'],
+            email: data['email'],
+            createdAt: data['createdAt'],
+            enabled: data['enabled'] ?? true,
+            roles: data['roles'] || ['user'],
+            photoURL: data['photoURL'] || null,
+            uid: data['uid']
+          } as UserResponse;
+        })
       ),
       catchError(error => this.handleFirebaseError('Error al obtener usuarios por rol', error))
     );

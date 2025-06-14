@@ -13,22 +13,7 @@ export class HealthCenterService {
 
   private http = inject(HttpClient);
 
-  selectedCenter = signal<HealthCenterResponse>({
-    name: '',
-    address: '',
-    phone: '',
-    latitude: 0,
-    longitude: 0,
-    id: 0,
-    user: {
-      firstName: '',
-      lastName: '',
-      username: '',
-    },
-    status: '',
-    createdDate: '',
-    modifiedDate: ''
-  });
+
 
   getAll(): Observable<HealthCenterResponse[]> {
     return this.http.get<HealthCenterResponse[]>(`${this.baseUrl}/all`);
@@ -60,21 +45,5 @@ export class HealthCenterService {
   }
 
   clearSelectedCenter() {
-    this.selectedCenter.set({
-      name: '',
-      address: '',
-      phone: '',
-      latitude: 0,
-      longitude: 0,
-      id: 0,
-      user: {
-        firstName: '',
-        lastName: '',
-        username: '',
-      },
-      status: '',
-      createdDate: '',
-      modifiedDate: ''
-    });
   }
 }

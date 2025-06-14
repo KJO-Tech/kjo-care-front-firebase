@@ -21,7 +21,7 @@ export class UserModalComponent {
   readonly isSubmitting = signal(false);
 
   readonly title = computed(() =>
-    this.type() === 'create' ? 'Crear nuevo usuario' : `Editar ${this.user()?.firstName || 'usuario'}`
+    this.type() === 'create' ? 'Crear nuevo usuario' : `Editar ${this.user()?.displayName || 'usuario'}`
   );
 
   readonly submitButtonText = computed(() =>
@@ -34,9 +34,9 @@ export class UserModalComponent {
 
   readonly userForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    firstName: ['', [Validators.required, Validators.minLength(2)]],
-    lastName: ['', [Validators.required, Validators.minLength(2)]],
-    username: ['', [Validators.required, Validators.minLength(3)]],
+    // firstName: ['', [Validators.required, Validators.minLength(2)]],
+    // lastName: ['', [Validators.required, Validators.minLength(2)]],
+    displayName: ['', [Validators.required, Validators.minLength(3)]],
     password: [''],
     roles: [['user'], [Validators.required]]
   });
@@ -61,9 +61,9 @@ export class UserModalComponent {
       if (userToEdit && this.type() === 'edit') {
         this.userForm.patchValue({
           email: userToEdit.email,
-          firstName: userToEdit.firstName,
-          lastName: userToEdit.lastName,
-          username: userToEdit.username,
+          // firstName: userToEdit.firstName,
+          // lastName: userToEdit.lastName,
+          displayName: userToEdit.displayName,
           password: '',
           roles: userToEdit.roles
         });
@@ -72,7 +72,7 @@ export class UserModalComponent {
 
     effect(() => {
       const emailControl = this.userForm.get('email');
-      const usernameControl = this.userForm.get('username');
+      const usernameControl = this.userForm.get('displayName');
 
       if (emailControl?.value && this.type() === 'create' && !usernameControl?.dirty) {
         const emailPrefix = emailControl.value.split('@')[0];
@@ -107,10 +107,10 @@ export class UserModalComponent {
 
   private createUser(formValue: any) {
     const request: Omit<UserRequest, 'id'> = {
-      username: formValue.username,
+      displayName: formValue.displayName,
       email: formValue.email,
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
+      // firstName: formValue.firstName,
+      // lastName: formValue.lastName,
       password: formValue.password,
       roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
     };
@@ -123,10 +123,10 @@ export class UserModalComponent {
     if (!currentUser?.id) throw new Error('User ID required');
 
     const request: Partial<UserRequest> = {
-      username: formValue.username,
+      displayName: formValue.displayName,
       email: formValue.email,
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
+      // firstName: formValue.firstName,
+      // lastName: formValue.lastName,
       roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
     };
 

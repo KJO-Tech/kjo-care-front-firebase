@@ -1,5 +1,4 @@
 <div class="space-y-6">
-  <!-- Header -->
   <div class="flex justify-between items-center gap-2 flex-wrap">
     <div>
       <h1 class="text-3xl font-bold text-base-content">Gestión de Usuarios</h1>
@@ -17,7 +16,6 @@
     </modal-open-button>
   </div>
 
-  <!-- Estadísticas con @defer -->
   @defer (on viewport; prefetch on idle) {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="stat bg-base-200 rounded-box">
@@ -91,7 +89,6 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-          <!-- Búsqueda -->
           <div class="form-control">
             <div class="input-group">
               <input
@@ -108,7 +105,6 @@
             </div>
           </div>
 
-          <!-- Filtro por rol -->
           <select
             class="select select-bordered"
             [value]="selectedRole()"
@@ -133,7 +129,6 @@
         </div>
       </div>
 
-      <!-- Tabla con @defer optimizado -->
       @if (users.isLoading()) {
         <div class="flex justify-center py-8">
           <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -143,7 +138,11 @@
           when !users.isLoading() && filteredUsers().length > 0;
           on immediate
         ) {
-          <user-table [users]="filteredUsers()"></user-table>
+          <user-table
+            [users]="filteredUsers()"
+            (userToggled)="toggleUserStatus($event)"
+            (userRestored)="restoreUser($event)"
+          />
         } @placeholder (minimum 300ms) {
           <div class="space-y-4 mt-4">
             @for (item of [1, 2, 3, 4, 5]; track item) {
@@ -187,7 +186,6 @@
   </div>
 </div>
 
-<!-- MODALES con hydration optimizada -->
 @defer (
   on interaction(modalCreateButton);
   prefetch on hover(modalCreateButton);

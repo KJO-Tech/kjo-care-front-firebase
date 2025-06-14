@@ -14,7 +14,7 @@ import { DatePipe } from '@angular/common';
 export class ResourceDetailComponent {
   resourceService = inject(EmergencyResourceService);
 
-  resource = computed(() => this.resourceService.selectedResource());
+  resource = computed(() => this.resourceService.getAll());
 
   copyToClipboard(text: string) {
     navigator.clipboard.writeText(text);

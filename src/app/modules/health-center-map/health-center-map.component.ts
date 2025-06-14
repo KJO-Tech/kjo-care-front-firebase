@@ -410,22 +410,6 @@ export default class HealthCenterMapComponent implements OnInit {
   }
 
   deleteHealthCenter() {
-    this.centersService.delete(this.centersService.selectedCenter().id).subscribe({
-      next: () => {
-        this.toastService.addToast({
-          message: 'Health Center deleted successfully',
-          type: 'success',
-          duration: 4000
-        });
-        this.centers.reload();
-      },
-      error: (error) => {
-        this.toastService.addToast({
-          message: 'Error deleting health center',
-          type: 'error',
-          duration: 4000
-        });
-      }
-    });
+
   }
 }

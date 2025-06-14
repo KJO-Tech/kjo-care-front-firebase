@@ -43,16 +43,20 @@
         <tr class="hover">
           <td>
             <div class="flex items-center gap-3">
-              <div class="avatar placeholder">
-                <div class="bg-neutral text-neutral-content rounded-full w-12">
-                  <span class="text-sm">
-                    {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
-                  </span>
+              <!-- Avatar -->
+              <div class="avatar">
+                <div class="w-10 h-10 rounded-full">
+                  @if (user.photoURL) {
+                    <img [src]="user.photoURL" [alt]="user.displayName" class="w-full h-full object-cover" />
+                  } @else {
+                    <div class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">
+                      {{ getInitials(user.displayName) }}
+                    </div>
+                  }
                 </div>
               </div>
               <div>
-                <div class="font-semibold">{{ user.firstName }} {{ user.lastName }}</div>
-                <div class="text-sm text-base-content/70">{{ user.username }}</div>
+                <div class="font-medium">{{ user.displayName }}</div>
               </div>
             </div>
           </td>
@@ -104,10 +108,10 @@
           <!-- Fecha -->
           <td>
             <div class="text-sm">
-              {{ user.createdTimestamp | date:'dd/MM/yyyy' }}
+              {{ user.createdAt?.toDate() | date:'dd/MM/yyyy' }}
             </div>
             <div class="text-xs text-base-content/50">
-              {{ user.createdTimestamp | date:'HH:mm' }}
+              {{ user.createdAt?.toDate() | date:'HH:mm' }}
             </div>
           </td>
 

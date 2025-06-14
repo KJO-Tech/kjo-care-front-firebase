@@ -4,63 +4,45 @@
       <div>
         <h2 class="text-2xl font-bold text-base-content">{{ title() }}</h2>
         <p class="text-sm text-base-content/70 mt-1">
-          {{ type() === 'create' ? 'Añade un nuevo usuario al sistema' : 'Modifica la información del usuario' }}
+          {{
+            type() === "create"
+              ? "Añade un nuevo usuario al sistema"
+              : "Modifica la información del usuario"
+          }}
         </p>
       </div>
       <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost hover:btn-error" type="button">
+        <button
+          class="btn btn-sm btn-circle btn-ghost hover:btn-error"
+          type="button"
+        >
           <i class="material-icons-outlined !text-xl">close</i>
         </button>
       </form>
     </div>
 
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- First Name -->
-        <fieldset class="form-control">
+      <fieldset class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Nombre de Usuario</span>
+          <span class="label-text-alt text-error">*</span>
+        </label>
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          [class.input-error]="formUtils.isValidField(userForm, 'displayName')"
+          formControlName="username"
+          placeholder="nombreusuario"
+          autocomplete="displayName"
+        />
+        @if (formUtils.isValidField(userForm, "displayName")) {
           <label class="label">
-            <span class="label-text font-medium">Nombre</span>
-            <span class="label-text-alt text-error">*</span>
+            <span class="label-text-alt text-error">
+              {{ formUtils.getFieldError(userForm, "displayName") }}
+            </span>
           </label>
-          <input
-            type="text"
-            class="input input-bordered w-full"
-            [class.input-error]="formUtils.isValidField(userForm, 'firstName')"
-            formControlName="firstName"
-            placeholder="Ingresa el nombre"
-            autocomplete="given-name"
-          />
-          @if (formUtils.isValidField(userForm, 'firstName')) {
-            <label class="label">
-              <span class="label-text-alt text-error">
-                {{ formUtils.getFieldError(userForm, 'firstName') }}
-              </span>
-            </label>
-          }
-        </fieldset>
-
-        <fieldset class="form-control">
-          <label class="label">
-            <span class="label-text font-medium">Apellido</span>
-            <span class="label-text-alt text-error">*</span>
-          </label>
-          <input
-            type="text"
-            class="input input-bordered w-full"
-            [class.input-error]="formUtils.isValidField(userForm, 'lastName')"
-            formControlName="lastName"
-            placeholder="Ingresa el apellido"
-            autocomplete="family-name"
-          />
-          @if (formUtils.isValidField(userForm, 'lastName')) {
-            <label class="label">
-              <span class="label-text-alt text-error">
-                {{ formUtils.getFieldError(userForm, 'lastName') }}
-              </span>
-            </label>
-          }
-        </fieldset>
-      </div>
+        }
+      </fieldset>
 
       <fieldset class="form-control">
         <label class="label">
@@ -75,38 +57,16 @@
           placeholder="usuario@ejemplo.com"
           autocomplete="email"
         />
-        @if (formUtils.isValidField(userForm, 'email')) {
+        @if (formUtils.isValidField(userForm, "email")) {
           <label class="label">
             <span class="label-text-alt text-error">
-              {{ formUtils.getFieldError(userForm, 'email') }}
+              {{ formUtils.getFieldError(userForm, "email") }}
             </span>
           </label>
         }
       </fieldset>
 
-      <fieldset class="form-control">
-        <label class="label">
-          <span class="label-text font-medium">Nombre de Usuario</span>
-          <span class="label-text-alt text-error">*</span>
-        </label>
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          [class.input-error]="formUtils.isValidField(userForm, 'username')"
-          formControlName="username"
-          placeholder="nombreusuario"
-          autocomplete="username"
-        />
-        @if (formUtils.isValidField(userForm, 'username')) {
-          <label class="label">
-            <span class="label-text-alt text-error">
-              {{ formUtils.getFieldError(userForm, 'username') }}
-            </span>
-          </label>
-        }
-      </fieldset>
-
-      @if (type() === 'create') {
+      @if (type() === "create") {
         <fieldset class="form-control">
           <label class="label">
             <span class="label-text font-medium">Contraseña</span>
@@ -127,14 +87,14 @@
               (click)="toggleShowPassword()"
             >
               <i class="material-icons-outlined !text-xl">
-                {{ showPassword() ? 'visibility_off' : 'visibility' }}
+                {{ showPassword() ? "visibility_off" : "visibility" }}
               </i>
             </button>
           </div>
-          @if (formUtils.isValidField(userForm, 'password')) {
+          @if (formUtils.isValidField(userForm, "password")) {
             <label class="label">
               <span class="label-text-alt text-error">
-                {{ formUtils.getFieldError(userForm, 'password') }}
+                {{ formUtils.getFieldError(userForm, "password") }}
               </span>
             </label>
           }
@@ -155,13 +115,13 @@
           <option value="user">Usuario</option>
           <option value="admin">Administrador</option>
         </select>
-        @if (formUtils.isValidField(userForm, 'roles')) {
+        @if (formUtils.isValidField(userForm, "roles")) {
           <label class="label">
             <span class="label-text-alt text-error">
-              {{ formUtils.getFieldError(userForm, 'roles') }}
+              {{ formUtils.getFieldError(userForm, "roles") }}
             </span>
           </label>
-          }
+        }
       </fieldset>
 
       <div class="modal-action pt-6 border-t border-base-300">

@@ -36,24 +36,24 @@ export class EmergencyResourceModalComponent {
   });
 
   constructor() {
-    effect(() => {
-      this.title.set('Add new Emergency Resource');
-      this.nameButton.set('Save');
+    // effect(() => {
+    //   this.title.set('Add new Emergency Resource');
+    //   this.nameButton.set('Save');
 
-      if (this.resourceService.selectedResource().id > 0) {
-        this.title.set('Edit Emergency Resource');
-        this.nameButton.set('Update');
+    //   if (this.resourceService.selectedResource().id > 0) {
+    //     this.title.set('Edit Emergency Resource');
+    //     this.nameButton.set('Update');
 
-        const resource = this.resourceService.selectedResource();
+    //     const resource = this.resourceService.selectedResource();
 
-        this.resourceForm.patchValue({
-          name: resource.name,
-          description: resource.description,
-          contacts: resource.contacts,
-          links: resource.links
-        });
-      }
-    });
+    //     this.resourceForm.patchValue({
+    //       name: resource.name,
+    //       description: resource.description,
+    //       contacts: resource.contacts,
+    //       links: resource.links
+    //     });
+    //   }
+    // });
   }
 
   onSubmit() {
@@ -79,51 +79,7 @@ export class EmergencyResourceModalComponent {
       formData.append('videoUrl', video);
     }
 
-    if (this.resourceService.selectedResource().id > 0) {
-      return this.resourceService.update(formData, this.resourceService.selectedResource().id).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'Blog updated successfully',
-              type: 'success',
-              duration: 4000
-            });
 
-            this.reload.emit();
-            this.resourceForm.reset();
-            this.resourceForm.clearValidators();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error updating blog',
-              type: 'error',
-              duration: 4000
-            });
-          }
-        });
-    } else {
-      return this.resourceService.create(formData).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'Blog created successfully',
-              type: 'success',
-              duration: 4000
-            });
-
-            this.reload.emit();
-            this.resourceForm.reset();
-            this.resourceForm.clearValidators();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error creating blog',
-              type: 'error',
-              duration: 4000
-            });
-          }
-        });
-    }
   }
 
   addInput(event: Event, field: 'contacts' | 'links') {

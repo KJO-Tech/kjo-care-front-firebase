@@ -28,19 +28,9 @@ export default class UserPageComponent {
 
   modalCreateButton = viewChild<ElementRef>("modalCreateButton")
 
-
-
-
   readonly users = rxResource({
     loader: () => {
-      // const role = this.selectedRole()
-      // const showDisabled = this.showDisabled();
-
-      // if (role !== 'all') {
-      //   return this.userService.getUsersByRole(role)
-      // }
       return this.userService.getAll()
-
     }
   });
 
@@ -54,15 +44,20 @@ export default class UserPageComponent {
         if (!showDisabled && !user.enabled) return false;
 
         if (searchTerm) {
-          const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-          const email = user.email.toLowerCase();
-          return fullName.includes(searchTerm) || email.includes(searchTerm);
+          const displayName = user.displayName?.toLowerCase() || '';
+          const email = user.email?.toLowerCase() || '';
+          return displayName.includes(searchTerm) || email.includes(searchTerm);
         }
 
         return true;
       })
-      .sort((a, b) => b.createdTimestamp - a.createdTimestamp);
+      .sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
   });
+
   readonly userStats = computed(() => {
     const allUsers = this.users.value() ?? [];
     return {
@@ -73,7 +68,9 @@ export default class UserPageComponent {
       users: allUsers.filter(u => u.roles.includes('user')).length
     };
   });
+
   readonly selectedUser = this.userService.selectedUser;
+
   deleteUser(): void {
     const user = this.selectedUser();
     if (!user?.id) return;
@@ -85,6 +82,7 @@ export default class UserPageComponent {
       }
     });
   }
+
   restoreUser(userId: string): void {
     this.userService.restore(userId).subscribe({
       next: () => this.users.reload()
@@ -96,7 +94,6 @@ export default class UserPageComponent {
       next: () => this.users.reload()
     });
   }
-
 
   updateSearch(term: string): void {
     this.search.set(term);
