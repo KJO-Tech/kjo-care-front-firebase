@@ -12,12 +12,30 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class ProfileButtonComponent {
   private authService = inject(AuthService)
-  private keycloakService = inject(KeycloakService);
+  readonly currentUser = this.authService.currentUser
+  readonly isLoading = this.authService.isLoading
 
-  readonly userLetters = computed<string>(() => {
-    const firstName: string = this.keycloakService.profile()?.firstName ?? '?';
-    const lastName: string = this.keycloakService.profile()?.lastName ?? '?';
-    return firstName[0] + lastName[0];
+  readonly userAvatar = computed(() => {
+    const user = this.currentUser()
+    return user?.photoURL
+  })
+
+  readonly userLetters = computed(() => {
+    const user = this.currentUser();
+    if (!user?.displayName && !user?.email) return '?';
+
+    const name = user.displayName || user.email?.split('@')[0] || '?';
+    const words = name.trim().split(' ');
+
+    if (words.length === 1) {
+      return words[0].substring(0, 2).toUpperCase();
+    }
+
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+  });
+  readonly userName = computed(() => {
+    const user = this.currentUser();
+    return user?.displayName || user?.email?.split('@')[0] || 'Usuario';
   });
 
   logout() {
@@ -25,6 +43,6 @@ export class ProfileButtonComponent {
   }
 
   async account() {
-    await this.keycloakService.goToAccountManagement();
+    // await this.keycloakService.goToAccountManagement();Z
   }
 }
