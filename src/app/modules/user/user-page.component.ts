@@ -37,11 +37,16 @@ export default class UserPageComponent {
   readonly filteredUsers = computed(() => {
     const userList = this.users.value() ?? [];
     const searchTerm = this.search().toLowerCase();
+    const selectedRole = this.selectedRole();
     const showDisabled = this.showDisabled();
 
     return userList
       .filter(user => {
         if (!showDisabled && !user.enabled) return false;
+
+        if (selectedRole !== 'all') {
+          if (!user.roles.includes(selectedRole)) return false;
+        }
 
         if (searchTerm) {
           const displayName = user.displayName?.toLowerCase() || '';
@@ -90,8 +95,38 @@ export default class UserPageComponent {
   }
 
   toggleUserStatus(userId: string): void {
+    const currentUsers = this.users.value() ?? [];
+    const userIndex = currentUsers.findIndex(u => u.id === userId);
+
+    if (userIndex === -1) return;
+
+    const currentUser = currentUsers[userIndex];
+    const newStatus = !currentUser.enabled;
+
+    const optimisticUsers = [...currentUsers];
+    optimisticUsers[userIndex] = { ...currentUser, enabled: newStatus };
+    this.users.set(optimisticUsers);
+
     this.userService.toggleUserStatus(userId).subscribe({
-      next: () => this.users.reload()
+      next: (updatedUser) => {
+        const users = this.users.value() ?? [];
+        const finalUsers = users.map(user =>
+          user.id === userId ? updatedUser : user
+        );
+        this.users.set(finalUsers);
+      },
+      error: (error) => {
+        console.error('Error al cambiar estado:', error);
+        const revertedUsers = [...currentUsers];
+        revertedUsers[userIndex] = currentUser;
+        this.users.set(revertedUsers);
+
+        this.toastService.addToast({
+          message: 'Error al cambiar el estado del usuario',
+          type: 'error',
+          duration: 3000
+        });
+      }
     });
   }
 

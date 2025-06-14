@@ -4,11 +4,14 @@ import { UserRequest, UserResponse } from '../interfaces/user-http.interface';
 import { CollectionReference, DocumentData, Firestore } from '@angular/fire/firestore';
 import { ToastService } from './toast.service';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private readonly auth = inject(Auth)
   private readonly firestore = inject(Firestore);
   private readonly toastService = inject(ToastService);
 
@@ -107,38 +110,46 @@ export class UserService {
   }
 
   create(request: Omit<UserRequest, 'id'>): Observable<UserResponse> {
-    const userData = {
-      displayName: request.displayName,
-      email: request.email,
-      roles: request.roles,
-      photoURL: request.photoURL || null,
-      uid: request.uid,
-      createdAt: serverTimestamp(),
-      enabled: true,
-      lastModified: serverTimestamp()
-    }
-    return from(addDoc(this.usersCollection, userData)).pipe(
-      map(docRef => ({
-        id: docRef.id,
-        displayName: request.displayName,
-        email: request.email,
-        roles: request.roles,
-        photoURL: request.photoURL || null,
-        uid: request.uid,
-        createdAt: new Date(),
-        enabled: true
-      }) as UserResponse),
+    return from(createUserWithEmailAndPassword(
+      this.auth,
+      request.email,
+      request.password!
+    )).pipe(
+      switchMap(userCredential => {
+        const userData = {
+          uid: userCredential.user.uid,
+          displayName: request.displayName,
+          email: request.email,
+          roles: request.roles,
+          photoURL: request.photoURL || null,
+          createdAt: serverTimestamp(),
+          enabled: true,
+          lastModified: serverTimestamp()
+        };
+
+        return from(addDoc(this.usersCollection, userData)).pipe(
+          map(docRef => ({
+            id: docRef.id,
+            uid: userCredential.user.uid,
+            displayName: request.displayName,
+            email: request.email,
+            roles: request.roles,
+            photoURL: request.photoURL || null,
+            createdAt: new Date(),
+            enabled: true
+          }) as UserResponse)
+        );
+      }),
       tap(() => {
         this.toastService.addToast({
           message: `Usuario ${request.displayName} creado exitosamente`,
           type: 'success',
           duration: 3000
-        })
+        });
       }),
       catchError(error => this.handleFirebaseError("Error al crear usuario", error))
-    )
+    );
   }
-
   update(id: string, request: Partial<UserRequest>): Observable<UserResponse> {
     const userDoc = doc(this.usersCollection, id)
     const updateData = {
@@ -296,11 +307,13 @@ export class UserService {
         const userDoc = doc(this.usersCollection, id);
         const newStatus = !user.enabled;
 
+        const updatedUser = { ...user, enabled: newStatus };
+
         return from(updateDoc(userDoc, {
           enabled: newStatus,
           statusChangedAt: serverTimestamp()
         })).pipe(
-          map(() => ({ ...user, enabled: newStatus })),
+          map(() => updatedUser),
           tap(() => {
             this.toastService.addToast({
               message: `Usuario ${newStatus ? 'habilitado' : 'deshabilitado'} exitosamente`,

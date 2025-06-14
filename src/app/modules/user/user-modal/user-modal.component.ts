@@ -34,8 +34,6 @@ export class UserModalComponent {
 
   readonly userForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    // firstName: ['', [Validators.required, Validators.minLength(2)]],
-    // lastName: ['', [Validators.required, Validators.minLength(2)]],
     displayName: ['', [Validators.required, Validators.minLength(3)]],
     password: [''],
     roles: [['user'], [Validators.required]]
@@ -61,8 +59,6 @@ export class UserModalComponent {
       if (userToEdit && this.type() === 'edit') {
         this.userForm.patchValue({
           email: userToEdit.email,
-          // firstName: userToEdit.firstName,
-          // lastName: userToEdit.lastName,
           displayName: userToEdit.displayName,
           password: '',
           roles: userToEdit.roles
@@ -109,8 +105,6 @@ export class UserModalComponent {
     const request: Omit<UserRequest, 'id'> = {
       displayName: formValue.displayName,
       email: formValue.email,
-      // firstName: formValue.firstName,
-      // lastName: formValue.lastName,
       password: formValue.password,
       roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
     };
@@ -125,8 +119,6 @@ export class UserModalComponent {
     const request: Partial<UserRequest> = {
       displayName: formValue.displayName,
       email: formValue.email,
-      // firstName: formValue.firstName,
-      // lastName: formValue.lastName,
       roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
     };
 

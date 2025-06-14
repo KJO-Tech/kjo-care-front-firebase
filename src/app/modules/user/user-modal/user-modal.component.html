@@ -31,8 +31,8 @@
           type="text"
           class="input input-bordered w-full"
           [class.input-error]="formUtils.isValidField(userForm, 'displayName')"
-          formControlName="username"
-          placeholder="nombreusuario"
+          formControlName="displayName"
+          placeholder="nombre de usuario"
           autocomplete="displayName"
         />
         @if (formUtils.isValidField(userForm, "displayName")) {
