@@ -1,17 +1,28 @@
 export interface UserRequest {
   id?: string;
-  username: string;
+  displayName: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string
+  password?: string;
   roles: string[];
+  photoURL?: string;
+  uid?: string
 }
 
 export interface UserResponse extends Omit<UserRequest, 'password'> {
   id: string;
-  createdTimestamp: number;
+  displayName: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  roles: string[];
   enabled: boolean;
+  createdAt: any;
+  photoURL?: string;
+  uid?: string
 }
 
-export type UserInfo = Omit<UserRequest, 'password' | 'roles' | 'email'> ;
+export type UserInfo = Omit<UserRequest, 'password' | 'roles' | 'email'>;

@@ -14,24 +14,7 @@ export class EmergencyResourceService {
 
   private http = inject(HttpClient);
 
-  selectedResource = signal<EmergencyResourceResponse>({
-    id: 0,
-    user: {
-      id: '',
-      username: '',
-      firstName: '',
-      lastName: ''
-    },
-    name: '',
-    description: '',
-    resourceUrl: '',
-    contacts: [],
-    links: [],
-    status: '',
-    accessCount: 0,
-    createdDate: '',
-    modifiedDate: ''
-  });
+ 
 
   getAll(): Observable<EmergencyResourceResponse[]> {
     return this.http.get<EmergencyResourceResponse[]>(`${this.baseUrl}`);

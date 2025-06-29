@@ -33,14 +33,12 @@ export class AuthService {
   private readonly toastService = inject(ToastService);
   private readonly firestore = inject(Firestore);
 
-  // Estado con signals
   private readonly state = signal<AuthState>({
     user: null,
     isLoading: false,
     error: null
   });
 
-  // Signals computados readonly
   public readonly currentUser = computed(() => this.state().user);
   public readonly isLoading = computed(() => this.state().isLoading);
   public readonly isAuthenticated = computed(() => !!this.state().user);
@@ -49,8 +47,6 @@ export class AuthService {
   constructor() {
     this.auth.setPersistence(browserLocalPersistence);
 
-    //* Comentando el bucle infinito
-    // effect(() => {
     this.auth.onAuthStateChanged((user) => {
       this.state.update(state => ({
         ...state,
@@ -58,7 +54,6 @@ export class AuthService {
         error: null
       }));
     });
-    // });
   }
 
   loginWithEmail(user: LoginEmail): Observable<LoginResponse> {

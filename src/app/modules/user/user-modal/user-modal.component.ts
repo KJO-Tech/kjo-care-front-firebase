@@ -1,135 +1,146 @@
-import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
-
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
-import { Blog, Category, Status } from '../../../core/models/blog';
-
-import { FormUtils } from '../../../shared/utils/form-utils';
-import { BlogService } from '../../../core/services/blog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
 import { UserRequest, UserResponse } from '../../../core/interfaces/user-http.interface';
+import { FormUtils } from '../../../shared/utils/form-utils';
 
 @Component({
   selector: 'user-modal',
   templateUrl: './user-modal.component.html',
-  imports: [
-    ReactiveFormsModule,
-    NgClass
-  ]
+  imports: [ReactiveFormsModule]
 })
-export class UserModalComponent implements OnInit {
+export class UserModalComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
 
-  private fb = inject(FormBuilder);
-  private userService = inject(UserService);
-  private toastService = inject(ToastService);
+  readonly user = input<UserResponse | null>(null);
+  readonly type = input<'create' | 'edit'>('create');
+  readonly reload = output<void>();
 
-  reload = output();
+  readonly showPassword = signal(false);
+  readonly isSubmitting = signal(false);
 
-  formUtils = FormUtils;
+  readonly title = computed(() =>
+    this.type() === 'create' ? 'Crear nuevo usuario' : `Editar ${this.user()?.displayName || 'usuario'}`
+  );
 
-  user = input<UserRequest | null>(null);
-  type = input<'create' | 'edit'>('create');
+  readonly submitButtonText = computed(() =>
+    this.type() === 'create' ? 'Crear Usuario' : 'Actualizar Usuario'
+  );
 
-  title = signal('Add new user');
-  nameButton = signal('Save');
-  nameModal = computed(() => this.type() === 'create' ? 'modal_user_create' : 'modal_user_edit');
-  showPassword = signal(false);
+  readonly modalId = computed(() =>
+    this.type() === 'create' ? 'modal_user_create' : 'modal_user_edit'
+  );
 
-  userForm = this.fb.group({
-    email: ['', [Validators.required, Validators.minLength(3)]],
-    firstName: ['', [Validators.required, Validators.minLength(3)]],
-    lastName: ['', [Validators.required, Validators.minLength(3)]],
-    password: ['', [Validators.required, Validators.minLength(3)]],
-    roles: ['', [Validators.required]]
+  readonly userForm = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    displayName: ['', [Validators.required, Validators.minLength(3)]],
+    password: [''],
+    roles: [['user'], [Validators.required]]
   });
 
-  ngOnInit(): void {
-    if (this.type() == 'edit') {
-      this.title.set('Edit blog');
-      this.nameButton.set('Update');
-    }
-  }
+  readonly formUtils = FormUtils;
 
   constructor() {
     effect(() => {
-      if (this.user()) {
-        const role = this.user()?.roles.includes('admin') ? 'admin' : this.user()?.roles.includes('user') ? 'user' : '';
+      const passwordControl = this.userForm.get('password');
+      if (this.type() === 'create') {
+        passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
+        passwordControl?.enable();
+      } else {
+        passwordControl?.clearValidators();
+        passwordControl?.disable();
+      }
+      passwordControl?.updateValueAndValidity();
+    });
 
+    effect(() => {
+      const userToEdit = this.user();
+      if (userToEdit && this.type() === 'edit') {
         this.userForm.patchValue({
-          email: this.user()?.email,
-          firstName: this.user()?.firstName,
-          lastName: this.user()?.lastName,
-          password: 'without password',
-          roles: role
+          email: userToEdit.email,
+          displayName: userToEdit.displayName,
+          password: '',
+          roles: userToEdit.roles
         });
+      }
+    });
+
+    effect(() => {
+      const emailControl = this.userForm.get('email');
+      const usernameControl = this.userForm.get('displayName');
+
+      if (emailControl?.value && this.type() === 'create' && !usernameControl?.dirty) {
+        const emailPrefix = emailControl.value.split('@')[0];
+        usernameControl?.setValue(emailPrefix);
       }
     });
   }
 
-  onSubmit() {
-    if (this.userForm.invalid) {
+  onSubmit(): void {
+    if (this.userForm.invalid || this.isSubmitting()) {
       this.userForm.markAllAsTouched();
-      console.log('Form invalid');
       return;
     }
 
-    const request: UserRequest = {
-      id: this.user()?.id,
-      username: this.userForm.value.email!,
-      email: this.userForm.value.email!,
-      firstName: this.userForm.value.firstName!,
-      lastName: this.userForm.value.lastName!,
-      password: this.userForm.value.password!,
-      roles: [this.userForm.value.roles ?? '']
-    };
+    this.isSubmitting.set(true);
+    const formValue = this.userForm.getRawValue();
 
-    if (this.user()) {
-      return this.userService.update(request).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'User updated successfully',
-              type: 'success',
-              duration: 3000
-            });
+    const operation$ = this.type() === 'create'
+      ? this.createUser(formValue)
+      : this.updateUser(formValue);
 
-            this.reload.emit();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error updating user',
-              type: 'error',
-              duration: 3000
-            });
-          }
-        });
-    } else {
-      return this.userService.create(request).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'User created successfully',
-              type: 'success',
-              duration: 3000
-            });
-
-            this.reload.emit();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error creating user',
-              type: 'error',
-              duration: 3000
-            });
-          }
-        });
-    }
+    operation$.subscribe({
+      next: () => {
+        this.reload.emit();
+        this.resetForm();
+        this.closeModal();
+      },
+      error: () => this.isSubmitting.set(false),
+      complete: () => this.isSubmitting.set(false)
+    });
   }
 
-  toggleShowPassword() {
-    this.showPassword.set(!this.showPassword());
+  private createUser(formValue: any) {
+    const request: Omit<UserRequest, 'id'> = {
+      displayName: formValue.displayName,
+      email: formValue.email,
+      password: formValue.password,
+      roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
+    };
+
+    return this.userService.create(request);
+  }
+
+  private updateUser(formValue: any) {
+    const currentUser = this.user();
+    if (!currentUser?.id) throw new Error('User ID required');
+
+    const request: Partial<UserRequest> = {
+      displayName: formValue.displayName,
+      email: formValue.email,
+      roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
+    };
+
+    if (formValue.password?.trim()) {
+      request.password = formValue.password;
+    }
+
+    return this.userService.update(currentUser.id, request);
+  }
+
+  toggleShowPassword(): void {
+    this.showPassword.update(current => !current);
+  }
+
+  private resetForm(): void {
+    this.userForm.reset({ roles: ['user'] });
+    this.showPassword.set(false);
+    this.isSubmitting.set(false);
+  }
+
+  private closeModal(): void {
+    const modal = document.getElementById(this.modalId()) as HTMLDialogElement;
+    modal?.close();
   }
 }

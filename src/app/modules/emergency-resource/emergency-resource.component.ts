@@ -43,44 +43,9 @@ export default class EmergencyResourceComponent {
   }
 
   deleteResource() {
-    this.resourceService.delete(this.resourceService.selectedResource().id).subscribe({
-      next: () => {
-        this.toastService.addToast({
-          message: 'Resource deleted successfully',
-          type: 'success',
-          duration: 4000
-        });
 
-        this.reload();
-      },
-      error: (error) => {
-        this.toastService.addToast({
-          message: 'Error deleting resource',
-          type: 'error',
-          duration: 4000
-        });
-      }
-    });
   }
 
   clearSelectedResource() {
-    this.resourceService.selectedResource.set({
-      id: 0,
-      user: {
-        id: '',
-        username: '',
-        firstName: '',
-        lastName: ''
-      },
-      name: '',
-      description: '',
-      resourceUrl: '',
-      contacts: [],
-      links: [],
-      status: '',
-      accessCount: 0,
-      createdDate: '',
-      modifiedDate: ''
-    });
   }
 }

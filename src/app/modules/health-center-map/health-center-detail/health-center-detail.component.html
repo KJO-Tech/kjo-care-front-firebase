@@ -7,8 +7,6 @@
       </button>
     </form>
 
-    <h2 class="text-xl font-semibold">{{ healthCenter().name }}</h2>
-    <p class="text-sm opacity-80 mt-1">{{ healthCenter().address }}</p>
 
 
     <div class="space-y-4 pt-4">
@@ -17,28 +15,25 @@
         <div id="detailMap" class="w-full h-full"></div>
       </div>
 
-      <div class="flex">
-        <p class="text-sm font-medium">Teléfono:</p>
-        <p class="text-sm opacity-80">{{ healthCenter().phone || 'No disponible' }}</p>
-      </div>
+
 
 
       <div>
         <p class="text-sm font-medium">Coordenadas:</p>
-        <p class="text-sm opacity-80">Lat: {{ healthCenter().latitude }}, Lng: {{ healthCenter().longitude }}</p>
+        <!-- <p class="text-sm opacity-80">Lat: {{ healthCenter().latitude }}, Lng: {{ healthCenter().longitude }}</p> -->
       </div>
 
-      <div class="flex items-center">
+      <!-- <div class="flex items-center">
       <span class="badge badge-outline" [class.badge-primary]="healthCenter().status === 'ACTIVE'"
             [class.badge-neutral]="healthCenter().status === 'INACTIVE'">
         {{ healthCenter().status }}
       </span>
-      </div>
+      </div> -->
 
-      <div class="text-sm opacity-80 flex justify-between items-center gap-2 flex-wrap">
+      <!-- <div class="text-sm opacity-80 flex justify-between items-center gap-2 flex-wrap">
         <span>Creado: {{ healthCenter().createdDate | date }}</span>
         <span>Modificado: {{ healthCenter().modifiedDate | date }}</span>
-      </div>
+      </div> -->
     </div>
 
     <div class="modal-action mt-4">
