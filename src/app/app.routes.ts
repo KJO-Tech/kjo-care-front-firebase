@@ -22,7 +22,9 @@ export const routes: Routes = [
       { path: 'moods', loadChildren: () => import('./modules/mood-analytics/mood-analytics.routes') },
       { path: 'settings', loadChildren: () => import('./modules/settings/settings.routes') },
       { path: 'health-centers', loadComponent: () => import('./modules/health-center/health-center.component') },
-      { path: 'map', loadComponent: () => import('./modules/health-center-map/health-center-map.component') }
+      { path: 'map', loadComponent: () => import('./modules/health-center-map/health-center-map.component') },
+      { path: 'activity-category', loadComponent: () => import('./modules/activity-category/activity-category.component') },
+      { path: 'daily-exercise', loadComponent: () => import('./modules/daily-exercise/daily-exercise.component') },
     ],
     // canActivate: [authGuard]
   },
