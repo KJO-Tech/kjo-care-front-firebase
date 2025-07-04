@@ -1,42 +1,71 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
-import { environment } from '../../../environments/environment';
-
-import { Observable } from 'rxjs';
+import { from, Observable, throwError } from 'rxjs';
 
 import { Category } from '../models/blog';
+import { Firestore } from '@angular/fire/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc } from 'firebase/firestore';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
-  private baseUrl: string = environment.apiUrl + '/api/mind/blog/category';
-
-  private http = inject(HttpClient);
+  private firestore = inject(Firestore);
+  private collectionName = 'categories';
 
   selectedCategory = signal<Category>({
-    id: 0,
-    name: ''
+    id: '',
+    nameTranslations: {
+      es: '', en: ''
+    },
+    isActive: true
   });
 
   findAll(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.baseUrl}`);
+    const q = query(collection(this.firestore, this.collectionName));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        return snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data() as Omit<Category, 'id'>
+        }));
+      }),
+      catchError(error => {
+        console.error('Error al obtener categorías:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  getById(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.baseUrl}/${id}`);
+
+  create(category: Omit<Category, 'id'>): Observable<string> {
+    return from(addDoc(collection(this.firestore, this.collectionName), category)).pipe(
+      map(docRef => docRef.id),
+      catchError(error => {
+        console.error('Error al crear categoría:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  create(request: Category): Observable<Category> {
-    return this.http.post<Category>(`${this.baseUrl}`, request);
+  update(category: Partial<Omit<Category, 'id'>>, id: string): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(updateDoc(docRef, category)).pipe(
+      catchError(error => {
+        console.error('Error al actualizar categoría:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  update(request: Category, id: number): Observable<Category> {
-    return this.http.patch<Category>(`${this.baseUrl}/${id}`, request);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  delete(id: string): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(deleteDoc(docRef)).pipe(
+      catchError(error => {
+        console.error('Error al eliminar categoría:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

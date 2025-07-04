@@ -28,7 +28,9 @@ export class CategoryModalComponent {
   nameButton = signal('Save');
 
   categoryForm = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(3)]]
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    nameEn: ['', [Validators.required, Validators.minLength(3)]],
+    active: [true],
   });
 
 
@@ -37,13 +39,15 @@ export class CategoryModalComponent {
       this.title.set('Add new category');
       this.nameButton.set('Save');
 
-      if (this.categoryService.selectedCategory().id > 0) {
+      if (this.categoryService.selectedCategory().id.length > 0) {
         this.title.set('Edit Category');
         this.nameButton.set('Update');
       }
 
       this.categoryForm.patchValue({
-        name: this.categoryService.selectedCategory().name
+        name: this.categoryService.selectedCategory().nameTranslations['es'],
+        nameEn: this.categoryService.selectedCategory().nameTranslations['en'],
+        active: this.categoryService.selectedCategory().isActive,
       });
     });
   }
@@ -57,10 +61,14 @@ export class CategoryModalComponent {
 
     const request: Category = {
       id: this.categoryService.selectedCategory().id,
-      name: this.categoryForm.value.name!
+      nameTranslations: {
+        es: this.categoryForm.value.name!,
+        en: this.categoryForm.value.nameEn!,
+      },
+      isActive: this.categoryForm.value.active!
     };
 
-    if (this.categoryService.selectedCategory().id > 0) {
+    if (this.categoryService.selectedCategory().id.length > 0) {
       this.categoryService.update(request, request.id).subscribe({
         next: () => {
           this.toastService.addToast({

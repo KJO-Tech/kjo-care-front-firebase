@@ -11,18 +11,34 @@
 
     <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Name</legend>
+        <legend class="fieldset-legend">Name in Spanish</legend>
         <input
           type="text"
           class="input validator w-full"
           formControlName="name"
-          placeholder="Category"
+          placeholder="Category in Spanish"
           minlength="3"
           required
           autocomplete="off"
         />
         <p class="validator-hint hidden">
           {{ formUtils.getFieldError(categoryForm, 'name') }}
+        </p>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Name</legend>
+        <input
+          type="text"
+          class="input validator w-full"
+          formControlName="nameEn"
+          placeholder="Category"
+          minlength="3"
+          required
+          autocomplete="off"
+        />
+        <p class="validator-hint hidden">
+          {{ formUtils.getFieldError(categoryForm, 'nameEn') }}
         </p>
       </fieldset>
 

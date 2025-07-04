@@ -61,7 +61,7 @@ export class BlogModalComponent implements OnInit {
         this.blogForm.patchValue({
           title: this.blog()?.title,
           content: this.blog()?.content,
-          categoryId: this.blog()?.category?.id
+          categoryId: this.blog()?.categoryId
         });
       }
     });

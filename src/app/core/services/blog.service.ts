@@ -1,13 +1,15 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { from, Observable, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-import { Blog } from '../models/blog';
+import { Blog, Status } from '../models/blog';
 import { blogs } from '../../shared/utils/local-data';
-import { BlogDetailResponse, BlogResponse } from '../interfaces/blog-http.interface';
+import { Firestore } from '@angular/fire/firestore';
+import { collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,43 +19,82 @@ export class BlogService {
 
   private http = inject(HttpClient);
 
-  private _selectedBlog = signal<BlogResponse>(blogs[0]);
+  private firestore = inject(Firestore);
+  private collectionName = 'blogs';
 
-  get selectedBlog(): BlogResponse {
+  private _selectedBlog = signal<Blog>({
+    id: '',
+    title: '',
+    content: '',
+    mediaUrl: '',
+    mediaType: '',
+    createdAt: '',
+    updatedAt: '',
+    status: Status.Published,
+    categoryId: ''
+  });
+
+  get selectedBlog(): Blog {
     return this._selectedBlog();
   }
 
-  set selectedBlog(blog: BlogResponse) {
+  set selectedBlog(blog: Blog) {
     this._selectedBlog.set(blog);
   }
 
-  findAll(): Observable<BlogResponse[]> {
-    return this.http.get<BlogResponse[]>(`${this.baseUrl}/all`);
+  findAll(): Observable<Blog[]> {
+    const q = query(collection(this.firestore, this.collectionName));
+    return from(getDocs(q)).pipe(
+      map((snapshot) => {
+        return snapshot.docs.map(doc => ({
+          ...doc.data() as Omit<Blog, 'id'>,
+          id: doc.id
+        }));
+      }),
+      catchError(error => {
+        console.error('Error al obtener categorías:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  // findAll(): Observable<Blog[]> {
-  //   return this.http.get<{
-  //     content: Blog[];
-  //     page: number;
-  //     size: number;
-  //   }>(`${this.baseUrl}/all`).pipe(
-  //     map(({ content }) => content)
-  //   );
-  // }
-
-  getById(id: number): Observable<BlogDetailResponse> {
-    return this.http.get<BlogDetailResponse>(`${this.baseUrl}/${id}`);
+  getById(id: string): Observable<Blog | null> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(getDoc(docRef)).pipe(
+      map(docSnap => {
+        if (!docSnap.exists()) return null;
+        return {
+          id: docSnap.id,
+          ...docSnap.data() as Omit<Blog, 'id'>
+        };
+      }),
+      catchError(error => {
+        console.error('Error al obtener blog:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   create(request: FormData): Observable<Blog> {
     return this.http.post<Blog>(`${this.baseUrl}`, request);
   }
 
-  update(request: FormData, id: number): Observable<Blog> {
+  update(request: FormData, id: string): Observable<Blog> {
     return this.http.put<Blog>(`${this.baseUrl}/${id}`, request);
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  delete(id: string): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+
+    const blog: Partial<Omit<Blog, 'id'>> = {
+      status: Status.Deleted
+    };
+
+    return from(updateDoc(docRef, blog)).pipe(
+      catchError(error => {
+        console.error('Error al eliminar el blog:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

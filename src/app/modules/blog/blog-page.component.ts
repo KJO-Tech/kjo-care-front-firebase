@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { Category, FilterDTO, Status } from '../../core/models/blog';
+import { Blog, Category, FilterDTO, Status } from '../../core/models/blog';
 import { BlogModalComponent } from './blog-modal/blog-modal.component';
 import { BlogGridComponent } from './blog-grid/blog-grid.component';
 import { BlogTableComponent } from './blog-table/blog-table.component';
@@ -10,8 +10,6 @@ import { BlogService } from '../../core/services/blog.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CategoryService } from '../../core/services/category.service';
 import { ToastService } from '../../core/services/toast.service';
-import { blogs } from '../../shared/utils/local-data';
-import { BlogResponse } from '../../core/interfaces/blog-http.interface';
 import { DialogComponent } from '../../shared/components/dialog/dialog.component';
 import { BlogCommentsModalComponent } from './blog-comments-modal/blog-comments-modal.component';
 
@@ -46,20 +44,20 @@ export default class BlogPageComponent {
     return this._categories.value() ?? [];
   });
 
-  filteredBlogs = computed<BlogResponse[]>(() => {
+  filteredBlogs = computed<Blog[]>(() => {
     let temporal = this.blogs.value() ?? [];
     const filter = this.filter();
 
     if (filter.search.length > 0) {
-      temporal = temporal.filter(blog => blog.blog.title.toLowerCase().includes(filter.search.toLowerCase()));
+      temporal = temporal.filter(blog => blog.title.toLowerCase().includes(filter.search.toLowerCase()));
     }
 
-    if (filter.category > 0) {
-      temporal = temporal.filter(blog => blog.blog.category?.id === filter.category);
+    if (filter.category.length > 0) {
+      temporal = temporal.filter(blog => blog.categoryId === filter.category);
     }
 
     if (filter.status.length > 0) {
-      temporal = temporal.filter(blog => blog.blog.state === filter.status);
+      temporal = temporal.filter(blog => blog.status === filter.status);
     }
 
     return temporal;
@@ -67,7 +65,7 @@ export default class BlogPageComponent {
 
   private filter = signal<FilterDTO>({
     search: '',
-    category: 0,
+    category: '',
     status: Status.Published
   });
 
@@ -76,7 +74,7 @@ export default class BlogPageComponent {
   }
 
   deleteBlog() {
-    this.blogService.delete(this.blogService.selectedBlog?.blog.id ?? '').subscribe({
+    this.blogService.delete(this.blogService.selectedBlog.id).subscribe({
       next: () => {
         this.toastService.addToast({
           message: 'Blog deleted successfully',
@@ -109,8 +107,6 @@ export default class BlogPageComponent {
             type: 'error',
             duration: 3000
           });
-
-          this.blogs.set(blogs);
           break;
         case 5:
           this.toastService.addToast({

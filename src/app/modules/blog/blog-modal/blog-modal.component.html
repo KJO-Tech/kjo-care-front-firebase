@@ -82,7 +82,7 @@
           <option disabled [ngValue]="0">-- Select category --</option>
 
           @for (category of categories(); track $index) {
-            <option [ngValue]="category.id">{{ category.name }}</option>
+            <option [ngValue]="category.id">{{ category.nameTranslations['en'] || 'Unknown' }}</option>
           }
         </select>
         <p class="validator-hint hidden">
