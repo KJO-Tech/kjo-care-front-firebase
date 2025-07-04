@@ -5,26 +5,26 @@
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
 
-    <h2 class="text-lg font-semibold">{{ blog().blog.title }}</h2>
+    <h2 class="text-lg font-semibold">{{ blog().title }}</h2>
     <div class="flex items-center gap-2 text-xs py-2">
-      <span>{{ blog().blog.author?.firstName }} {{ blog().blog.author?.lastName }}</span>
+      <span>{{ blog().author?.fullName || 'Unknown' }}</span>
       <span>•</span>
       <span class="flex items-center">
         <!-- CALENDAR ICON HERE -->
-        {{ blog().blog.publishedDate }}
+<!--        {{ blog().createdAt }}-->
       </span>
       <span>•</span>
-      <span>{{ blog().blog.category?.name }}</span>
+      <span>{{ blog().categoryId || 'Unknown' }}</span>
     </div>
 
     <div class="space-y-4 pt-4">
       <div class="aspect-video w-full bg-muted rounded-md flex items-center justify-center">
-        @if (blog().blog.video) {
+        @if (blog().mediaType == 'VIDEO') {
           <video controls class="w-full h-full">
-            <source src="{{ blog().blog.video }}" type="video/mp4" />
+            <source src="{{ blog().mediaUrl }}" type="video/mp4" />
           </video>
-        } @else if (blog().blog.image) {
-          <img src="{{ blog().blog.image }}" alt="{{ blog().blog.title }}" class="w-full h-full object-cover" />
+        } @else if (blog().mediaType == 'IMAGE') {
+          <img src="{{ blog().mediaUrl }}" alt="{{ blog().title }}" class="w-full h-full object-cover" />
         } @else {
           <div class="text-center opacity-80">
             <p class="text-sm">No image or video found.</p>
@@ -32,14 +32,14 @@
         }
       </div>
       <div class="space-y-4 text-sm opacity-80">
-        {{ blog().blog.content }}
+        {{ blog().content }}
       </div>
       <div class="flex gap-4">
         <div>
           <h3 class="text-sm font-medium mb-2">About</h3>
           <div class="flex gap-4">
             <div class="text-center">
-              <p class="text-lg font-bold">{{ blog().reactionCount }}</p>
+              <p class="text-lg font-bold">{{ blog().reaction }}</p>
               <p class="text-xs text-muted-foreground">Reactions</p>
             </div>
             <modal-open-button
@@ -47,7 +47,7 @@
               (click)="blogService.selectedBlog = blog()"
             >
               <div class="text-center">
-                <p class="text-lg font-bold">{{ blog().commentCount }}</p>
+                <p class="text-lg font-bold">{{ blog().comments }}</p>
                 <p class="text-xs text-muted-foreground">Comments</p>
               </div>
             </modal-open-button>

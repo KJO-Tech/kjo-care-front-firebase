@@ -33,28 +33,28 @@ export class BlogCommentComponent {
         return {
           id: this.comment().id,
           content: this.comment().content,
-          blogId: this.blogService.selectedBlog.blog.id,
+          blogId: this.blogService.selectedBlog.id,
           commentParentId: this.commentParentId()
         };
       case 'reply':
         return {
           id: 0,
           content: '',
-          blogId: this.blogService.selectedBlog.blog.id,
+          blogId: this.blogService.selectedBlog.id,
           commentParentId: this.comment().id
         };
       case 'create':
         return {
           id: 0,
           content: this.comment().content,
-          blogId: this.blogService.selectedBlog.blog.id,
+          blogId: this.blogService.selectedBlog.id,
           commentParentId: null
         };
         case 'delete':
           return {
             id: this.comment().id,
             content: this.comment().content,
-            blogId: this.blogService.selectedBlog.blog.id,
+            blogId: this.blogService.selectedBlog.id,
             commentParentId: null
           };
     }

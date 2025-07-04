@@ -16,26 +16,26 @@
     <tbody>
       @for (blog of blogs(); track $index) {
         <tr class="hover:bg-base-200">
-          <td>{{ blog.blog.id }}</td>
+          <td>{{ blog.id }}</td>
           <td class="min-w-64">
             <p class="line-clamp-2 text-ellipsis text-wrap">
-              {{ blog.blog.title }}
+              {{ blog.title }}
             </p>
           </td>
           <td class="truncate">
-            {{ blog.blog.author?.firstName }} {{ blog.blog.author?.lastName }}
+            {{ blog.author?.fullName || 'Unknown' }}
           </td>
-          <td class="truncate">{{ blog.blog.category?.name }}</td>
-          <td>{{ blog.blog.publishedDate }}</td>
+          <td class="truncate">{{ blog.categoryId }}</td>
+          <td>{{ blog.createdAt }}</td>
           <td>
-            @if (blog.blog.state == Status.Draft) {
+            @if (blog.status == Status.Draft) {
               <span class="badge badge-outline">Draft</span>
             } @else {
               <span class="badge badge-primary">Published</span>
             }
           </td>
-          <td class="text-center">{{ blog.reactionCount }}</td>
-          <td class="text-center">{{ blog.commentCount }}</td>
+          <td class="text-center">{{ blog.reaction }}</td>
+          <td class="text-center">{{ blog.comments }}</td>
           <td class="flex items-center gap-1">
             <modal-open-button
               [modalName]="'modal_blog_detail'"

@@ -1,7 +1,7 @@
 import { Component, inject, input } from '@angular/core';
 import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
 import { BlogService } from '../../../core/services/blog.service';
-import { BlogResponse } from '../../../core/interfaces/blog-http.interface';
+import { Blog } from '../../../core/models/blog';
 
 @Component({
   selector: 'blog-detail',
@@ -13,7 +13,7 @@ import { BlogResponse } from '../../../core/interfaces/blog-http.interface';
 export class BlogDetailComponent {
   blogService = inject(BlogService);
 
-  blog = input.required<BlogResponse>();
+  blog = input.required<Blog>();
 
   type = input<'text' | 'icon'>('text');
 

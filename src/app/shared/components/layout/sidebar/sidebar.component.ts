@@ -33,6 +33,14 @@ export class SidebarComponent {
       path: '/dashboard/blog-management'
     },
     {
+      name: 'Activities Management',
+      path: '/dashboard/activity-category'
+    },
+    {
+      name: 'Daily Exercise',
+      path: '/dashboard/daily-exercise'
+    },
+    {
       name: 'Mood Analytics',
       path: '/dashboard/moods'
     },

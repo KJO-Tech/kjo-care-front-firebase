@@ -1,34 +1,39 @@
-import { inject, Injectable, signal } from '@angular/core';
-
+import { inject, Injectable } from '@angular/core';
 import { from, Observable, throwError } from 'rxjs';
-
-import { Category } from '../models/blog';
-import { Firestore } from '@angular/fire/firestore';
-import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc } from 'firebase/firestore';
 import { catchError, map } from 'rxjs/operators';
+import {
+  collection,
+  doc,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  getDocs,
+  getDoc,
+  query,
+  where,
+  orderBy,
+  DocumentData
+} from 'firebase/firestore';
+import { Firestore } from '@angular/fire/firestore';
+import { ActivityCategory } from '../models/activity.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CategoryService {
+export class ActivityCategoryService {
   private firestore = inject(Firestore);
-  private collectionName = 'categories';
+  private collectionName = 'activityCategories';
 
-  selectedCategory = signal<Category>({
-    id: '',
-    nameTranslations: {
-      es: '', en: ''
-    },
-    isActive: true
-  });
+  constructor() {
+  }
 
-  findAll(): Observable<Category[]> {
-    const q = query(collection(this.firestore, this.collectionName));
+  getCategories(): Observable<ActivityCategory[]> {
+    const q = query(collection(this.firestore, this.collectionName), orderBy('order'));
     return from(getDocs(q)).pipe(
       map((snapshot) => {
         return snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data() as Omit<Category, 'id'>
+          ...doc.data() as Omit<ActivityCategory, 'id'>
         }));
       }),
       catchError(error => {
@@ -38,8 +43,7 @@ export class CategoryService {
     );
   }
 
-
-  create(category: Omit<Category, 'id'>): Observable<string> {
+  createCategory(category: Omit<ActivityCategory, 'id'>): Observable<string> {
     return from(addDoc(collection(this.firestore, this.collectionName), category)).pipe(
       map(docRef => docRef.id),
       catchError(error => {
@@ -49,7 +53,7 @@ export class CategoryService {
     );
   }
 
-  update(category: Partial<Omit<Category, 'id'>>, id: string): Observable<void> {
+  updateCategory(id: string, category: Partial<Omit<ActivityCategory, 'id'>>): Observable<void> {
     const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
     return from(updateDoc(docRef, category)).pipe(
       catchError(error => {
@@ -59,7 +63,7 @@ export class CategoryService {
     );
   }
 
-  delete(id: string): Observable<void> {
+  deleteCategory(id: string): Observable<void> {
     const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
     return from(deleteDoc(docRef)).pipe(
       catchError(error => {
