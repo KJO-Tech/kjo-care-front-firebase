@@ -34,5 +34,10 @@ export const routes: Routes = [
       { path: 'map', loadComponent: () => import('./modules/health-center-map/health-center-map.component') }
     ],
     canActivate: [authGuard]
+  },
+  {
+    path: "app",
+    loadComponent: () => import('./modules/main/main.component'),
+    children: []
   }
 ];
