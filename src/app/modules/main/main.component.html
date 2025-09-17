@@ -3,11 +3,18 @@
     @for (link of links; track $index) {
       <a
         routerLink="{{ link.path }}"
-        routerLinkActive="dock-active"
         class="sm:py-2.5 sm:basis-0 lg:flex-row lg:justify-start lg:gap-3 lg:w-full"
       >
-        <i class="material-symbols-outlined">{{ link.icon }}</i>
-        <span class="dock-label sm:hidden lg:block lg:!text-sm">{{ link.name }}</span>
+        <i routerLinkActive #rla="routerLinkActive"
+           [routerLinkActiveOptions]="{ exact: link.path === '/app' }"
+           [ngClass]="{'material-icons': rla.isActive, 'material-icons-outlined': !rla.isActive}">
+          {{ link.icon }}
+        </i>
+        <span
+          class="dock-label sm:hidden lg:block lg:!text-sm"
+          routerLinkActive="font-semibold"
+          [routerLinkActiveOptions]="{ exact: link.path === '/app' }"
+        >{{ link.name }}</span>
       </a>
     }
   </div>
