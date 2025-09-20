@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NotificationsComponent } from '../../shared/components/layout/notifications/notifications.component';
 import { ProfileButtonComponent } from '../../shared/components/layout/profile-button/profile-button.component';
 import { NgClass } from '@angular/common';
+import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
 
 @Component({
   selector: 'app-main',
@@ -12,7 +13,8 @@ import { NgClass } from '@angular/common';
     NotificationsComponent,
     ProfileButtonComponent,
     RouterOutlet,
-    NgClass
+    NgClass,
+    ThemeControllerComponent
   ],
   templateUrl: './main.component.html'
 })

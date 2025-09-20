@@ -1,9 +1,11 @@
 <div class="flex">
-  <div class="dock sm:h-full lg:w-48 sm:w-18 sm:top-0 sm:flex-col sm:justify-center bg-base-300">
+  <div class="dock sm:h-full lg:w-45 sm:w-18 sm:top-0 sm:flex-col sm:justify-center bg-base-200 lg:px-4">
     @for (link of links; track $index) {
       <a
         routerLink="{{ link.path }}"
-        class="sm:py-2.5 sm:basis-0 lg:flex-row lg:justify-start lg:gap-3 lg:w-full"
+        routerLinkActive="bg-primary text-primary-content font-semibold"
+        [routerLinkActiveOptions]="{ exact: link.path === '/app' }"
+        class="sm:p-2.5 sm:basis-1 lg:flex-row lg:justify-start lg:gap-3 lg:w-full max-w-none"
       >
         <i routerLinkActive #rla="routerLinkActive"
            [routerLinkActiveOptions]="{ exact: link.path === '/app' }"
@@ -12,8 +14,6 @@
         </i>
         <span
           class="dock-label sm:hidden lg:block lg:!text-sm"
-          routerLinkActive="font-semibold"
-          [routerLinkActiveOptions]="{ exact: link.path === '/app' }"
         >{{ link.name }}</span>
       </a>
     }
@@ -21,15 +21,16 @@
 
   <div class="flex-1">
     <!--    Navbar  -->
-    <div class="navbar bg-base-300 w-full shadow-sm sticky top-0 z-30">
+    <div class="navbar bg-base-200 w-full sticky top-0 z-30">
       <div class="flex-1">
-        <a class="btn btn-ghost text-lg px-1 sm:ml-2 lg:ml-4" routerLink="/app">
+        <a class="btn btn-ghost text-lg px-1 sm:ml-2 lg:ml-2.5" routerLink="/app">
           <i class="material-symbols-outlined !text-3xl">network_intelligence</i>
           <span class="sm:hidden">KJO Mind Care</span>
         </a>
       </div>
 
       <div class="navbar-end w-fit mr-2 sm:mr-3 flex items-center gap-3">
+        <app-theme-controller />
 
         <navbar-notifications class="" />
         <!--        <navbar-profile-button class="sm:hidden" />-->
@@ -37,7 +38,7 @@
     </div>
 
     <div class="sm:pl-18 lg:pl-48">
-      <main>
+      <main class="p-4">
         <h1>Bienvenido</h1>
         <router-outlet />
       </main>
