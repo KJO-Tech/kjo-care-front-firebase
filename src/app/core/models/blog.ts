@@ -1,27 +1,33 @@
-import { UserProfile } from './user-profile';
+import { UserModel } from './user.model';
 
 export interface Blog {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  image?: string;
-  video?: string;
-  publishedDate: string;
-  modifiedDate: string;
-  state: Status;
-  author?: UserProfile;
-  category?: Category;
+  mediaUrl: string;
+  mediaType: string;
+  createdAt: string;
+  updatedAt: string;
+  status: Status;
+  author?: {
+    id: string;
+    fullName: string;
+  };
+  categoryId: string;
+  reaction?: number;
+  comments?: number;
 }
 
 export enum Status {
-  Published = 'PUBLICADO',
-  Draft = 'PENDIENTE',
-  Deleted = 'ELIMINADO',
+  Published = 'PUBLISHED',
+  Draft = 'DRAFT',
+  Deleted = 'DELETED',
 }
 
 export interface Category {
-  id: number;
-  name: string;
+  id: string;
+  isActive: boolean;
+  nameTranslations: { [key: string]: string };
 }
 
 export interface Reaction {
@@ -34,6 +40,6 @@ export interface Reaction {
 
 export interface FilterDTO {
   search: string;
-  category: number;
+  category: string;
   status: string;
 }

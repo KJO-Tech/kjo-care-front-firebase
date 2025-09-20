@@ -51,28 +51,7 @@ export class HealthCenterModalComponent implements OnInit {
   });
 
   constructor() {
-    effect(() => {
-      this.title.set('Añadir centro de salud');
-      this.nameButton.set('Guardar');
 
-      const selectedCenter = this.healthCenterService.selectedCenter();
-      if (selectedCenter.id > 0) {
-        this.title.set('Editar centro de salud');
-        this.nameButton.set('Actualizar');
-      }
-
-      this.healthCenterForm.patchValue({
-        name: selectedCenter.name,
-        address: selectedCenter.address,
-        phone: selectedCenter.phone,
-        latitude: selectedCenter.latitude,
-        longitude: selectedCenter.longitude
-      });
-
-      // Actualizar las coordenadas seleccionadas
-      this.selectedLat = selectedCenter.latitude;
-      this.selectedLng = selectedCenter.longitude;
-    });
   }
 
   ngOnInit(): void {
@@ -101,11 +80,7 @@ export class HealthCenterModalComponent implements OnInit {
     let lat = this.healthCenterForm.value.latitude || -12.0464;
     let lng = this.healthCenterForm.value.longitude || -77.0428;
 
-    if (this.healthCenterService.selectedCenter().id === 0) {
-      const userCoords = await this.getUserLocation();
-      lat = userCoords.latitude;
-      lng = userCoords.longitude;
-    }
+
 
     // Configurar estilo para el marcador
     this.markerLayer.setStyle(new Style({
@@ -133,10 +108,7 @@ export class HealthCenterModalComponent implements OnInit {
       })
     });
 
-    // Añadir marcador inicial si hay coordenadas
-    if (lat && lng && this.healthCenterService.selectedCenter().id > 0) {
-      this.addMarker(lat, lng);
-    }
+
 
     // Añadir evento de clic para seleccionar nuevas coordenadas
     this.coordinatesMap.on('click', (evt) => {
@@ -192,51 +164,7 @@ export class HealthCenterModalComponent implements OnInit {
       longitude: this.healthCenterForm.value.longitude!
     };
 
-    if (this.healthCenterService.selectedCenter().id > 0) {
-      // Actualizar centro de salud existente
 
-      this.healthCenterService.update(request, this.healthCenterService.selectedCenter().id).subscribe({
-        next: () => {
-          this.toastService.addToast({
-            message: 'Centro de salud actualizado correctamente',
-            type: 'success',
-            duration: 4000
-          });
-
-          this.reload.emit();
-          this.healthCenterForm.reset();
-          this.resetForm();
-        },
-        error: (error) => {
-          this.toastService.addToast({
-            message: 'Error al actualizar centro de salud',
-            type: 'error',
-            duration: 4000
-          });
-        }
-      });
-    } else {
-      // Crear nuevo centro de salud
-      this.healthCenterService.create(request).subscribe({
-        next: () => {
-          this.toastService.addToast({
-            message: 'Centro de salud creado correctamente',
-            type: 'success',
-            duration: 4000
-          });
-
-          this.reload.emit();
-          this.resetForm();
-        },
-        error: (error) => {
-          this.toastService.addToast({
-            message: 'Error al crear centro de salud',
-            type: 'error',
-            duration: 4000
-          });
-        }
-      });
-    }
   }
 
   private resetForm(): void {

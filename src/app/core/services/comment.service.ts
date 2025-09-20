@@ -19,7 +19,7 @@ export class CommentService {
   readonly _selectedComment = signal<CommentRequest>({
     id: 0,
     content: '',
-    blogId: 0,
+    blogId: '',
     commentParentId: null
   });
 

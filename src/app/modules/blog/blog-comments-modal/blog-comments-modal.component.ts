@@ -24,7 +24,7 @@ export class BlogCommentsModalComponent {
   toastService = inject(ToastService);
 
   readonly blog = rxResource({
-    request: () => this.blogService.selectedBlog.blog.id,
+    request: () => this.blogService.selectedBlog.id,
     loader: ({ request }) => this.blogService.getById(request)
   });
 

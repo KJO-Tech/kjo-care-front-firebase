@@ -7,7 +7,7 @@
       </button>
     </form>
 
-    <h2 class="text-lg font-semibold">Comments of "{{ blogService.selectedBlog.blog.title }}"</h2>
+    <h2 class="text-lg font-semibold">Comments of "{{ blogService.selectedBlog.title }}"</h2>
 
     <div class="min-h-40">
 
@@ -27,25 +27,25 @@
         </div>
       } @else {
         <ul class="list">
-          @for (comment of blog.value()?.comments; track comment; ) {
-            <blog-comment
-              [comment]="comment"
-              [commentParentId]="null"
-            ></blog-comment>
-          }
+<!--          @for (comment of blog.value()?.comments; track comment; ) {-->
+<!--            <blog-comment-->
+<!--              [comment]="comment"-->
+<!--              [commentParentId]="null"-->
+<!--            ></blog-comment>-->
+<!--          }-->
           <li class="list-row p-0">
-            <modal-open-button
-              [modalName]="'modal_blog_comment'"
-              [classes]="'btn btn-ghost btn-link'"
-              (click)="commentService.selectedComment = {
-                id: 0,
-                content: '',
-                blogId: blogService.selectedBlog.blog.id,
-                commentParentId: null,
-              }"
-            >
-              + Add a comment
-            </modal-open-button>
+<!--            <modal-open-button-->
+<!--              [modalName]="'modal_blog_comment'"-->
+<!--              [classes]="'btn btn-ghost btn-link'"-->
+<!--              (click)="commentService.selectedComment = {-->
+<!--                id: 0,-->
+<!--                content: '',-->
+<!--                blogId: blogService.selectedBlog.blog.id,-->
+<!--                commentParentId: null,-->
+<!--              }"-->
+<!--            >-->
+<!--              + Add a comment-->
+<!--            </modal-open-button>-->
           </li>
         </ul>
       }

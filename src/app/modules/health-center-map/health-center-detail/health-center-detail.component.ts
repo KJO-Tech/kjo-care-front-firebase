@@ -23,16 +23,14 @@ import { HealthCenterService } from '../../../core/services/health-center.servic
 export class HealthCenterDetailComponent implements OnInit {
   healthCenterService = inject(HealthCenterService);
 
-  healthCenter = computed(() => this.healthCenterService.selectedCenter());
+  healthCenter = computed(() => this.healthCenterService.getAll());
   map: Map | null = null;
 
   constructor() {
     effect(() => {
       // Cada vez que cambie el centro de salud seleccionado, inicializamos el mapa
-      const center = this.healthCenterService.selectedCenter();
-      if (center && this.map) {
-        this.updateMap(center.latitude, center.longitude);
-      }
+      const center = this.healthCenterService.getAll();
+
     });
   }
 
@@ -44,7 +42,7 @@ export class HealthCenterDetailComponent implements OnInit {
   }
 
   private initMap(): void {
-    const center = this.healthCenterService.selectedCenter();
+    const center = this.healthCenterService.getAll();
 
     if (!center) return;
 
@@ -63,18 +61,10 @@ export class HealthCenterDetailComponent implements OnInit {
       source: markerSource
     });
 
-    // Crear mapa
-    this.map = new Map({
-      target: 'detailMap',
-      layers: [osmLayer, markerLayer],
-      view: new View({
-        center: fromLonLat([center.longitude, center.latitude]),
-        zoom: 15
-      })
-    });
+
 
     // Añadir marcador
-    this.addMarker(center.latitude, center.longitude);
+    // this.addMarker(center.latitude, center.longitude);
   }
 
   private updateMap(lat: number, lng: number): void {

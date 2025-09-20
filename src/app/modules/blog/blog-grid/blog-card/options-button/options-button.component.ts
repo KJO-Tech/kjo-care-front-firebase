@@ -4,7 +4,7 @@ import {
   ModalOpenButtonComponent
 } from '../../../../../shared/components/modal-open-button/modal-open-button.component';
 import { BlogService } from '../../../../../core/services/blog.service';
-import { BlogResponse } from '../../../../../core/interfaces/blog-http.interface';
+import { Blog } from '../../../../../core/models/blog';
 
 @Component({
   selector: 'blog-card-options-button',
@@ -16,5 +16,5 @@ import { BlogResponse } from '../../../../../core/interfaces/blog-http.interface
 export class OptionsButtonComponent {
   blogService = inject(BlogService);
 
-  blog = input.required<BlogResponse>();
+  blog = input.required<Blog>();
 }

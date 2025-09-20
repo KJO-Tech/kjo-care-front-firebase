@@ -4,8 +4,9 @@
     modalName="modal_category"
     [classes]="'btn-primary'"
     (click)="categoryService.selectedCategory.set({
-      id: 0,
-      name: ''
+      id: '',
+      nameTranslations: {es: '', en: ''},
+      isActive: true
     })"
   >
     Add Category
@@ -38,7 +39,8 @@
       } @else {
         @for (category of categories.value(); track category.id) {
           <tr class="hover:bg-base-200">
-            <td>{{ category.name }}</td>
+            <td>{{ category.nameTranslations['es'] || 'Unknown' }}</td>
+            <td>{{ category.isActive ? 'Active' : 'Inactive' }}</td>
             <td class="flex items-center gap-1">
               <modal-open-button
                 [modalName]="'modal_category'"

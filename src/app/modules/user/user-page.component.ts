@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { UserService } from '../../core/services/user.service';
@@ -20,50 +20,130 @@ import { ToastService } from '../../core/services/toast.service';
 })
 export default class UserPageComponent {
 
-  readonly userService = inject(UserService);
+  private readonly userService = inject(UserService);
+  readonly search = signal<string>("")
+  readonly selectedRole = signal<string>("all")
+  readonly showDisabled = signal<boolean>(false)
   readonly toastService = inject(ToastService);
 
-  search = signal<string>('');
+  modalCreateButton = viewChild<ElementRef>("modalCreateButton")
 
-  users = rxResource({
-    loader: () => this.userService.getAll()
+  readonly users = rxResource({
+    loader: () => {
+      return this.userService.getAll()
+    }
   });
 
   readonly filteredUsers = computed(() => {
-    let temporal: UserResponse[] = this.users.value() ?? [];
+    const userList = this.users.value() ?? [];
+    const searchTerm = this.search().toLowerCase();
+    const selectedRole = this.selectedRole();
+    const showDisabled = this.showDisabled();
 
-    if (this.search().length > 0) {
-      temporal = temporal.filter(user => {
-        const fullName = `${user.firstName} ${user.lastName}`;
-        return fullName.toLowerCase().includes(this.search().toLowerCase());
+    return userList
+      .filter(user => {
+        if (!showDisabled && !user.enabled) return false;
+
+        if (selectedRole !== 'all') {
+          if (!user.roles.includes(selectedRole)) return false;
+        }
+
+        if (searchTerm) {
+          const displayName = user.displayName?.toLowerCase() || '';
+          const email = user.email?.toLowerCase() || '';
+          return displayName.includes(searchTerm) || email.includes(searchTerm);
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime();
       });
-    }
-
-    return temporal;
   });
 
-  deleteUser() {
-    this.userService.delete(this.userService.selectedUser?.id ?? '').subscribe({
-      next: () => {
-        this.toastService.addToast({
-          message: 'User deleted successfully',
-          type: 'success',
-          duration: 4000
-        });
+  readonly userStats = computed(() => {
+    const allUsers = this.users.value() ?? [];
+    return {
+      total: allUsers.length,
+      enabled: allUsers.filter(u => u.enabled).length,
+      disabled: allUsers.filter(u => !u.enabled).length,
+      admins: allUsers.filter(u => u.roles.includes('admin')).length,
+      users: allUsers.filter(u => u.roles.includes('user')).length
+    };
+  });
 
-        this.reload();
+  readonly selectedUser = this.userService.selectedUser;
+
+  deleteUser(): void {
+    const user = this.selectedUser();
+    if (!user?.id) return;
+
+    this.userService.delete(user.id).subscribe({
+      next: () => {
+        this.users.reload();
+        this.userService.clearSelectedUser();
+      }
+    });
+  }
+
+  restoreUser(userId: string): void {
+    this.userService.restore(userId).subscribe({
+      next: () => this.users.reload()
+    });
+  }
+
+  toggleUserStatus(userId: string): void {
+    const currentUsers = this.users.value() ?? [];
+    const userIndex = currentUsers.findIndex(u => u.id === userId);
+
+    if (userIndex === -1) return;
+
+    const currentUser = currentUsers[userIndex];
+    const newStatus = !currentUser.enabled;
+
+    const optimisticUsers = [...currentUsers];
+    optimisticUsers[userIndex] = { ...currentUser, enabled: newStatus };
+    this.users.set(optimisticUsers);
+
+    this.userService.toggleUserStatus(userId).subscribe({
+      next: (updatedUser) => {
+        const users = this.users.value() ?? [];
+        const finalUsers = users.map(user =>
+          user.id === userId ? updatedUser : user
+        );
+        this.users.set(finalUsers);
       },
       error: (error) => {
+        console.error('Error al cambiar estado:', error);
+        const revertedUsers = [...currentUsers];
+        revertedUsers[userIndex] = currentUser;
+        this.users.set(revertedUsers);
+
         this.toastService.addToast({
-          message: 'Error deleting user',
+          message: 'Error al cambiar el estado del usuario',
           type: 'error',
-          duration: 4000
+          duration: 3000
         });
       }
     });
   }
 
-  reload() {
+  updateSearch(term: string): void {
+    this.search.set(term);
+  }
+
+  updateRoleFilter(role: string): void {
+    this.selectedRole.set(role);
+    this.users.reload();
+  }
+
+  toggleShowDisabled(): void {
+    this.showDisabled.update(current => !current);
+  }
+
+  reload(): void {
     this.users.reload();
   }
 }

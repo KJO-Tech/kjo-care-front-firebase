@@ -3,33 +3,17 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
 import { HealthCenterRequest, HealthCenterResponse } from '../interfaces/health-center-http.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HealthCenterService {
-  private baseUrl: string = environment.apiUrl + '/api/mind/emergency/centers';
+  private baseUrl: string = '/api/mind/emergency/centers';
 
   private http = inject(HttpClient);
 
-  selectedCenter = signal<HealthCenterResponse>({
-    name: '',
-    address: '',
-    phone: '',
-    latitude: 0,
-    longitude: 0,
-    id: 0,
-    user: {
-      firstName: '',
-      lastName: '',
-      username: '',
-    },
-    status: '',
-    createdDate: '',
-    modifiedDate: ''
-  });
+
 
   getAll(): Observable<HealthCenterResponse[]> {
     return this.http.get<HealthCenterResponse[]>(`${this.baseUrl}/all`);
@@ -61,21 +45,5 @@ export class HealthCenterService {
   }
 
   clearSelectedCenter() {
-    this.selectedCenter.set({
-      name: '',
-      address: '',
-      phone: '',
-      latitude: 0,
-      longitude: 0,
-      id: 0,
-      user: {
-        firstName: '',
-        lastName: '',
-        username: '',
-      },
-      status: '',
-      createdDate: '',
-      modifiedDate: ''
-    });
   }
 }
