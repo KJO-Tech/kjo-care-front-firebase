@@ -2,10 +2,10 @@
   "name": "KJO Mind Care",
   "short_name": "Mind Care",
   "theme_color": "#9172FE",
-  "background_color": "#fff",
+  "background_color": "#9172FE",
   "display": "standalone",
   "scope": "./",
-  "start_url": "./",
+  "start_url": "./app",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
