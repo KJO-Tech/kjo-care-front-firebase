@@ -4,7 +4,7 @@ import { authGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth/login',
+    redirectTo: 'app',
     pathMatch: 'full'
   },
   {
@@ -21,15 +21,27 @@ export const routes: Routes = [
       { path: 'blog-management', loadComponent: () => import('./modules/blog/blog-page.component') },
       { path: 'moods', loadChildren: () => import('./modules/mood-analytics/mood-analytics.routes') },
       { path: 'settings', loadChildren: () => import('./modules/settings/settings.routes') },
-      { path: 'health-centers', loadComponent: () => import('./modules/health-center/health-center.component') },
+      // { path: 'health-centers', loadComponent: () => import('./modules/health-center/health-center.component') },
       { path: 'map', loadComponent: () => import('./modules/health-center-map/health-center-map.component') },
       { path: 'activity-category', loadComponent: () => import('./modules/activity-category/activity-category.component') },
       { path: 'daily-exercise', loadComponent: () => import('./modules/daily-exercise/daily-exercise.component') },
+      { path: '**', redirectTo: '' }
+    ],
+    // canActivate: [adminGuard]
+  },
+  {
+    path: 'app',
+    loadComponent: () => import('./modules/main/main.component'),
+    children: [
+      { path: '', loadComponent: () => import('./modules/main/home/home.component') },
+      { path: 'exercises/:id', loadComponent: () => import('./modules/main/exercises/exercises.component') },
+      { path: 'mood', loadChildren: () => import('./modules/main/mood/mood.routes') },
+      { path: 'community', loadChildren: () => import('./modules/main/community/community.routes') },
+      { path: 'resources', loadChildren: () => import('./modules/main/resources/resources.routes') },
+      { path: 'profile', loadComponent: () => import('./modules/main/profile/profile.component') },
+      { path: 'notifications', loadComponent: () => import('./modules/main/notifications/notifications-page.component') },
+      { path: '**', redirectTo: '' }
     ],
     // canActivate: [authGuard]
   },
-  {
-    path: '**',
-    redirectTo: '/'
-  }
 ];
