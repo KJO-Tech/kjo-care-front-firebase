@@ -102,3 +102,36 @@
     will-change: transform;
   }
 }
+
+/* Hero Card Carousel */
+.card-carousel-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-card.is-active {
+  opacity: 1;
+  z-index: 3;
+  transform: translateY(0) scale(1);
+}
+
+.hero-card.is-next {
+  opacity: 0.5;
+  z-index: 2;
+  transform: translateY(30px) scale(0.9);
+}
+
+.hero-card.is-previous {
+  opacity: 0;
+  z-index: 1;
+  transform: translateY(-30px) scale(0.9);
+}
+
+.hero-card:not(.is-active):not(.is-next):not(.is-previous) {
+  opacity: 0;
+  z-index: 0;
+  transform: translateY(60px) scale(0.8);
+}
