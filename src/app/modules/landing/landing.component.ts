@@ -1,23 +1,51 @@
-import { Component, effect, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+} from '@angular/core';
 import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
 import { NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
-  imports: [ThemeControllerComponent, NgClass],
+  styleUrls: ['./landing.component.css'],
+  imports: [ThemeControllerComponent, NgClass, RouterLink],
 })
-export default class LandingComponent {
-  isVisible = signal(false);
-  scrollY = signal(0);
+export default class LandingComponent implements AfterViewInit, OnDestroy {
+  private elementRef = inject(ElementRef);
+  private observer?: IntersectionObserver;
 
-  constructor() {
-    // effect(() => {
-    this.isVisible.set(true);
-    // const handleScroll = () => this.scrollY.set(window.scrollY);
-    // window.addEventListener('scroll', handleScroll);
-    // return () => window.removeEventListener('scroll', handleScroll);
-    // });
+  ngAfterViewInit() {
+    this.initAnimations();
+  }
+
+  ngOnDestroy() {
+    this.observer?.disconnect();
+  }
+
+  private initAnimations() {
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1,
+    };
+
+    this.observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, options);
+
+    const elements =
+      this.elementRef.nativeElement.querySelectorAll('.animate-on-scroll');
+    elements.forEach((el: Element) => this.observer?.observe(el));
   }
 
   features = [

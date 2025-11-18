@@ -2,15 +2,13 @@
   <!--  Navigation -->
   <nav class="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-primary/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-2">
+      <a class="flex items-center gap-2" routerLink="/">
         <div
           class="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
           <i class="material-symbols-outlined !text-2xl text-primary-content">network_intelligence</i>
         </div>
-        <span class="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                KJO Mind Care
-        </span>
-      </div>
+        <span class="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">KJO Mind Care</span>
+      </a>
       <div class="hidden md:flex items-center gap-8">
         <a href="#features" class="text-sm text-foreground/70 hover:text-foreground transition">
           Características
@@ -26,7 +24,7 @@
         <app-theme-controller />
         <a
           href="/app"
-          class="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:shadow-lg hover:shadow-primary/50 transition"
+          class="px-4 py-2 rounded-lg bg-primary text-primary-content text-sm font-medium hover:shadow-lg hover:shadow-primary/50 transition"
         >
           Abrir App
         </a>
@@ -51,8 +49,7 @@
     <div class="max-w-7xl mx-auto">
       <div class="grid md:grid-cols-2 gap-12 items-center">
         <!-- Left Content -->
-        <div class="space-y-6" [ngClass]="{'animate-fade-in-up': isVisible(), 'opacity-0': !isVisible()}"
-        >
+        <div class="space-y-6 animate-on-scroll animate-fade-in-up">
           <div
             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 w-fit">
             <span class="w-2 h-2 bg-primary rounded-full animate-glow"></span>
@@ -110,9 +107,8 @@
 
         <!-- Right Visual - Hero Animation -->
         <div
-          class="relative h-full flex items-center justify-center"
-          [ngClass]="{'animate-slide-in-right': isVisible(), 'opacity-0': !isVisible()}"
-          style="animation-delay: 0.2s"
+          class="relative h-full flex items-center justify-center animate-on-scroll animate-slide-in-right"
+          style="transition-delay: 0.2s"
         >
           <div class="relative w-full h-80 md:h-96">
             <!--  Floating cards effect -->
@@ -128,12 +124,6 @@
                         animation-delay: {{$index * 0.5}}s;
                   "
                   >
-                    <!--            style={{-->
-                    <!--            transform: `rotate(${i * 8}deg) translateY(${i * 40}px)`,-->
-                    <!--                            zIndex: 3 - i,-->
-                    <!--                            animation: `float 4s ease-in-out infinite`,-->
-                    <!--                            animationDelay: `${i * 0.5}s`-->
-                    <!--            }}-->
                     <div class="text-center">
                       <div class="text-5xl mb-2">{{ ['🧠', '💪', '🌟'][$index] }}</div>
                       <p class="text-sm font-semibold text-foreground/80">{{
@@ -154,7 +144,7 @@
   <!-- Features Section with Parallax -->
   <section id="features" class="py-32 px-4 sm:px-6 lg:px-8 relative">
     <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-20 space-y-4">
+      <div class="text-center mb-20 space-y-4 animate-on-scroll animate-fade-in-up">
         <h2 class="text-4xl sm:text-5xl font-bold">Lo que hace especial a KJO</h2>
         <p class="text-xl text-foreground/70 max-w-2xl mx-auto">
           Herramientas diseñadas realmente para ti y tu bienestar
@@ -164,8 +154,8 @@
       <div class="space-y-24">
         @for (feature of features; track $index) {
           <div
-            class="grid md:grid-cols-2 gap-12 items-center"
-            style="animation: fadeInUp 0.8s ease-out {{0.15 * $index}}s both;"
+            class="grid md:grid-cols-2 gap-12 items-center animate-on-scroll animate-fade-in-up"
+            [style.transition-delay]="(0.15 * $index) + 's'"
           >
             <!-- Content -->
             <div [ngClass]="{'order-1': $even, 'order-2': !$even}">
@@ -192,7 +182,7 @@
                 class="w-full h-full rounded-3xl bg-gradient-to-br {{feature.color}} shadow-2xl flex items-center justify-center overflow-hidden relative group">
                 <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-all duration-300"></div>
                 <div class="text-9xl md:text-8xl animate-float"
-                     style="animation: '{{`${$index * 0.3}s`}}';"
+                     [style.animation-delay]="($index * 0.3) + 's'"
                 >
                   {{ feature.image }}
                 </div>
@@ -208,16 +198,19 @@
   <section id="benefits"
            class="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary/15 via-transparent to-accent/15 rounded-3xl mx-4 md:mx-auto md:max-w-6xl">
     <div class="max-w-6xl mx-auto">
-      <h2 class="text-4xl font-bold text-center mb-4">¿Por qué KJO Mind Care?</h2>
-      <p class="text-lg text-foreground/70 text-center mb-16 max-w-2xl mx-auto">
-        Hecho por gente que entiende lo que los adolescentes necesitan
-      </p>
+      <div class="animate-on-scroll animate-fade-in-up">
+        <h2 class="text-4xl font-bold text-center mb-4">¿Por qué KJO Mind Care?</h2>
+        <p class="text-lg text-foreground/70 text-center mb-16 max-w-2xl mx-auto">
+          Hecho por gente que entiende lo que los adolescentes necesitan
+        </p>
+      </div>
+
 
       <div class="grid md:grid-cols-3 gap-8">
         @for (benefit of benefits; track $index) {
           <div
-            class="p-8 rounded-2xl bg-card/60 backdrop-blur-sm border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 text-center hover:scale-105"
-            style="animation: '{{isVisible() ? `fadeInUp 0.8s ease-out ${0.1 * $index}s both` : 'none'}}';"
+            class="p-8 rounded-2xl bg-card/60 backdrop-blur-sm border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 text-center hover:scale-105 animate-on-scroll animate-fade-in-up"
+            [style.transition-delay]="(0.1 * $index) + 's'"
           >
             <div class="text-5xl mb-4">{{ benefit.icon }}</div>
             <h3 class="font-bold text-xl mb-2">{{ benefit.title }}</h3>
@@ -231,7 +224,7 @@
   <!--Coming Soon Section-->
   <section id="coming" class="py-32 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-16 space-y-4">
+      <div class="text-center mb-16 space-y-4 animate-on-scroll animate-fade-in-up">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/50">
           <i class="material-symbols-outlined !text-xl leading-4 w-4 h-4 text-accent">auto_awesome</i>
           <span class="text-sm text-accent font-semibold">Próximamente</span>
@@ -245,9 +238,9 @@
       <div class="grid md:grid-cols-3 gap-8">
         @for (item of comingSoon; track $index) {
           <div
-            class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/10 border border-primary/20 hover:border-primary/50 transition-all duration-300 group"
+            class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/10 border border-primary/20 hover:border-primary/50 transition-all duration-300 group animate-on-scroll animate-fade-in-up"
+            [style.transition-delay]="(0.15 * $index) + 's'"
           >
-            <!--            style="animation: '{{isVisible() ? `fadeInUp 0.8s ease-out ${0.15 * $index}s both` : 'none'}}"-->
             <div
               class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary p-2 mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
               <i class="material-symbols-outlined !text-2xl w-fit h-fit text-primary-content">{{ item.icon }}</i>
@@ -263,7 +256,7 @@
   <!--Testimonials-->
   <section class="py-32 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-16 space-y-4">
+      <div class="text-center mb-16 space-y-4 animate-on-scroll animate-fade-in-up">
         <h2 class="text-4xl sm:text-5xl font-bold">Historias reales</h2>
         <p class="text-lg text-foreground/70">Lo que dicen los usuarios de KJO</p>
       </div>
@@ -271,9 +264,9 @@
       <div class="grid md:grid-cols-3 gap-8">
         @for (testimonial of testimonials; track $index) {
           <div
-            class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/5 border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:scale-105"
+            class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/5 border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:scale-105 animate-on-scroll animate-fade-in-up"
+            [style.transition-delay]="(0.15 * $index) + 's'"
           >
-            <!--            style="animation: '{{isVisible() ? `fadeInUp 0.8s ease-out ${0.15 * $index}s both` : 'none'}}';"-->
             <div class="flex items-center gap-4 mb-6">
               <div
                 class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg">
@@ -294,7 +287,7 @@
   <!-- Final CTA -->
   <section
     class="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 border-y border-primary/20 rounded-3xl mx-4 md:mx-auto md:max-w-6xl">
-    <div class="max-w-4xl mx-auto text-center space-y-8">
+    <div class="max-w-4xl mx-auto text-center space-y-8 animate-on-scroll animate-fade-in-up">
       <div class="space-y-4">
         <h2 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-pretty">
           Tu viaje empieza aquí
@@ -306,14 +299,14 @@
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center pt-8">
         <a
-          href="/app"
-          class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/40 transition text-lg group"
+          routerLink="/app"
+          class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-content font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/40 transition text-lg group"
         >
           <i class="material-symbols-outlined w-5 h-5">download</i>
           Entrar a KJO
         </a>
         <a
-          href="/app"
+          routerLink="/app"
           class="px-8 py-4 rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary/10 transition text-lg flex items-center justify-center gap-2 group"
         >
           Explorar Web
