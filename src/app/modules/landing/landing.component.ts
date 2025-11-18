@@ -4,6 +4,7 @@ import {
   ElementRef,
   inject,
   OnDestroy,
+  signal,
 } from '@angular/core';
 import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
 import { NgClass } from '@angular/common';
@@ -18,13 +19,18 @@ import { RouterLink } from '@angular/router';
 export default class LandingComponent implements AfterViewInit, OnDestroy {
   private elementRef = inject(ElementRef);
   private observer?: IntersectionObserver;
+  private cardInterval: any;
+
+  activeIndex = signal(0);
 
   ngAfterViewInit() {
     this.initAnimations();
+    this.startCardCarousel();
   }
 
   ngOnDestroy() {
     this.observer?.disconnect();
+    clearInterval(this.cardInterval);
   }
 
   private initAnimations() {
@@ -47,6 +53,42 @@ export default class LandingComponent implements AfterViewInit, OnDestroy {
       this.elementRef.nativeElement.querySelectorAll('.animate-on-scroll');
     elements.forEach((el: Element) => this.observer?.observe(el));
   }
+
+  private startCardCarousel() {
+    this.cardInterval = setInterval(() => {
+      this.activeIndex.update(
+        (current) => (current + 1) % this.heroCards.length,
+      );
+    }, 3000);
+  }
+
+  getCardStatus(index: number): 'is-active' | 'is-next' | 'is-previous' | '' {
+    const active = this.activeIndex();
+    const total = this.heroCards.length;
+
+    if (index === active) {
+      return 'is-active';
+    }
+
+    const nextIndex = (active + 1) % total;
+    if (index === nextIndex) {
+      return 'is-next';
+    }
+
+    const prevIndex = (active - 1 + total) % total;
+    if (index === prevIndex) {
+      return 'is-previous';
+    }
+
+    return '';
+  }
+
+
+  heroCards = [
+    { icon: '🧠', text: 'Entiéndete' },
+    { icon: '💪', text: 'Fortalécete' },
+    { icon: '🌟', text: 'Brilla' },
+  ];
 
   features = [
     {

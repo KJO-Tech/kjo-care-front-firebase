@@ -191,3 +191,14 @@
 html {
   scroll-behavior: smooth;
 }
+
+.hero-card {
+  @apply absolute w-56 h-32 md:scale-150 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-primary/50 shadow-xl p-6 flex items-center justify-center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* space-y-2 */
+  transition: all 0.5s ease-in-out;
+  will-change: transform, opacity, z-index;
+}

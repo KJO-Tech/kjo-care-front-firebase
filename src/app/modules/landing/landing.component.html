@@ -110,31 +110,13 @@
           class="relative h-full flex items-center justify-center animate-on-scroll animate-slide-in-right"
           style="transition-delay: 0.2s"
         >
-          <div class="relative w-full h-80 md:h-96">
-            <!--  Floating cards effect -->
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="space-y-4">
-                @for (item of [0, 1, 2]; track $index) {
-                  <div
-                    class="absolute w-56 h-32 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-xl border border-primary/50 shadow-xl p-6 flex items-center justify-center"
-                    style="
-                        transform: rotate($index * 8deg) translateY($index * 40px);
-                        z-index: {{3 - $index}};
-                        animation: float 4s ease-in-out infinite;
-                        animation-delay: {{$index * 0.5}}s;
-                  "
-                  >
-                    <div class="text-center">
-                      <div class="text-5xl mb-2">{{ ['🧠', '💪', '🌟'][$index] }}</div>
-                      <p class="text-sm font-semibold text-foreground/80">{{
-                          ['Entiéndete', 'Fortalécete',
-                            'Brilla'][$index]
-                        }}</p>
-                    </div>
-                  </div>
-                }
+          <div class="relative w-full h-80 md:h-96 card-carousel-container">
+            @for (card of heroCards; track $index) {
+              <div class="hero-card" [ngClass]="getCardStatus($index)">
+                <div class="text-5xl">{{ card.icon }}</div>
+                <p class="font-semibold text-foreground/80">{{ card.text }}</p>
               </div>
-            </div>
+            }
           </div>
         </div>
       </div>
