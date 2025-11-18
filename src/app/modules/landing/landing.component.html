@@ -159,7 +159,7 @@
             <!--Image/Visual-->
             <div
               class="relative h-80 md:h-96 flex items-center justify-center parallax"
-              [ngClass]="{'order-1': $even, 'order-2': !$even}">
+              [ngClass]="{'order-2': $even, 'order-1': !$even}">
               <div
                 class="w-full h-full rounded-3xl bg-gradient-to-br {{feature.color}} shadow-2xl flex items-center justify-center overflow-hidden relative group">
                 <div class="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-all duration-300"></div>
@@ -190,13 +190,15 @@
 
       <div class="grid md:grid-cols-3 gap-8">
         @for (benefit of benefits; track $index) {
-          <div
-            class="p-8 rounded-2xl bg-card/60 backdrop-blur-sm border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 text-center hover:scale-105 animate-on-scroll animate-fade-in-up"
-            [style.transition-delay]="(0.1 * $index) + 's'"
+          <div class="animate-on-scroll animate-fade-in-up"
+               [style.transition-delay]="(0.1 * $index) + 's'"
           >
-            <div class="text-5xl mb-4">{{ benefit.icon }}</div>
-            <h3 class="font-bold text-xl mb-2">{{ benefit.title }}</h3>
-            <p class="text-foreground/70">{{ benefit.desc }}</p>
+            <div
+              class="p-8 rounded-2xl bg-card/60 backdrop-blur-sm border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 text-center hover:scale-105">
+              <div class="text-5xl mb-4">{{ benefit.icon }}</div>
+              <h3 class="font-bold text-xl mb-2">{{ benefit.title }}</h3>
+              <p class="text-foreground/70">{{ benefit.desc }}</p>
+            </div>
           </div>
         }
       </div>
@@ -219,16 +221,18 @@
 
       <div class="grid md:grid-cols-3 gap-8">
         @for (item of comingSoon; track $index) {
-          <div
-            class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/10 border border-primary/20 hover:border-primary/50 transition-all duration-300 group animate-on-scroll animate-fade-in-up"
-            [style.transition-delay]="(0.15 * $index) + 's'"
-          >
+          <div class="animate-on-scroll animate-fade-in-up"
+               [style.transition-delay]="(0.15 * $index) + 's'">
             <div
-              class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary p-2 mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
-              <i class="material-symbols-outlined !text-2xl w-fit h-fit text-primary-content">{{ item.icon }}</i>
+              class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/10 border border-primary/20 hover:border-primary/50 transition-all duration-300 group"
+            >
+              <div
+                class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary p-2 mb-4 group-hover:scale-110 transition-transform flex items-center justify-center">
+                <i class="material-symbols-outlined !text-2xl w-fit h-fit text-primary-content">{{ item.icon }}</i>
+              </div>
+              <h3 class="font-bold text-xl mb-2">{{ item.title }}</h3>
+              <p class="text-foreground/70">{{ item.desc }}</p>
             </div>
-            <h3 class="font-bold text-xl mb-2">{{ item.title }}</h3>
-            <p class="text-foreground/70">{{ item.desc }}</p>
           </div>
         }
       </div>
@@ -245,21 +249,23 @@
 
       <div class="grid md:grid-cols-3 gap-8">
         @for (testimonial of testimonials; track $index) {
-          <div
-            class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/5 border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:scale-105 animate-on-scroll animate-fade-in-up"
-            [style.transition-delay]="(0.15 * $index) + 's'"
-          >
-            <div class="flex items-center gap-4 mb-6">
-              <div
-                class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg">
-                {{ testimonial.avatar }}
+          <div class="animate-on-scroll animate-fade-in-up"
+               [style.transition-delay]="(0.15 * $index) + 's'">
+            <div
+              class="p-8 rounded-2xl bg-gradient-to-br from-card to-primary/5 border border-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:scale-105 h-full"
+            >
+              <div class="flex items-center gap-4 mb-6">
+                <div
+                  class="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg">
+                  {{ testimonial.avatar }}
+                </div>
+                <div>
+                  <p class="font-bold text-lg">{{ testimonial.name }}</p>
+                  <p class="text-sm text-foreground/60">Usuario de KJO</p>
+                </div>
               </div>
-              <div>
-                <p class="font-bold text-lg">{{ testimonial.name }}</p>
-                <p class="text-sm text-foreground/60">Usuario de KJO</p>
-              </div>
+              <p class="text-foreground/70 italic leading-relaxed">"{{ testimonial.text }}"</p>
             </div>
-            <p class="text-foreground/70 italic leading-relaxed">"{{ testimonial.text }}"</p>
           </div>
         }
       </div>
@@ -307,9 +313,8 @@
             <div class="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
               <i class="material-symbols-outlined !text-xl leading-3 w-fit h-3 text-primary-content">network_intelligence</i>
             </div>
-            <span class="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    KJO Mind Care
-                  </span>
+            <span
+              class="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">KJO Mind Care</span>
           </div>
           <p class="text-sm text-foreground/60">Tu compañero de bienestar mental</p>
         </div>

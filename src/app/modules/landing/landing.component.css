@@ -2,7 +2,7 @@
 @layer utilities {
   .animate-on-scroll {
     opacity: 0;
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out, border 300ms 0s, scale 300ms 0s, shadow 300ms 0s;
   }
 
   .animate-on-scroll.is-visible {
