@@ -12,16 +12,16 @@
 
   <div class="flex items-center gap-2 w-full">
     <div class="w-full">
-      <div class="font-semibold">{{ comment().userId.fullName }}</div>
-      @if (comment().date) {
+      <div class="font-semibold">{{ comment().author.fullName }}</div>
+      @if (comment().createdAt) {
         <relative-time
           class="text-xs opacity-80"
-          datetime="{{ comment().date }}"
+          [datetime]="comment().createdAt.toDate().toISOString()"
           precision="day"
           tense="past"
         ></relative-time>
       } @else {
-        <span class="text-xs opacity-80">No date</span>
+        <span class="text-xs opacity-80">Just now</span>
       }
     </div>
     <div class="flex items-center">
@@ -53,9 +53,9 @@
 
   <div class="list-col-wrap">
     <p>{{ comment().content }}</p>
-    @if (comment().childrenComments.length > 0) {
+    @if (comment().replies.length > 0) {
       <div class="list">
-        @for (child of comment().childrenComments; track child) {
+        @for (child of comment().replies; track child) {
           <blog-comment
             [comment]="child"
             [commentParentId]="comment().id"
