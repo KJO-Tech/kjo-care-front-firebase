@@ -1,13 +1,24 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  UserRequest,
+  UserResponse,
+} from '../../../core/interfaces/user-http.interface';
 import { UserService } from '../../../core/services/user.service';
-import { UserRequest, UserResponse } from '../../../core/interfaces/user-http.interface';
 import { FormUtils } from '../../../shared/utils/form-utils';
 
 @Component({
   selector: 'user-modal',
   templateUrl: './user-modal.component.html',
-  imports: [ReactiveFormsModule]
+  imports: [ReactiveFormsModule],
 })
 export class UserModalComponent {
   private readonly fb = inject(FormBuilder);
@@ -21,22 +32,26 @@ export class UserModalComponent {
   readonly isSubmitting = signal(false);
 
   readonly title = computed(() =>
-    this.type() === 'create' ? 'Crear nuevo usuario' : `Editar ${this.user()?.displayName || 'usuario'}`
+    this.type() === 'create'
+      ? 'Crear nuevo usuario'
+      : `Editar ${this.user()?.fullName || 'usuario'}`,
   );
 
   readonly submitButtonText = computed(() =>
-    this.type() === 'create' ? 'Crear Usuario' : 'Actualizar Usuario'
+    this.type() === 'create' ? 'Crear Usuario' : 'Actualizar Usuario',
   );
 
   readonly modalId = computed(() =>
-    this.type() === 'create' ? 'modal_user_create' : 'modal_user_edit'
+    this.type() === 'create' ? 'modal_user_create' : 'modal_user_edit',
   );
 
   readonly userForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    displayName: ['', [Validators.required, Validators.minLength(3)]],
+    fullName: ['', [Validators.required, Validators.minLength(3)]],
     password: [''],
-    roles: [['user'], [Validators.required]]
+    role: ['user', [Validators.required]],
+    phone: [''],
+    age: [null as number | null],
   });
 
   readonly formUtils = FormUtils;
@@ -45,7 +60,10 @@ export class UserModalComponent {
     effect(() => {
       const passwordControl = this.userForm.get('password');
       if (this.type() === 'create') {
-        passwordControl?.setValidators([Validators.required, Validators.minLength(6)]);
+        passwordControl?.setValidators([
+          Validators.required,
+          Validators.minLength(6),
+        ]);
         passwordControl?.enable();
       } else {
         passwordControl?.clearValidators();
@@ -59,18 +77,24 @@ export class UserModalComponent {
       if (userToEdit && this.type() === 'edit') {
         this.userForm.patchValue({
           email: userToEdit.email,
-          displayName: userToEdit.displayName,
+          fullName: userToEdit.fullName,
           password: '',
-          roles: userToEdit.roles
+          role: userToEdit.role,
+          phone: userToEdit.phone,
+          age: userToEdit.age,
         });
       }
     });
 
     effect(() => {
       const emailControl = this.userForm.get('email');
-      const usernameControl = this.userForm.get('displayName');
+      const usernameControl = this.userForm.get('fullName');
 
-      if (emailControl?.value && this.type() === 'create' && !usernameControl?.dirty) {
+      if (
+        emailControl?.value &&
+        this.type() === 'create' &&
+        !usernameControl?.dirty
+      ) {
         const emailPrefix = emailControl.value.split('@')[0];
         usernameControl?.setValue(emailPrefix);
       }
@@ -86,9 +110,10 @@ export class UserModalComponent {
     this.isSubmitting.set(true);
     const formValue = this.userForm.getRawValue();
 
-    const operation$ = this.type() === 'create'
-      ? this.createUser(formValue)
-      : this.updateUser(formValue);
+    const operation$ =
+      this.type() === 'create'
+        ? this.createUser(formValue)
+        : this.updateUser(formValue);
 
     operation$.subscribe({
       next: () => {
@@ -97,16 +122,18 @@ export class UserModalComponent {
         this.closeModal();
       },
       error: () => this.isSubmitting.set(false),
-      complete: () => this.isSubmitting.set(false)
+      complete: () => this.isSubmitting.set(false),
     });
   }
 
   private createUser(formValue: any) {
     const request: Omit<UserRequest, 'id'> = {
-      displayName: formValue.displayName,
+      fullName: formValue.fullName,
       email: formValue.email,
       password: formValue.password,
-      roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
+      role: formValue.role,
+      phone: formValue.phone,
+      age: formValue.age,
     };
 
     return this.userService.create(request);
@@ -117,9 +144,11 @@ export class UserModalComponent {
     if (!currentUser?.id) throw new Error('User ID required');
 
     const request: Partial<UserRequest> = {
-      displayName: formValue.displayName,
+      fullName: formValue.fullName,
       email: formValue.email,
-      roles: Array.isArray(formValue.roles) ? formValue.roles : [formValue.roles]
+      role: formValue.role,
+      phone: formValue.phone,
+      age: formValue.age,
     };
 
     if (formValue.password?.trim()) {
@@ -130,11 +159,11 @@ export class UserModalComponent {
   }
 
   toggleShowPassword(): void {
-    this.showPassword.update(current => !current);
+    this.showPassword.update((current) => !current);
   }
 
   private resetForm(): void {
-    this.userForm.reset({ roles: ['user'] });
+    this.userForm.reset({ role: 'user' });
     this.showPassword.set(false);
     this.isSubmitting.set(false);
   }

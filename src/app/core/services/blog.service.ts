@@ -1,100 +1,170 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { from, Observable, throwError } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
-
-import { Blog, Status } from '../models/blog';
-import { blogs } from '../../shared/utils/local-data';
-import { Firestore } from '@angular/fire/firestore';
-import { collection, doc, getDoc, getDocs, query, updateDoc } from 'firebase/firestore';
-import { catchError, map } from 'rxjs/operators';
+import {
+  collection,
+  collectionData,
+  doc,
+  docData,
+  Firestore,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from '@angular/fire/firestore';
+import {
+  catchError,
+  combineLatest,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
+import { Blog, BlogStatus } from '../models/blog';
+import { AuthService } from './auth.service';
+import { CommentService } from './comment.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BlogService {
-  private baseUrl: string = environment.apiUrl + '/api/mind/blog/blogs';
-
-  private http = inject(HttpClient);
-
   private firestore = inject(Firestore);
+  private authService = inject(AuthService);
+  private commentService = inject(CommentService);
   private collectionName = 'blogs';
 
-  private _selectedBlog = signal<Blog>({
-    id: '',
-    title: '',
-    content: '',
-    mediaUrl: '',
-    mediaType: '',
-    createdAt: '',
-    updatedAt: '',
-    status: Status.Published,
-    categoryId: ''
-  });
+  private _selectedBlog = signal<Blog | null>(null);
 
-  get selectedBlog(): Blog {
+  get selectedBlog(): Blog | null {
     return this._selectedBlog();
   }
 
-  set selectedBlog(blog: Blog) {
+  set selectedBlog(blog: Blog | null) {
     this._selectedBlog.set(blog);
   }
 
   findAll(): Observable<Blog[]> {
-    const q = query(collection(this.firestore, this.collectionName));
-    return from(getDocs(q)).pipe(
-      map((snapshot) => {
-        return snapshot.docs.map(doc => ({
-          ...doc.data() as Omit<Blog, 'id'>,
-          id: doc.id
-        }));
+    const blogsCollection = collection(this.firestore, this.collectionName);
+
+    // Admin sees all, others see only non-deleted
+    // Note: This requires a complex query or client-side filtering if we want to show DRAFTs to authors
+    // For now, let's fetch all and filter client-side based on role for simplicity,
+    // or use a basic query.
+
+    // Since we need to check isAdmin, we can switchMap from auth state
+    // But for simplicity and performance, we can just fetch and filter.
+    // Ideally, we should use Firestore security rules and queries.
+
+    const q = query(blogsCollection, orderBy('createdAt', 'desc'));
+
+    return collectionData(q, { idField: 'id' }).pipe(
+      map((blogs: any[]) => {
+        const user = this.authService.userData();
+        const isAdmin = user?.role === 'admin';
+
+        return blogs
+          .map((blog) => {
+            // Convert Timestamp to Date if needed, or keep as Timestamp
+            // The model expects Timestamp, so we cast
+            return blog as Blog;
+          })
+          .filter((blog) => {
+            if (isAdmin) return true;
+            return blog.status !== BlogStatus.DELETED;
+          });
       }),
-      catchError(error => {
-        console.error('Error al obtener categorías:', error);
-        return throwError(() => error);
-      })
+      // We need to populate isLiked for each blog.
+      // This is expensive if we do it for all blogs.
+      // Android app likely does it.
+      // Optimization: Only fetch likes for visible blogs or do it in component.
+      // For now, let's map it.
+      switchMap((blogs) => {
+        if (blogs.length === 0) return of([]);
+
+        const user = this.authService.userData();
+
+        const blogsWithDetails$ = blogs.map((blog) => {
+          const likes$ = user
+            ? this.checkIfLiked(blog.id, user.uid)
+            : of(false);
+
+          const commentsCount$ = this.commentService.getCommentCount(blog.id);
+
+          return combineLatest([likes$, commentsCount$]).pipe(
+            map(([isLiked, comments]) => ({
+              ...blog,
+              isLiked,
+              comments,
+            })),
+          );
+        });
+
+        return combineLatest(blogsWithDetails$);
+      }),
     );
   }
 
   getById(id: string): Observable<Blog | null> {
     const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
-    return from(getDoc(docRef)).pipe(
-      map(docSnap => {
-        if (!docSnap.exists()) return null;
-        return {
-          id: docSnap.id,
-          ...docSnap.data() as Omit<Blog, 'id'>
-        };
+    return docData(docRef, { idField: 'id' }).pipe(
+      switchMap((blogData: any) => {
+        if (!blogData) return of(null);
+
+        const blog = blogData as Blog;
+        const user = this.authService.userData();
+
+        const likes$ = user ? this.checkIfLiked(blog.id, user.uid) : of(false);
+
+        const commentsCount$ = this.commentService.getCommentCount(blog.id);
+
+        return combineLatest([likes$, commentsCount$]).pipe(
+          map(([isLiked, comments]) => ({
+            ...blog,
+            isLiked,
+            comments,
+          })),
+        );
       }),
-      catchError(error => {
-        console.error('Error al obtener blog:', error);
-        return throwError(() => error);
-      })
     );
   }
 
-  create(request: FormData): Observable<Blog> {
-    return this.http.post<Blog>(`${this.baseUrl}`, request);
+  create(blog: Partial<Blog>): Observable<void> {
+    const id = doc(collection(this.firestore, this.collectionName)).id;
+    const newBlog: Blog = {
+      ...blog,
+      id: id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      likes: 0,
+      reaction: 0,
+      comments: 0,
+      isLiked: false,
+      status: BlogStatus.PENDING, // Default
+      author: this.authService.userData()!, // Assume logged in
+    } as Blog;
+
+    return from(setDoc(doc(this.firestore, this.collectionName, id), newBlog));
   }
 
-  update(request: FormData, id: string): Observable<Blog> {
-    return this.http.put<Blog>(`${this.baseUrl}/${id}`, request);
+  update(id: string, blog: Partial<Blog>): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(updateDoc(docRef, { ...blog, updatedAt: Timestamp.now() }));
   }
 
   delete(id: string): Observable<void> {
     const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(updateDoc(docRef, { status: BlogStatus.DELETED }));
+  }
 
-    const blog: Partial<Omit<Blog, 'id'>> = {
-      status: Status.Deleted
-    };
-
-    return from(updateDoc(docRef, blog)).pipe(
-      catchError(error => {
-        console.error('Error al eliminar el blog:', error);
-        return throwError(() => error);
-      })
+  // Reactions
+  private checkIfLiked(blogId: string, userId: string): Observable<boolean> {
+    const reactionDocRef = doc(
+      this.firestore,
+      `${this.collectionName}/${blogId}/reactions/${userId}`,
+    );
+    return docData(reactionDocRef).pipe(
+      map((doc) => !!doc),
+      catchError(() => of(false)),
     );
   }
 }

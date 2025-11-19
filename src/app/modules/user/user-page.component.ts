@@ -1,12 +1,18 @@
-import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { UserService } from '../../core/services/user.service';
-import { UserTableComponent } from './user-table/user-table.component';
-import { UserModalComponent } from './user-modal/user-modal.component';
-import { UserRequest, UserResponse } from '../../core/interfaces/user-http.interface';
-import { DialogComponent } from '../../shared/components/dialog/dialog.component';
 import { ToastService } from '../../core/services/toast.service';
+import { UserService } from '../../core/services/user.service';
+import { DialogComponent } from '../../shared/components/dialog/dialog.component';
+import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
+import { UserModalComponent } from './user-modal/user-modal.component';
+import { UserTableComponent } from './user-table/user-table.component';
 
 @Component({
   selector: 'app-user',
@@ -15,23 +21,22 @@ import { ToastService } from '../../core/services/toast.service';
     DialogComponent,
     ModalOpenButtonComponent,
     UserTableComponent,
-    UserModalComponent
-  ]
+    UserModalComponent,
+  ],
 })
 export default class UserPageComponent {
-
   private readonly userService = inject(UserService);
-  readonly search = signal<string>("")
-  readonly selectedRole = signal<string>("all")
-  readonly showDisabled = signal<boolean>(false)
+  readonly search = signal<string>('');
+  readonly selectedRole = signal<string>('all');
+  readonly showDisabled = signal<boolean>(false);
   readonly toastService = inject(ToastService);
 
-  modalCreateButton = viewChild<ElementRef>("modalCreateButton")
+  modalCreateButton = viewChild<ElementRef>('modalCreateButton');
 
   readonly users = rxResource({
     loader: () => {
-      return this.userService.getAll()
-    }
+      return this.userService.getAll();
+    },
   });
 
   readonly filteredUsers = computed(() => {
@@ -41,17 +46,17 @@ export default class UserPageComponent {
     const showDisabled = this.showDisabled();
 
     return userList
-      .filter(user => {
+      .filter((user) => {
         if (!showDisabled && !user.enabled) return false;
 
         if (selectedRole !== 'all') {
-          if (!user.roles.includes(selectedRole)) return false;
+          if (user.role !== selectedRole) return false;
         }
 
         if (searchTerm) {
-          const displayName = user.displayName?.toLowerCase() || '';
+          const fullName = user.fullName?.toLowerCase() || '';
           const email = user.email?.toLowerCase() || '';
-          return displayName.includes(searchTerm) || email.includes(searchTerm);
+          return fullName.includes(searchTerm) || email.includes(searchTerm);
         }
 
         return true;
@@ -67,10 +72,10 @@ export default class UserPageComponent {
     const allUsers = this.users.value() ?? [];
     return {
       total: allUsers.length,
-      enabled: allUsers.filter(u => u.enabled).length,
-      disabled: allUsers.filter(u => !u.enabled).length,
-      admins: allUsers.filter(u => u.roles.includes('admin')).length,
-      users: allUsers.filter(u => u.roles.includes('user')).length
+      enabled: allUsers.filter((u) => u.enabled).length,
+      disabled: allUsers.filter((u) => !u.enabled).length,
+      admins: allUsers.filter((u) => u.role === 'admin').length,
+      users: allUsers.filter((u) => u.role === 'user').length,
     };
   });
 
@@ -84,19 +89,19 @@ export default class UserPageComponent {
       next: () => {
         this.users.reload();
         this.userService.clearSelectedUser();
-      }
+      },
     });
   }
 
   restoreUser(userId: string): void {
     this.userService.restore(userId).subscribe({
-      next: () => this.users.reload()
+      next: () => this.users.reload(),
     });
   }
 
   toggleUserStatus(userId: string): void {
     const currentUsers = this.users.value() ?? [];
-    const userIndex = currentUsers.findIndex(u => u.id === userId);
+    const userIndex = currentUsers.findIndex((u) => u.id === userId);
 
     if (userIndex === -1) return;
 
@@ -110,8 +115,8 @@ export default class UserPageComponent {
     this.userService.toggleUserStatus(userId).subscribe({
       next: (updatedUser) => {
         const users = this.users.value() ?? [];
-        const finalUsers = users.map(user =>
-          user.id === userId ? updatedUser : user
+        const finalUsers = users.map((user) =>
+          user.id === userId ? updatedUser : user,
         );
         this.users.set(finalUsers);
       },
@@ -124,9 +129,9 @@ export default class UserPageComponent {
         this.toastService.addToast({
           message: 'Error al cambiar el estado del usuario',
           type: 'error',
-          duration: 3000
+          duration: 3000,
         });
-      }
+      },
     });
   }
 
@@ -140,7 +145,7 @@ export default class UserPageComponent {
   }
 
   toggleShowDisabled(): void {
-    this.showDisabled.update(current => !current);
+    this.showDisabled.update((current) => !current);
   }
 
   reload(): void {

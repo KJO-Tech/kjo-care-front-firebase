@@ -1,31 +1,28 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { AchievementsComponent } from './components/achievements/achievements.component';
+import { StatisticsComponent } from './components/statistics/statistics.component';
+import { HomeMoodRegisterComponent } from './components/home-mood-register/home-mood-register.component';
+import { WeeklyHistoryComponent } from './components/weekly-history/weekly-history.component';
+import { DailyActivitiesComponent } from './components/daily-activities/daily-activities.component';
 import { KeycloakService } from '../../auth/services/keycloak.service';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
   imports: [
-    RouterLink
+    AchievementsComponent,
+    StatisticsComponent,
+    HomeMoodRegisterComponent,
+    WeeklyHistoryComponent,
+    DailyActivitiesComponent
   ],
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeComponent {
+export default class HomeComponent {
+  userService = inject(KeycloakService);
 
-  private authService = inject(AuthService)
-
-
-  user = this.authService.currentUser();
-  userEmail = computed(() => this.user?.email ?? 'Usuario');
-  isLoading = this.authService.isLoading;
-
-  async logout() {
-    await this.authService.logout();
-  }
-
-  async account() {
-
-  }
-
+  userName = computed(() => {
+    const names = this.userService.profile()?.firstName ?? 'Usuario';
+    return names.split(' ')[0];
+  });
 }

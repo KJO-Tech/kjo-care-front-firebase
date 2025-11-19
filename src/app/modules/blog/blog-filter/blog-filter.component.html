@@ -20,7 +20,9 @@
     >
       <option value="">All Categories</option>
       @for (category of categories(); track $index) {
-        <option value="{{ category.id }}">{{ category.nameTranslations['en'] || 'Unknown' }}</option>
+        <option value="{{ category.id }}">
+          {{ category.nameTranslations["en"] || "Unknown" }}
+        </option>
       }
     </select>
 
@@ -31,9 +33,9 @@
       #statusSelect
     >
       <option value="">All status</option>
-      <option value="{{ Status.Published }}">{{ Status.Published }}</option>
-      <option value="{{ Status.Draft }}">{{ Status.Draft }}</option>
-      <option value="{{ Status.Deleted }}">{{ Status.Deleted }}</option>
+      <option value="{{ Status.PUBLISHED }}">{{ Status.PUBLISHED }}</option>
+      <option value="{{ Status.PENDING }}">{{ Status.PENDING }}</option>
+      <option value="{{ Status.DELETED }}">{{ Status.DELETED }}</option>
     </select>
   </div>
 </div>

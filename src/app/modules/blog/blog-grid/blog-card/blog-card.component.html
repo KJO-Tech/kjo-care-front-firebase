@@ -6,21 +6,23 @@
         <blog-card-options-button [blog]="blog()" />
       </div>
       <div class="flex items-center gap-2 text-xs opacity-80">
-        <span class="truncate">By {{ blog().author?.fullName || 'Unknown' }}</span>
+        <span class="truncate"
+          >By {{ blog().author.fullName || "Unknown" }}</span
+        >
         <span>•</span>
         <span>
-        <!-- CALENDAR ICON HERE -->
-<!--          {{ blog().createdAt }}-->
-      </span>
+          <!-- CALENDAR ICON HERE -->
+          {{ blog().createdAt.toDate() | date }}
+        </span>
       </div>
       <p class="text-sm line-clamp-3 my-3 opacity-80">{{ blog().content }}</p>
     </div>
     <div class="card-actions justify-between items-center">
-      @if (blog().status == Status.Published) {
+      @if (blog().status == Status.PUBLISHED) {
         <div class="badge badge-primary">Published</div>
-      } @else if (blog().status == Status.Draft) {
-        <div class="badge badge-outline">Draft</div>
-      } @else if (blog().status == Status.Deleted) {
+      } @else if (blog().status == Status.PENDING) {
+        <div class="badge badge-outline">Pending</div>
+      } @else if (blog().status == Status.DELETED) {
         <div class="badge badge-error">Deleted</div>
       }
       <modal-open-button

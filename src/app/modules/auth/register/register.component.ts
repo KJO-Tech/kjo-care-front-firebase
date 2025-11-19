@@ -1,14 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  effect,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { LogoComponent } from "../../../shared/components/logo.component";
+import { Router, RouterLink } from '@angular/router';
+import { LogoComponent } from '../../../shared/components/logo.component';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NEVER } from 'rxjs';
 import { RegisterForm } from '../../../core/interfaces/auth-http.interface';
-
-
 
 @Component({
   selector: 'auth-register',
@@ -20,34 +24,55 @@ export default class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
 
+  private router = inject(Router);
+
   protected readonly loading = signal(false);
-  readonly registerSignal = signal({ displayName: '', email: '', password: '' });
+  readonly registerSignal = signal({
+    displayName: '',
+    email: '',
+    password: '',
+  });
   readonly registerResource = rxResource({
     request: () => this.registerSignal(),
-    loader: () => this.isRegisterEmpy(this.registerSignal()) ? NEVER : this.authService.register(this.registerSignal())
+    loader: () =>
+      this.isRegisterEmpy(this.registerSignal())
+        ? NEVER
+        : this.authService.register(this.registerSignal()),
   });
 
-  registerForm = this.fb.nonNullable.group({
-    displayName: ['', [Validators.required, Validators.minLength(3)]],
-    email: ['', [
-      Validators.required,
-      Validators.email,
-      Validators.pattern(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-    ]],
-    password: ['', [
-      Validators.required,
-      Validators.minLength(6)
-    ]],
-    confirmPassword: ['', [Validators.required]]
-  }, {
-    validators: this.passwordMatchValidator.bind(this)
-  });
+  constructor() {
+    effect(() => {
+      if (this.registerResource.value()?.success) {
+        this.router.navigate(['/app']);
+      }
+    });
+  }
+
+  registerForm = this.fb.nonNullable.group(
+    {
+      displayName: ['', [Validators.required, Validators.minLength(3)]],
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email,
+          Validators.pattern(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
+        ],
+      ],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    {
+      validators: this.passwordMatchValidator.bind(this),
+    },
+  );
 
   protected get displayNameErrors(): string {
     const control = this.registerForm.get('displayName');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'El nombre es requerido';
-      if (control.errors['minlength']) return 'El nombre debe tener al menos 3 caracteres';
+      if (control.errors['minlength'])
+        return 'El nombre debe tener al menos 3 caracteres';
     }
     return '';
   }
@@ -56,7 +81,8 @@ export default class RegisterComponent {
     const control = this.registerForm.get('email');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'El email es requerido';
-      if (control.errors['email'] || control.errors['pattern']) return 'Email inválido';
+      if (control.errors['email'] || control.errors['pattern'])
+        return 'Email inválido';
     }
     return '';
   }
@@ -65,7 +91,8 @@ export default class RegisterComponent {
     const control = this.registerForm.get('password');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'La contraseña es requerida';
-      if (control.errors['minlength']) return 'La contraseña debe tener al menos 6 caracteres';
+      if (control.errors['minlength'])
+        return 'La contraseña debe tener al menos 6 caracteres';
     }
     return '';
   }
@@ -74,7 +101,8 @@ export default class RegisterComponent {
     const control = this.registerForm.get('confirmPassword');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'Debe confirmar la contraseña';
-      if (control.errors['passwordMismatch']) return 'Las contraseñas no coinciden';
+      if (control.errors['passwordMismatch'])
+        return 'Las contraseñas no coinciden';
     }
     return '';
   }
@@ -98,7 +126,7 @@ export default class RegisterComponent {
       this.registerSignal.set({
         displayName: this.registerForm.value.displayName ?? '',
         email: this.registerForm.value.email ?? '',
-        password: this.registerForm.value.password ?? ''
+        password: this.registerForm.value.password ?? '',
       });
     } else {
       this.registerForm.markAllAsTouched();
