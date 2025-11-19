@@ -134,9 +134,9 @@
                   classes="btn btn-ghost btn-sm"
                   (click)="userService.setSelectedUser(user)"
                 >
-                  <i class="material-icons-outlined text-lg text-primary"
-                    >edit</i
-                  >
+                  <i class="material-icons-outlined text-lg text-primary">
+                    edit
+                  </i>
                 </modal-open-button>
               </div>
 
@@ -150,13 +150,13 @@
                   (click)="toggleUserStatus(user.id)"
                 >
                   @if (user.enabled) {
-                    <i class="material-icons-outlined text-lg text-warning"
-                      >visibility_off</i
-                    >
+                    <i class="material-icons-outlined text-lg text-warning">
+                      visibility_off
+                    </i>
                   } @else {
-                    <i class="material-icons-outlined text-lg text-success"
-                      >visibility</i
-                    >
+                    <i class="material-icons-outlined text-lg text-success">
+                      visibility
+                    </i>
                   }
                 </button>
               </div>
@@ -169,9 +169,9 @@
                     classes="btn btn-ghost btn-sm"
                     (click)="userService.setSelectedUser(user)"
                   >
-                    <i class="material-icons-outlined text-lg text-error"
-                      >delete</i
-                    >
+                    <i class="material-icons-outlined text-lg text-error">
+                      delete
+                    </i>
                   </modal-open-button>
                 </div>
               } @else {
