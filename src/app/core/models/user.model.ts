@@ -1,8 +1,10 @@
-
 export interface UserModel {
   uid: string;
+  fullName: string;
   email: string;
-  displayName: string;
-  photoURL?: string;
-  createdAt: Date;
+  createdAt: any;
+  profileImage?: string;
+  phone?: string;
+  age?: number;
+  role?: 'admin' | 'user';
 }

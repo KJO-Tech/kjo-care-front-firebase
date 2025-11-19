@@ -4,13 +4,15 @@
       <span class="">{{ userLetters() }}</span>
     </div>
   </div>
-  <div class="list-col-wrap flex items-center justify-between text-center w-full">
+  <div
+    class="list-col-wrap flex items-center justify-between text-center w-full"
+  >
     <span class="w-0 border h-full mx-auto"></span>
   </div>
 
   <div class="flex items-center gap-2 w-full">
     <div class="w-full">
-      <div class="font-semibold">{{ comment().userId.firstName }} {{ comment().userId.lastName }}</div>
+      <div class="font-semibold">{{ comment().userId.fullName }}</div>
       @if (comment().date) {
         <relative-time
           class="text-xs opacity-80"
@@ -53,7 +55,7 @@
     <p>{{ comment().content }}</p>
     @if (comment().childrenComments.length > 0) {
       <div class="list">
-        @for (child of comment().childrenComments; track child; ) {
+        @for (child of comment().childrenComments; track child) {
           <blog-comment
             [comment]="child"
             [commentParentId]="comment().id"
