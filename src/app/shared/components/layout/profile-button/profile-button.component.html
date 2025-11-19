@@ -1,28 +1,107 @@
 <div class="dropdown dropdown-end">
-  <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-    <div class="w-10 rounded-full">
-      <img
-        alt="Tailwind CSS Navbar component"
-        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-      />
-    </div>
+  <div tabindex="0" role="button" class="btn btn-circle avatar">
+    @if (isLoading()) {
+      <div class="w-10 rounded-full bg-base-300 animate-pulse"></div>
+    } @else {
+      <div class="w-10 rounded-full">
+        @if (userAvatar()) {
+          <img
+            [src]="userAvatar()!"
+            [alt]="userName()"
+            class="w-full h-full object-cover rounded-full"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+          />
+          <div
+            class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm rounded-full"
+            style="display: none"
+          >
+            {{ userLetters() }}
+          </div>
+        } @else {
+          <div
+            class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm rounded-full"
+          >
+            {{ userLetters() }}
+          </div>
+        }
+      </div>
+    }
   </div>
+
+  <!-- @defer (on hover, interaction; prefetch on idle) { -->
   <ul
     tabindex="0"
-    class="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-4 w-52 p-2 shadow-md space-y-1"
+    class="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-4 w-60 p-2 shadow-lg border border-base-300 space-y-1"
   >
+    <div class="flex items-center gap-3">
+      <div class="avatar">
+        <div class="w-8 rounded-full">
+          @if (userAvatar()) {
+            <img
+              [src]="userAvatar()!"
+              [alt]="userName()"
+              class="w-full h-full object-cover"
+            />
+          } @else {
+            <div
+              class="h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xs"
+            >
+              {{ userLetters() }}
+            </div>
+          }
+        </div>
+      </div>
+      <div class="min-w-0 max-w-44 flex-1">
+        <div class="font-medium text-sm truncate">{{ userName() }}</div>
+        <div class="text-xs opacity-70 truncate">
+          {{ currentUser()?.email }}
+        </div>
+      </div>
+    </div>
+
+    <div class="divider my-1"></div>
+
     <li>
-      <a class="justify-between" (click)="account()"> Profile </a>
+      <a class="flex items-center gap-2" (click)="account()">
+        <i class="material-icons-outlined text-base">person</i>
+        <span>Perfil</span>
+      </a>
     </li>
     <li>
-      <a>Settings</a>
+      <a routerLink="/dashboard/settings" class="flex items-center gap-2">
+        <i class="material-icons-outlined text-base">settings</i>
+        <span>Configuración</span>
+      </a>
     </li>
     <li>
-      <a>Audit Logs</a>
+      <a class="flex items-center gap-2">
+        <i class="material-icons-outlined text-base">history</i>
+        <span>Historial</span>
+      </a>
     </li>
-    <hr />
+
+    <div class="divider my-1"></div>
+
     <li>
-      <a (click)="logout()">Logout</a>
+      <a
+        class="flex items-center gap-2 text-error hover:bg-error/10"
+        (click)="logout()"
+      >
+        <i class="material-icons-outlined text-base">logout</i>
+        <span>Cerrar Sesión</span>
+      </a>
     </li>
   </ul>
+  <!-- } 
+  @placeholder {
+    <div class="w-52 h-32 bg-base-300 rounded-box animate-pulse mt-4"></div>
+  } @loading (after 100ms; minimum 200ms) {
+    <div class="w-52 bg-base-100 rounded-box mt-4 p-2 shadow-lg">
+      <div class="animate-pulse space-y-2">
+        <div class="h-4 bg-base-300 rounded w-3/4"></div>
+        <div class="h-4 bg-base-300 rounded w-1/2"></div>
+        <div class="h-4 bg-base-300 rounded w-2/3"></div>
+      </div>
+    </div>
+  } -->
 </div>

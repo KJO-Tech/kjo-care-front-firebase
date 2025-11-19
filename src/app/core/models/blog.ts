@@ -1,48 +1,59 @@
-import { UserProfile } from './user-profile';
+import { Timestamp } from 'firebase/firestore';
+import { UserModel } from './user.model';
 
 export interface Blog {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  image?: string;
-  video?: string;
-  publishedDate: string;
-  modifiedDate: string;
-  state: Status;
-  author?: UserProfile;
-  category?: Category;
+  author: UserModel;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  mediaUrl?: string | null;
+  mediaType?: MediaType | null;
+  likes: number;
+  reaction: number;
+  comments: number;
+  isLiked: boolean;
+  categoryId?: string | null;
+  status: BlogStatus;
 }
 
-export enum Status {
-  Published = 'PUBLICADO',
-  Draft = 'PENDIENTE',
-  Deleted = 'ELIMINADO',
+export enum MediaType {
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO',
+  YOUTUBE = 'YOUTUBE',
+}
+
+export enum BlogStatus {
+  PENDING = 'PENDING',
+  PUBLISHED = 'PUBLISHED',
+  DELETED = 'DELETED',
 }
 
 export interface Category {
-  id: number;
-  name: string;
-}
-
-export interface Reaction {
-  id: number;
-  blogId: number;
-  userId: number;
-  type: string;
-  reaction: string;
+  id: string;
+  nameTranslations: { [key: string]: string };
+  isActive: boolean;
 }
 
 export interface Comment {
-  id: number;
-  blogId: number;
-  userId: number;
+  id: string;
+  author: UserModel;
   content: string;
-  commentDate: string;
-  commentParentId: number;
+  createdAt: Timestamp;
+  isMine: boolean;
+  parentCommentId?: string | null;
+  blogId?: string;
+  replies: Comment[];
+}
+
+export interface Reaction {
+  userId: string;
+  timestamp: Timestamp;
 }
 
 export interface FilterDTO {
   search: string;
-  category: number;
-  status: string;
+  category: string;
+  status: BlogStatus;
 }

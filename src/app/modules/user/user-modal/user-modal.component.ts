@@ -1,142 +1,175 @@
-import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
-
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
-import { Blog, Category, Status } from '../../../core/models/blog';
-
-import { FormUtils } from '../../../shared/utils/form-utils';
-import { BlogService } from '../../../core/services/blog.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { rxResource } from '@angular/core/rxjs-interop';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  UserRequest,
+  UserResponse,
+} from '../../../core/interfaces/user-http.interface';
 import { UserService } from '../../../core/services/user.service';
-import { UserRequest } from '../../../core/interfaces/user-http.interface';
+import { FormUtils } from '../../../shared/utils/form-utils';
 
 @Component({
   selector: 'user-modal',
   templateUrl: './user-modal.component.html',
-  imports: [
-    ReactiveFormsModule,
-    NgClass
-  ]
+  imports: [ReactiveFormsModule],
 })
-export class UserModalComponent implements OnInit {
+export class UserModalComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
 
-  private fb = inject(FormBuilder);
-  private userService = inject(UserService);
-  private toastService = inject(ToastService);
+  readonly user = input<UserResponse | null>(null);
+  readonly type = input<'create' | 'edit'>('create');
+  readonly reload = output<void>();
 
-  reload = output();
+  readonly showPassword = signal(false);
+  readonly isSubmitting = signal(false);
 
-  formUtils = FormUtils;
+  readonly title = computed(() =>
+    this.type() === 'create'
+      ? 'Crear nuevo usuario'
+      : `Editar ${this.user()?.fullName || 'usuario'}`,
+  );
 
-  user = input<UserRequest | null>(null);
-  type = input<'create' | 'edit'>('create');
+  readonly submitButtonText = computed(() =>
+    this.type() === 'create' ? 'Crear Usuario' : 'Actualizar Usuario',
+  );
 
-  title = signal('Add new user');
-  nameButton = signal('Save');
-  nameModal = computed(() => this.type() === 'create' ? 'modal_user_create' : 'modal_user_edit');
+  readonly modalId = computed(() =>
+    this.type() === 'create' ? 'modal_user_create' : 'modal_user_edit',
+  );
 
-  userForm = this.fb.group({
-    email: ['', [Validators.required, Validators.minLength(3)]],
-    firstName: ['', [Validators.required, Validators.minLength(3)]],
-    lastName: ['', [Validators.required, Validators.minLength(3)]],
-    password: ['', [Validators.required, Validators.minLength(3)]],
-    roles: ['', [Validators.required]]
+  readonly userForm = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    fullName: ['', [Validators.required, Validators.minLength(3)]],
+    password: [''],
+    role: ['user', [Validators.required]],
+    phone: [''],
+    age: [null as number | null],
   });
 
-  ngOnInit(): void {
-    if (this.type() == 'edit') {
-      this.title.set('Edit blog');
-      this.nameButton.set('Update');
-    }
-  }
+  readonly formUtils = FormUtils;
 
   constructor() {
     effect(() => {
-      console.log('User seleccionado', this.userService.selectedUser);
-      console.log('User seleccionado', this.user());
-      if (this.user()) {
-        const roles = this.user()?.roles ? this.user()?.roles[0] : '';
+      const passwordControl = this.userForm.get('password');
+      if (this.type() === 'create') {
+        passwordControl?.setValidators([
+          Validators.required,
+          Validators.minLength(6),
+        ]);
+        passwordControl?.enable();
+      } else {
+        passwordControl?.clearValidators();
+        passwordControl?.disable();
+      }
+      passwordControl?.updateValueAndValidity();
+    });
 
+    effect(() => {
+      const userToEdit = this.user();
+      if (userToEdit && this.type() === 'edit') {
         this.userForm.patchValue({
-          email: this.user()?.email,
-          firstName: this.user()?.firstName,
-          lastName: this.user()?.lastName,
-          password: this.user()?.password,
-          roles: roles
+          email: userToEdit.email,
+          fullName: userToEdit.fullName,
+          password: '',
+          role: userToEdit.role,
+          phone: userToEdit.phone,
+          age: userToEdit.age,
         });
+      }
+    });
+
+    effect(() => {
+      const emailControl = this.userForm.get('email');
+      const usernameControl = this.userForm.get('fullName');
+
+      if (
+        emailControl?.value &&
+        this.type() === 'create' &&
+        !usernameControl?.dirty
+      ) {
+        const emailPrefix = emailControl.value.split('@')[0];
+        usernameControl?.setValue(emailPrefix);
       }
     });
   }
 
-  onSubmit() {
-    if (this.userForm.invalid) {
+  onSubmit(): void {
+    if (this.userForm.invalid || this.isSubmitting()) {
       this.userForm.markAllAsTouched();
-      console.log('Form invalid');
       return;
     }
 
-    const request: UserRequest = {
-      id: this.user()?.id,
-      email: this.userForm.value.email!,
-      firstName: this.userForm.value.firstName!,
-      lastName: this.userForm.value.lastName!,
-      password: this.userForm.value.password!,
-      roles: [this.userForm.value.roles ?? '']
+    this.isSubmitting.set(true);
+    const formValue = this.userForm.getRawValue();
+
+    const operation$ =
+      this.type() === 'create'
+        ? this.createUser(formValue)
+        : this.updateUser(formValue);
+
+    operation$.subscribe({
+      next: () => {
+        this.reload.emit();
+        this.resetForm();
+        this.closeModal();
+      },
+      error: () => this.isSubmitting.set(false),
+      complete: () => this.isSubmitting.set(false),
+    });
+  }
+
+  private createUser(formValue: any) {
+    const request: Omit<UserRequest, 'id'> = {
+      fullName: formValue.fullName,
+      email: formValue.email,
+      password: formValue.password,
+      role: formValue.role,
+      phone: formValue.phone,
+      age: formValue.age,
     };
 
-    if (this.user()) {
-      return this.userService.update(request).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'User updated successfully',
-              type: 'success',
-              duration: 3000
-            });
+    return this.userService.create(request);
+  }
 
-            this.reload.emit();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error updating user',
-              type: 'error',
-              duration: 3000
-            });
-          }
-        });
-    } else {
-      return this.userService.create(request).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'User created successfully',
-              type: 'success',
-              duration: 3000
-            });
+  private updateUser(formValue: any) {
+    const currentUser = this.user();
+    if (!currentUser?.id) throw new Error('User ID required');
 
-            this.reload.emit();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error creating user',
-              type: 'error',
-              duration: 3000
-            });
-          }
-        });
+    const request: Partial<UserRequest> = {
+      fullName: formValue.fullName,
+      email: formValue.email,
+      role: formValue.role,
+      phone: formValue.phone,
+      age: formValue.age,
+    };
+
+    if (formValue.password?.trim()) {
+      request.password = formValue.password;
     }
 
-    // this.blogForm.reset(
-    //   {
-    //     title: '',
-    //     content: '',
-    //     image: null,
-    //     video: null,
-    //     category: '',
-    //     status: ''
-    //   }
-    // );
+    return this.userService.update(currentUser.id, request);
+  }
+
+  toggleShowPassword(): void {
+    this.showPassword.update((current) => !current);
+  }
+
+  private resetForm(): void {
+    this.userForm.reset({ role: 'user' });
+    this.showPassword.set(false);
+    this.isSubmitting.set(false);
+  }
+
+  private closeModal(): void {
+    const modal = document.getElementById(this.modalId()) as HTMLDialogElement;
+    modal?.close();
   }
 }

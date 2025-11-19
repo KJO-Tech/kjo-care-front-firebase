@@ -22,7 +22,7 @@ export class SidebarComponent {
     },
     {
       name: 'Health Centers',
-      path: '/dashboard/health-centers'
+      path: '/dashboard/map'
     },
     {
       name: 'Recursos de Emergencia',
@@ -31,6 +31,14 @@ export class SidebarComponent {
     {
       name: 'Blog Management',
       path: '/dashboard/blog-management'
+    },
+    {
+      name: 'Activities Management',
+      path: '/dashboard/activity-category'
+    },
+    {
+      name: 'Daily Exercise',
+      path: '/dashboard/daily-exercise'
     },
     {
       name: 'Mood Analytics',

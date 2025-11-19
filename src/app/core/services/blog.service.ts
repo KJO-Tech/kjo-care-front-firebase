@@ -1,59 +1,170 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { Observable } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
-
-import { Blog } from '../models/blog';
-import { blogs } from '../../shared/utils/local-data';
-import { BlogResponse } from '../interfaces/blog-http.interface';
+import {
+  collection,
+  collectionData,
+  doc,
+  docData,
+  Firestore,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from '@angular/fire/firestore';
+import {
+  catchError,
+  combineLatest,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
+import { Blog, BlogStatus } from '../models/blog';
+import { AuthService } from './auth.service';
+import { CommentService } from './comment.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BlogService {
-  private baseUrl: string = environment.apiUrl + '/blog/blogs';
+  private firestore = inject(Firestore);
+  private authService = inject(AuthService);
+  private commentService = inject(CommentService);
+  private collectionName = 'blogs';
 
-  private http = inject(HttpClient);
+  private _selectedBlog = signal<Blog | null>(null);
 
-  private _selectedBlog = signal<BlogResponse>(blogs[0]);
-
-  get selectedBlog(): BlogResponse {
+  get selectedBlog(): Blog | null {
     return this._selectedBlog();
   }
 
-  set selectedBlog(blog: BlogResponse) {
+  set selectedBlog(blog: Blog | null) {
     this._selectedBlog.set(blog);
   }
 
-  findAll(): Observable<BlogResponse[]> {
-    return this.http.get<BlogResponse[]>(`${this.baseUrl}/all`);
+  findAll(): Observable<Blog[]> {
+    const blogsCollection = collection(this.firestore, this.collectionName);
+
+    // Admin sees all, others see only non-deleted
+    // Note: This requires a complex query or client-side filtering if we want to show DRAFTs to authors
+    // For now, let's fetch all and filter client-side based on role for simplicity,
+    // or use a basic query.
+
+    // Since we need to check isAdmin, we can switchMap from auth state
+    // But for simplicity and performance, we can just fetch and filter.
+    // Ideally, we should use Firestore security rules and queries.
+
+    const q = query(blogsCollection, orderBy('createdAt', 'desc'));
+
+    return collectionData(q, { idField: 'id' }).pipe(
+      map((blogs: any[]) => {
+        const user = this.authService.userData();
+        const isAdmin = user?.role === 'admin';
+
+        return blogs
+          .map((blog) => {
+            // Convert Timestamp to Date if needed, or keep as Timestamp
+            // The model expects Timestamp, so we cast
+            return blog as Blog;
+          })
+          .filter((blog) => {
+            if (isAdmin) return true;
+            return blog.status !== BlogStatus.DELETED;
+          });
+      }),
+      // We need to populate isLiked for each blog.
+      // This is expensive if we do it for all blogs.
+      // Android app likely does it.
+      // Optimization: Only fetch likes for visible blogs or do it in component.
+      // For now, let's map it.
+      switchMap((blogs) => {
+        if (blogs.length === 0) return of([]);
+
+        const user = this.authService.userData();
+
+        const blogsWithDetails$ = blogs.map((blog) => {
+          const likes$ = user
+            ? this.checkIfLiked(blog.id, user.uid)
+            : of(false);
+
+          const commentsCount$ = this.commentService.getCommentCount(blog.id);
+
+          return combineLatest([likes$, commentsCount$]).pipe(
+            map(([isLiked, comments]) => ({
+              ...blog,
+              isLiked,
+              comments,
+            })),
+          );
+        });
+
+        return combineLatest(blogsWithDetails$);
+      }),
+    );
   }
 
-  // findAll(): Observable<Blog[]> {
-  //   return this.http.get<{
-  //     content: Blog[];
-  //     page: number;
-  //     size: number;
-  //   }>(`${this.baseUrl}/all`).pipe(
-  //     map(({ content }) => content)
-  //   );
-  // }
+  getById(id: string): Observable<Blog | null> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return docData(docRef, { idField: 'id' }).pipe(
+      switchMap((blogData: any) => {
+        if (!blogData) return of(null);
 
-  getById(id: number): Observable<Blog> {
-    return this.http.get<Blog>(`${this.baseUrl}/${id}`);
+        const blog = blogData as Blog;
+        const user = this.authService.userData();
+
+        const likes$ = user ? this.checkIfLiked(blog.id, user.uid) : of(false);
+
+        const commentsCount$ = this.commentService.getCommentCount(blog.id);
+
+        return combineLatest([likes$, commentsCount$]).pipe(
+          map(([isLiked, comments]) => ({
+            ...blog,
+            isLiked,
+            comments,
+          })),
+        );
+      }),
+    );
   }
 
-  create(request: FormData): Observable<Blog> {
-    return this.http.post<Blog>(`${this.baseUrl}`, request);
+  create(blog: Partial<Blog>): Observable<void> {
+    const id = doc(collection(this.firestore, this.collectionName)).id;
+    const newBlog: Blog = {
+      ...blog,
+      id: id,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      likes: 0,
+      reaction: 0,
+      comments: 0,
+      isLiked: false,
+      status: BlogStatus.PENDING, // Default
+      author: this.authService.userData()!, // Assume logged in
+    } as Blog;
+
+    return from(setDoc(doc(this.firestore, this.collectionName, id), newBlog));
   }
 
-  update(request: FormData, id: number): Observable<Blog> {
-    return this.http.put<Blog>(`${this.baseUrl}/${id}`, request);
+  update(id: string, blog: Partial<Blog>): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(updateDoc(docRef, { ...blog, updatedAt: Timestamp.now() }));
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  delete(id: string): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+    return from(updateDoc(docRef, { status: BlogStatus.DELETED }));
+  }
+
+  // Reactions
+  private checkIfLiked(blogId: string, userId: string): Observable<boolean> {
+    const reactionDocRef = doc(
+      this.firestore,
+      `${this.collectionName}/${blogId}/reactions/${userId}`,
+    );
+    return docData(reactionDocRef).pipe(
+      map((doc) => !!doc),
+      catchError(() => of(false)),
+    );
   }
 }

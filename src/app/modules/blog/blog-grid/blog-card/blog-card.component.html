@@ -2,25 +2,27 @@
   <div class="card-body justify-between">
     <div class="flex flex-col">
       <div class="flex items-center justify-between">
-        <h2 class="card-title line-clamp-2">{{ blog().blog.title }}</h2>
+        <h2 class="card-title line-clamp-2">{{ blog().title }}</h2>
         <blog-card-options-button [blog]="blog()" />
       </div>
       <div class="flex items-center gap-2 text-xs opacity-80">
-        <span class="truncate">By {{ blog().blog.author?.firstName }} {{ blog().blog.author?.lastName }}</span>
+        <span class="truncate"
+          >By {{ blog().author.fullName || "Unknown" }}</span
+        >
         <span>•</span>
         <span>
-        <!-- CALENDAR ICON HERE -->
-          {{ blog().blog.publishedDate }}
-      </span>
+          <!-- CALENDAR ICON HERE -->
+          {{ blog().createdAt.toDate() | date }}
+        </span>
       </div>
-      <p class="text-sm line-clamp-3 my-3 opacity-80">{{ blog().blog.content }}</p>
+      <p class="text-sm line-clamp-3 my-3 opacity-80">{{ blog().content }}</p>
     </div>
     <div class="card-actions justify-between items-center">
-      @if (blog().blog.state == Status.Published) {
+      @if (blog().status == Status.PUBLISHED) {
         <div class="badge badge-primary">Published</div>
-      } @else if (blog().blog.state == Status.Draft) {
-        <div class="badge badge-outline">Draft</div>
-      } @else if (blog().blog.state == Status.Deleted) {
+      } @else if (blog().status == Status.PENDING) {
+        <div class="badge badge-outline">Pending</div>
+      } @else if (blog().status == Status.DELETED) {
         <div class="badge badge-error">Deleted</div>
       }
       <modal-open-button
@@ -28,13 +30,7 @@
         [label]="'View'"
         (click)="blogService.selectedBlog = blog()"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye mr-2 h-4 w-4">
-          <path
-            d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
+        <i class="material-symbols-outlined !text-xl mr-2">visibility</i>
       </modal-open-button>
     </div>
   </div>

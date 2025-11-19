@@ -1,22 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { KeycloakService } from './modules/auth/services/keycloak.service';
 import { ToastComponent } from './shared/components/layout/toast/toast.component';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, ToastComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  template: `
+  <router-outlet /> <app-toast/>
+  `,
 })
-export class AppComponent {
-  keycloakService = inject(KeycloakService);
-
-  login() {
-    this.keycloakService.login();
-  }
-
-  ngOnInit() {
-    this.keycloakService.init();
-  }
-}
+export class AppComponent {}

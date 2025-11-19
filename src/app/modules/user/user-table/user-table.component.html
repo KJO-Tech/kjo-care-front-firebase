@@ -1,51 +1,203 @@
 <div class="overflow-x-auto">
-  <table class="table">
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Role</th>
-      <th>Status</th>
-      <th>Created At</th>
-      <th>Actions</th>
-    </tr>
+  <table class="table table-zebra">
+    <thead class="bg-base-200">
+      <tr>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">person</i>
+            Usuario
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">email</i>
+            Correo
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">security</i>
+            Rol
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">toggle_on</i>
+            Estado
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">schedule</i>
+            Creado
+          </div>
+        </th>
+        <th class="text-center">Acciones</th>
+      </tr>
     </thead>
     <tbody>
-      @for (user of users(); track $index) {
-        <tr class="hover:bg-base-200">
-          <td>{{ user.firstName }} {{ user.lastName }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ 'ROLE' }}</td>
+      @for (user of users(); track user.id) {
+        @let isAdmin = user.role === "admin";
+        @let isUser = user.role === "user";
+
+        <tr class="hover">
           <td>
-            @if (user.enabled) {
-              <span class="badge badge-primary">Active</span>
+            <div class="flex items-center gap-3">
+              <!-- Avatar -->
+              <div class="avatar">
+                <div class="w-10 h-10 rounded-full">
+                  @if (user.profileImage) {
+                    <img
+                      [src]="user.profileImage"
+                      [alt]="user.fullName"
+                      class="w-full h-full object-cover"
+                    />
+                  } @else {
+                    <div
+                      class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm"
+                    >
+                      {{ getInitials(user.fullName) }}
+                    </div>
+                  }
+                </div>
+              </div>
+              <div>
+                <div class="font-medium">{{ user.fullName }}</div>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="flex items-center gap-2">
+              <span>{{ user.email }}</span>
+              @if (user.email.includes("admin")) {
+                <div class="badge badge-xs badge-info">Admin Email</div>
+              }
+            </div>
+          </td>
+
+          <!-- Rol -->
+          <td>
+            @if (isAdmin) {
+              <div class="badge badge-warning gap-1">
+                <i class="material-icons-outlined text-xs"
+                  >admin_panel_settings</i
+                >
+                Administrador
+              </div>
+            } @else if (isUser) {
+              <div class="badge badge-info gap-1">
+                <i class="material-icons-outlined text-xs">person</i>
+                Usuario
+              </div>
             } @else {
-              <span class="badge badge-neutral">Inactive</span>
+              <div class="badge badge-neutral gap-1">
+                <i class="material-icons-outlined text-xs">help</i>
+                Sin rol
+              </div>
             }
           </td>
-          <td>{{ user.createdTimestamp | date }}</td>
-          <td class="flex items-center gap-1">
-            <modal-open-button
-              [modalName]="'modal_user_edit'"
-              [type]="'icon'"
-              (click)="userService.selectedUser = user"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                   class="lucide lucide-square-pen h-4 w-4">
-                <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path
-                  d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"></path>
-              </svg>
-            </modal-open-button>
 
-            <button class="btn btn-circle btn-xs">X</button>
+          <!-- Estado -->
+          <td>
+            @if (user.enabled) {
+              <div class="badge badge-success gap-1">
+                <i class="material-icons-outlined text-xs">check_circle</i>
+                Activo
+              </div>
+            } @else {
+              <div class="badge badge-error gap-1">
+                <i class="material-icons-outlined text-xs">cancel</i>
+                Inactivo
+              </div>
+            }
+          </td>
+
+          <!-- Fecha -->
+          <td>
+            <div class="text-sm">
+              {{ user.createdAt?.toDate() | date: "dd/MM/yyyy" }}
+            </div>
+            <div class="text-xs text-base-content/50">
+              {{ user.createdAt?.toDate() | date: "HH:mm" }}
+            </div>
+          </td>
+
+          <!-- Acciones -->
+          <td>
+            <div class="flex items-center justify-center gap-1">
+              <!-- Editar -->
+              <div class="tooltip" data-tip="Editar usuario">
+                <modal-open-button
+                  [modalName]="'modal_user_edit'"
+                  [type]="'icon'"
+                  classes="btn btn-ghost btn-sm"
+                  (click)="userService.setSelectedUser(user)"
+                >
+                  <i class="material-icons-outlined text-lg text-primary">
+                    edit
+                  </i>
+                </modal-open-button>
+              </div>
+
+              <!-- Toggle Estado -->
+              <div
+                class="tooltip"
+                [attr.data-tip]="user.enabled ? 'Desactivar' : 'Activar'"
+              >
+                <button
+                  class="btn btn-ghost btn-sm"
+                  (click)="toggleUserStatus(user.id)"
+                >
+                  @if (user.enabled) {
+                    <i class="material-icons-outlined text-lg text-warning">
+                      visibility_off
+                    </i>
+                  } @else {
+                    <i class="material-icons-outlined text-lg text-success">
+                      visibility
+                    </i>
+                  }
+                </button>
+              </div>
+
+              @if (!isAdmin || (isAdmin && user.role !== "admin")) {
+                <div class="tooltip" data-tip="Eliminar usuario">
+                  <modal-open-button
+                    [modalName]="'modal_user_delete'"
+                    [type]="'icon'"
+                    classes="btn btn-ghost btn-sm"
+                    (click)="userService.setSelectedUser(user)"
+                  >
+                    <i class="material-icons-outlined text-lg text-error">
+                      delete
+                    </i>
+                  </modal-open-button>
+                </div>
+              } @else {
+                <div
+                  class="tooltip"
+                  data-tip="No se puede eliminar el último administrador"
+                >
+                  <button class="btn btn-ghost btn-sm" disabled>
+                    <i class="material-icons-outlined text-lg text-base-300"
+                      >delete</i
+                    >
+                  </button>
+                </div>
+              }
+            </div>
           </td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="7" class="text-center">
-            <p class="">No users found.</p>
+          <td colspan="6" class="text-center py-8">
+            <div class="flex flex-col items-center gap-2">
+              <i class="material-icons-outlined text-4xl text-base-300"
+                >inbox</i
+              >
+              <p class="text-base-content/70">No hay usuarios para mostrar</p>
+            </div>
           </td>
         </tr>
       }
