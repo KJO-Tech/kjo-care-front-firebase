@@ -1,14 +1,13 @@
 import { Component, effect, input, output, signal } from '@angular/core';
-import { Category, FilterDTO, Status } from '../../../core/models/blog';
+import { BlogStatus, Category, FilterDTO } from '../../../core/models/blog';
 
 @Component({
   selector: 'blog-filter',
   imports: [],
-  templateUrl: './blog-filter.component.html'
+  templateUrl: './blog-filter.component.html',
 })
 export class BlogFilterComponent {
-
-  protected readonly Status = Status;
+  protected readonly Status = BlogStatus;
 
   categories = input.required<Category[]>();
 
@@ -22,7 +21,7 @@ export class BlogFilterComponent {
     this.onFilterChange.emit({
       search: this.search(),
       category: this.category(),
-      status: this.status()
+      status: this.status() as BlogStatus,
     });
   }
 
