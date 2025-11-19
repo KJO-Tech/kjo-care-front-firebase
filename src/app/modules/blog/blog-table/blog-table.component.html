@@ -21,9 +21,9 @@
             </p>
           </td>
           <td class="truncate">
-            {{ blog.author?.fullName || "Unknown" }}
+            {{ blog.author.fullName || "Unknown" }}
           </td>
-          <td class="truncate">{{ blog.categoryId }}</td>
+          <td class="truncate">{{ getCategoryName(blog.categoryId || "") }}</td>
           <td class="truncate">{{ blog.createdAt.toDate() | date }}</td>
           <td>
             @if (blog.status == Status.PENDING) {

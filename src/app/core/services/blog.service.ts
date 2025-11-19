@@ -22,6 +22,7 @@ import {
 } from 'rxjs';
 import { Blog, BlogStatus } from '../models/blog';
 import { AuthService } from './auth.service';
+import { CommentService } from './comment.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +30,7 @@ import { AuthService } from './auth.service';
 export class BlogService {
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
+  private commentService = inject(CommentService);
   private collectionName = 'blogs';
 
   private _selectedBlog = signal<Blog | null>(null);
@@ -80,25 +82,24 @@ export class BlogService {
         if (blogs.length === 0) return of([]);
 
         const user = this.authService.userData();
-        if (!user) return of(blogs);
 
-        // Fetch likes for these blogs? Or just return blogs and let component fetch status?
-        // The model has isLiked. We need to check subcollection 'reactions' for current user.
-        // Doing this for a list is N+1 problem.
-        // Alternative: Store 'likes' array in blog document?
-        // The requirement says "reaction and comments son colecciones dentro de un blog".
-        // So we have to query subcollections.
+        const blogsWithDetails$ = blogs.map((blog) => {
+          const likes$ = user
+            ? this.checkIfLiked(blog.id, user.uid)
+            : of(false);
 
-        // For the list view, maybe we don't show "isLiked" status immediately or we accept the N+1 for now (limited by pagination usually).
-        // Let's try to fetch it for the list.
+          const commentsCount$ = this.commentService.getCommentCount(blog.id);
 
-        const blogsWithLikes$ = blogs.map((blog) =>
-          this.checkIfLiked(blog.id, user.uid).pipe(
-            map((isLiked) => ({ ...blog, isLiked })),
-          ),
-        );
+          return combineLatest([likes$, commentsCount$]).pipe(
+            map(([isLiked, comments]) => ({
+              ...blog,
+              isLiked,
+              comments,
+            })),
+          );
+        });
 
-        return combineLatest(blogsWithLikes$);
+        return combineLatest(blogsWithDetails$);
       }),
     );
   }
@@ -112,10 +113,16 @@ export class BlogService {
         const blog = blogData as Blog;
         const user = this.authService.userData();
 
-        if (!user) return of(blog);
+        const likes$ = user ? this.checkIfLiked(blog.id, user.uid) : of(false);
 
-        return this.checkIfLiked(blog.id, user.uid).pipe(
-          map((isLiked) => ({ ...blog, isLiked })),
+        const commentsCount$ = this.commentService.getCommentCount(blog.id);
+
+        return combineLatest([likes$, commentsCount$]).pipe(
+          map(([isLiked, comments]) => ({
+            ...blog,
+            isLiked,
+            comments,
+          })),
         );
       }),
     );

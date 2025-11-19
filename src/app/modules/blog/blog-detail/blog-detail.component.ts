@@ -15,6 +15,12 @@ export class BlogDetailComponent {
   commentService = inject(CommentService);
 
   blog = input.required<Blog>();
+  categories = input.required<any[]>();
 
   type = input<'text' | 'icon'>('text');
+
+  getCategoryName(id: string): string {
+    const category = this.categories().find((c) => c.id === id);
+    return category?.nameTranslations?.en || category?.name || id;
+  }
 }

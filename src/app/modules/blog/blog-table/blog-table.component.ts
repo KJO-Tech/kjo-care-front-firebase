@@ -15,4 +15,10 @@ export class BlogTableComponent {
   protected readonly Status = BlogStatus;
 
   blogs = input.required<Blog[]>();
+  categories = input.required<any[]>();
+
+  getCategoryName(id: string): string {
+    const category = this.categories().find((c) => c.id === id);
+    return category?.nameTranslations?.en || category?.name || id;
+  }
 }
