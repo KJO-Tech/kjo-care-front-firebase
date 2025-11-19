@@ -1,5 +1,4 @@
-import { User } from '@angular/fire/auth';
-import { UserModel } from '../models/user.model';
+import { User } from "firebase/auth";
 
 export interface LoginEmail {
   email: string;
@@ -7,7 +6,6 @@ export interface LoginEmail {
 }
 export interface AuthState {
   user: User | null;
-  userData?: UserModel | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -15,9 +13,4 @@ export interface RegisterForm {
   displayName: string;
   email: string;
   password: string;
-}
-
-export interface LoginResponse {
-  success: boolean;
-  error?: string;
 }

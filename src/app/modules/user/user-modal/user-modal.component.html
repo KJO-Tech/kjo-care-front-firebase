@@ -24,21 +24,21 @@
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <fieldset class="form-control">
         <label class="label">
-          <span class="label-text font-medium">Nombre Completo</span>
+          <span class="label-text font-medium">Nombre de Usuario</span>
           <span class="label-text-alt text-error">*</span>
         </label>
         <input
           type="text"
           class="input input-bordered w-full"
-          [class.input-error]="formUtils.isValidField(userForm, 'fullName')"
-          formControlName="fullName"
-          placeholder="Nombre Completo"
-          autocomplete="name"
+          [class.input-error]="formUtils.isValidField(userForm, 'displayName')"
+          formControlName="displayName"
+          placeholder="nombre de usuario"
+          autocomplete="displayName"
         />
-        @if (formUtils.isValidField(userForm, "fullName")) {
+        @if (formUtils.isValidField(userForm, "displayName")) {
           <label class="label">
             <span class="label-text-alt text-error">
-              {{ formUtils.getFieldError(userForm, "fullName") }}
+              {{ formUtils.getFieldError(userForm, "displayName") }}
             </span>
           </label>
         }
@@ -108,17 +108,17 @@
         </label>
         <select
           class="select select-bordered w-full"
-          [class.select-error]="formUtils.isValidField(userForm, 'role')"
-          formControlName="role"
+          [class.select-error]="formUtils.isValidField(userForm, 'roles')"
+          formControlName="roles"
         >
           <option disabled value="">Selecciona un rol</option>
           <option value="user">Usuario</option>
           <option value="admin">Administrador</option>
         </select>
-        @if (formUtils.isValidField(userForm, "role")) {
+        @if (formUtils.isValidField(userForm, "roles")) {
           <label class="label">
             <span class="label-text-alt text-error">
-              {{ formUtils.getFieldError(userForm, "role") }}
+              {{ formUtils.getFieldError(userForm, "roles") }}
             </span>
           </label>
         }

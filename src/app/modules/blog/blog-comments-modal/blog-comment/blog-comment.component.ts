@@ -1,74 +1,62 @@
-import {
-  Component,
-  computed,
-  CUSTOM_ELEMENTS_SCHEMA,
-  inject,
-  input,
-} from '@angular/core';
-import { Comment } from '../../../../core/models/blog';
-import { BlogService } from '../../../../core/services/blog.service';
-import { CommentService } from '../../../../core/services/comment.service';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, input } from '@angular/core';
+import { CommentSummary } from '../../../../core/interfaces/blog-http.interface';
 import { ModalOpenButtonComponent } from '../../../../shared/components/modal-open-button/modal-open-button.component';
+import { CommentService } from '../../../../core/services/comment.service';
+import { BlogService } from '../../../../core/services/blog.service';
+import { CommentRequest } from '../../../../core/interfaces/comment-http.interface';
 
 @Component({
   selector: 'blog-comment',
   templateUrl: './blog-comment.component.html',
-  imports: [ModalOpenButtonComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [
+    ModalOpenButtonComponent
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class BlogCommentComponent {
-  readonly comment = input.required<Comment>();
-  readonly commentParentId = input.required<string | null>();
+  readonly comment = input.required<CommentSummary>();
+  readonly commentParentId = input.required<number | null>();
 
   readonly blogService = inject(BlogService);
 
   commentService = inject(CommentService);
 
   readonly userLetters = computed<string>(() => {
-    const fullName = this.comment().author?.fullName || '?';
-    const names = fullName.trim().split(' ');
-    const firstInitial = names[0]?.[0] ?? '?';
-    const lastInitial = names.length > 1 ? names[names.length - 1][0] : '';
-    return (firstInitial + lastInitial).toUpperCase();
+    const firstName: string = this.comment().userId.firstName ?? '?';
+    const lastName: string = this.comment().userId.lastName ?? '?';
+    return firstName[0] + lastName[0];
   });
 
-  selectComment(type: 'edit' | 'reply' | 'create' | 'delete'): Comment {
-    const currentComment = this.comment();
-    const blogId = this.blogService.selectedBlog?.id || '';
-
+  selectComment(type: 'edit' | 'reply' | 'create' | 'delete'): CommentRequest {
     switch (type) {
       case 'edit':
         return {
-          ...currentComment,
-          // Ensure we have necessary fields if they are missing in partial updates (though here we have full comment)
+          id: this.comment().id,
+          content: this.comment().content,
+          blogId: this.blogService.selectedBlog.id,
+          commentParentId: this.commentParentId()
         };
       case 'reply':
         return {
-          id: '',
+          id: 0,
           content: '',
-          author: currentComment.author, // Placeholder, will be overwritten by service/backend or ignored
-          createdAt: null as any,
-          replies: [],
-          isMine: false,
-          parentCommentId: currentComment.id,
+          blogId: this.blogService.selectedBlog.id,
+          commentParentId: this.comment().id
         };
       case 'create':
         return {
-          id: '',
-          content: currentComment.content, // Copy content? Or empty? Usually empty for new. But here it says create... maybe it means quote? Or just new.
-          // If it's create, why are we selecting a comment? Maybe this method is used for generic button actions?
-          // Assuming 'create' means new top level comment, but this component is a comment item.
-          // If it's 'create', it might be a mistake in original code or context.
-          // Let's assume it's for replying or something.
-          // But for now, let's return a blank comment structure.
-          author: currentComment.author,
-          createdAt: null as any,
-          replies: [],
-          isMine: false,
-          parentCommentId: null,
+          id: 0,
+          content: this.comment().content,
+          blogId: this.blogService.selectedBlog.id,
+          commentParentId: null
         };
-      case 'delete':
-        return currentComment;
+        case 'delete':
+          return {
+            id: this.comment().id,
+            content: this.comment().content,
+            blogId: this.blogService.selectedBlog.id,
+            commentParentId: null
+          };
     }
   }
 }

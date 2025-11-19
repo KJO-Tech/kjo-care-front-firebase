@@ -1,125 +1,51 @@
 import { inject, Injectable, signal } from '@angular/core';
-import {
-  addDoc,
-  collection,
-  collectionData,
-  deleteDoc,
-  doc,
-  Firestore,
-  orderBy,
-  query,
-  Timestamp,
-  updateDoc,
-  getCountFromServer,
-} from '@angular/fire/firestore';
-import { from, map, Observable, throwError } from 'rxjs';
-import { Comment } from '../models/blog';
-import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
+
+import { environment } from '../../../environments/environment';
+
+import { Observable } from 'rxjs';
+
+import { Category } from '../models/blog';
+import { CommentRequest, CommentResponse } from '../interfaces/comment-http.interface';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class CommentService {
-  private firestore = inject(Firestore);
-  private authService = inject(AuthService);
-  private collectionName = 'blogs';
+  private baseUrl: string = environment.apiUrl + '/api/mind/blog/comment';
 
-  readonly _selectedComment = signal<Comment | null>(null);
+  private http = inject(HttpClient);
 
-  get selectedComment(): Comment | null {
+  readonly _selectedComment = signal<CommentRequest>({
+    id: 0,
+    content: '',
+    blogId: '',
+    commentParentId: null
+  });
+
+  get selectedComment(): CommentRequest {
     return this._selectedComment();
   }
 
-  set selectedComment(comment: Comment | null) {
+  set selectedComment(comment: CommentRequest) {
     this._selectedComment.set(comment);
   }
 
-  getComments(blogId: string): Observable<Comment[]> {
-    const commentsRef = collection(
-      this.firestore,
-      `${this.collectionName}/${blogId}/comments`,
-    );
-    const q = query(commentsRef, orderBy('createdAt', 'asc'));
-
-    return collectionData(q, { idField: 'id' }).pipe(
-      map((comments: any[]) => {
-        const user = this.authService.userData();
-        return comments.map((comment) => ({
-          ...comment,
-          isMine: user ? comment.author.uid === user.uid : false,
-          replies: [],
-        })) as Comment[];
-      }),
-      map((comments) => this.buildCommentTree(comments)),
-    );
+  create(request: CommentRequest): Observable<CommentResponse> {
+    if (!request.commentParentId) {
+      return this.http.post<CommentResponse>(`${this.baseUrl}?blogId=${request.blogId}&content=${request.content}`, null);
+    }
+    return this.http.post<CommentResponse>(`${this.baseUrl}?blogId=${request.blogId}&commentParentId=${request.commentParentId}&content=${request.content}`, request);
   }
 
-  private buildCommentTree(comments: Comment[]): Comment[] {
-    const commentMap = new Map<string, Comment>();
-    const rootComments: Comment[] = [];
-
-    comments.forEach((c) => {
-      c.replies = [];
-      commentMap.set(c.id, c);
-    });
-
-    comments.forEach((c) => {
-      if (c.parentCommentId) {
-        const parent = commentMap.get(c.parentCommentId);
-        if (parent) {
-          parent.replies.push(c);
-        } else {
-          rootComments.push(c);
-        }
-      } else {
-        rootComments.push(c);
-      }
-    });
-
-    return rootComments;
+  update(request: CommentRequest, id: number): Observable<CommentResponse> {
+    if (!request.commentParentId) {
+      return this.http.put<CommentResponse>(`${this.baseUrl}/${id}?blogId=${request.blogId}&content=${request.content}`, null);
+    }
+    return this.http.put<CommentResponse>(`${this.baseUrl}/${id}?blogId=${request.blogId}&commentParentId=${request.commentParentId}&content=${request.content}`, request);
   }
 
-  create(blogId: string, content: string, parentId?: string): Observable<void> {
-    const user = this.authService.userData();
-    if (!user) return throwError(() => new Error('User not logged in'));
-
-    const commentsRef = collection(
-      this.firestore,
-      `${this.collectionName}/${blogId}/comments`,
-    );
-    const newComment: any = {
-      author: user,
-      content,
-      createdAt: Timestamp.now(),
-      parentCommentId: parentId || null,
-    };
-
-    return from(addDoc(commentsRef, newComment)).pipe(map(() => void 0));
-  }
-
-  update(blogId: string, commentId: string, content: string): Observable<void> {
-    const commentRef = doc(
-      this.firestore,
-      `${this.collectionName}/${blogId}/comments/${commentId}`,
-    );
-    return from(updateDoc(commentRef, { content }));
-  }
-
-  delete(blogId: string, commentId: string): Observable<void> {
-    const commentRef = doc(
-      this.firestore,
-      `${this.collectionName}/${blogId}/comments/${commentId}`,
-    );
-    return from(deleteDoc(commentRef));
-  }
-
-  getCommentCount(blogId: string): Observable<number> {
-    const commentsRef = collection(
-      this.firestore,
-      `${this.collectionName}/${blogId}/comments`,
-    );
-    return from(getCountFromServer(commentsRef)).pipe(
-      map((snapshot) => snapshot.data().count),
-    );
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

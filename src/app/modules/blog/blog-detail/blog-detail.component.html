@@ -2,37 +2,29 @@
   <div class="modal-box w-11/12 max-w-xl max-h-11/12">
     <!-- X BUTTON -->
     <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-        ✕
-      </button>
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
 
     <h2 class="text-lg font-semibold">{{ blog().title }}</h2>
     <div class="flex items-center gap-2 text-xs py-2">
-      <span>{{ blog().author.fullName || "Unknown" }}</span>
+      <span>{{ blog().author?.fullName || 'Unknown' }}</span>
       <span>•</span>
       <span class="flex items-center">
         <!-- CALENDAR ICON HERE -->
-        {{ blog().createdAt.toDate() | date }}
+<!--        {{ blog().createdAt }}-->
       </span>
       <span>•</span>
-      <span>{{ getCategoryName(blog().categoryId || "") || "Unknown" }}</span>
+      <span>{{ blog().categoryId || 'Unknown' }}</span>
     </div>
 
     <div class="space-y-4 pt-4">
-      <div
-        class="aspect-video w-full bg-base-200 rounded-md flex items-center justify-center"
-      >
-        @if (blog().mediaType == "VIDEO") {
+      <div class="aspect-video w-full bg-muted rounded-md flex items-center justify-center">
+        @if (blog().mediaType == 'VIDEO') {
           <video controls class="w-full h-full">
             <source src="{{ blog().mediaUrl }}" type="video/mp4" />
           </video>
-        } @else if (blog().mediaType == "IMAGE") {
-          <img
-            src="{{ blog().mediaUrl }}"
-            alt="{{ blog().title }}"
-            class="w-full h-full object-cover"
-          />
+        } @else if (blog().mediaType == 'IMAGE') {
+          <img src="{{ blog().mediaUrl }}" alt="{{ blog().title }}" class="w-full h-full object-cover" />
         } @else {
           <div class="text-center opacity-80">
             <p class="text-sm">No image or video found.</p>

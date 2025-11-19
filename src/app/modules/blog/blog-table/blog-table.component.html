@@ -1,37 +1,37 @@
 <div class="overflow-x-auto">
   <table class="table">
     <thead>
-      <tr>
-        <th class="">Title</th>
-        <th>Author</th>
-        <th>Category</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Reactions</th>
-        <th>Comments</th>
-        <th>Actions</th>
-      </tr>
+    <tr>
+      <th></th>
+      <th class="">Title</th>
+      <th>Author</th>
+      <th>Category</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Reactions</th>
+      <th>Comments</th>
+      <th>Actions</th>
+    </tr>
     </thead>
     <tbody>
       @for (blog of blogs(); track $index) {
         <tr class="hover:bg-base-200">
+          <td>{{ blog.id }}</td>
           <td class="min-w-64">
             <p class="line-clamp-2 text-ellipsis text-wrap">
               {{ blog.title }}
             </p>
           </td>
           <td class="truncate">
-            {{ blog.author.fullName || "Unknown" }}
+            {{ blog.author?.fullName || 'Unknown' }}
           </td>
-          <td class="truncate">{{ getCategoryName(blog.categoryId || "") }}</td>
-          <td class="truncate">{{ blog.createdAt.toDate() | date }}</td>
+          <td class="truncate">{{ blog.categoryId }}</td>
+          <td>{{ blog.createdAt }}</td>
           <td>
-            @if (blog.status == Status.PENDING) {
-              <span class="badge badge-outline">Pending</span>
-            } @else if (blog.status == Status.PUBLISHED) {
-              <span class="badge badge-primary">Published</span>
+            @if (blog.status == Status.Draft) {
+              <span class="badge badge-outline">Draft</span>
             } @else {
-              <span class="badge badge-error">Deleted</span>
+              <span class="badge badge-primary">Published</span>
             }
           </td>
           <td class="text-center">{{ blog.reaction }}</td>

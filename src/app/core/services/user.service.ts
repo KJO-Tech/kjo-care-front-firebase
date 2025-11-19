@@ -1,41 +1,17 @@
 import { inject, Injectable, signal } from '@angular/core';
-import {
-  catchError,
-  from,
-  map,
-  Observable,
-  tap,
-  throwError,
-  switchMap,
-} from 'rxjs';
+import { catchError, from, map, Observable, tap, throwError, switchMap } from 'rxjs';
 import { UserRequest, UserResponse } from '../interfaces/user-http.interface';
-import {
-  CollectionReference,
-  DocumentData,
-  Firestore,
-} from '@angular/fire/firestore';
+import { CollectionReference, DocumentData, Firestore } from '@angular/fire/firestore';
 import { ToastService } from './toast.service';
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Auth } from '@angular/fire/auth';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class UserService {
-  private readonly auth = inject(Auth);
+  private readonly auth = inject(Auth)
   private readonly firestore = inject(Firestore);
   private readonly toastService = inject(ToastService);
 
@@ -60,34 +36,26 @@ export class UserService {
   getAll(): Observable<UserResponse[]> {
     const usersQuery = query(
       this.usersCollection,
-      orderBy('createdAt', 'desc'),
+      orderBy('createdAt', 'desc')
     );
 
     return from(getDocs(usersQuery)).pipe(
-      map((snapshot) =>
-        snapshot.docs.map((doc) => {
+      map(snapshot =>
+        snapshot.docs.map(doc => {
           const data = doc.data();
           return {
             id: doc.id,
-            fullName:
-              data['fullName'] ||
-              data['displayName'] ||
-              data['email']?.split('@')[0] ||
-              'Usuario',
+            displayName: data['displayName'] || data['email']?.split('@')[0] || 'Usuario',
             email: data['email'],
             createdAt: data['createdAt'],
             enabled: data['enabled'] ?? true,
-            role: data['role'] || 'user',
-            profileImage: data['profileImage'] || data['photoURL'] || null,
-            phone: data['phone'],
-            age: data['age'],
-            uid: data['uid'],
+            roles: data['roles'] || ['user'],
+            photoURL: data['photoURL'] || null,
+            uid: data['uid']
           } as UserResponse;
-        }),
+        })
       ),
-      catchError((error) =>
-        this.handleFirebaseError('Error al obtener usuarios', error),
-      ),
+      catchError(error => this.handleFirebaseError('Error al obtener usuarios', error))
     );
   }
 
@@ -95,26 +63,22 @@ export class UserService {
     const userDoc = doc(this.usersCollection, id);
 
     return from(getDoc(userDoc)).pipe(
-      map((docSnap) => {
+      map(docSnap => {
         if (!docSnap.exists()) return null;
 
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          fullName: data['fullName'] || data['displayName'],
+          displayName: data['displayName'],
           email: data['email'],
           createdAt: data['createdAt'],
           enabled: data['enabled'] ?? true,
-          role: data['role'] || 'user',
-          profileImage: data['profileImage'] || data['photoURL'] || null,
-          phone: data['phone'],
-          age: data['age'],
-          uid: data['uid'],
+          roles: data['roles'] || ['user'],
+          photoURL: data['photoURL'] || null,
+          uid: data['uid']
         } as UserResponse;
       }),
-      catchError((error) =>
-        this.handleFirebaseError('Error al obtener usuario', error),
-      ),
+      catchError(error => this.handleFirebaseError('Error al obtener usuario', error))
     );
   }
 
@@ -122,142 +86,116 @@ export class UserService {
     const emailQuery = query(
       this.usersCollection,
       where('email', '==', email),
-      orderBy('createdAt', 'desc'),
+      orderBy('createdAt', 'desc')
     );
 
     return from(getDocs(emailQuery)).pipe(
-      map((snapshot) =>
-        snapshot.docs.map((doc) => {
+      map(snapshot =>
+        snapshot.docs.map(doc => {
           const data = doc.data();
           return {
             id: doc.id,
-            fullName: data['fullName'] || data['displayName'],
+            displayName: data['displayName'],
             email: data['email'],
             createdAt: data['createdAt'],
             enabled: data['enabled'] ?? true,
-            role: data['role'] || 'user',
-            profileImage: data['profileImage'] || data['photoURL'] || null,
-            phone: data['phone'],
-            age: data['age'],
-            uid: data['uid'],
+            roles: data['roles'] || ['user'],
+            photoURL: data['photoURL'] || null,
+            uid: data['uid']
           } as UserResponse;
-        }),
+        })
       ),
-      catchError((error) =>
-        this.handleFirebaseError('Error al buscar usuario por email', error),
-      ),
+      catchError(error => this.handleFirebaseError('Error al buscar usuario por email', error))
     );
   }
 
   create(request: Omit<UserRequest, 'id'>): Observable<UserResponse> {
-    return from(
-      createUserWithEmailAndPassword(
-        this.auth,
-        request.email,
-        request.password!,
-      ),
-    ).pipe(
-      switchMap((userCredential) => {
+    return from(createUserWithEmailAndPassword(
+      this.auth,
+      request.email,
+      request.password!
+    )).pipe(
+      switchMap(userCredential => {
         const userData = {
           uid: userCredential.user.uid,
-          fullName: request.fullName,
+          displayName: request.displayName,
           email: request.email,
-          role: request.role || 'user',
-          profileImage: request.profileImage || null,
-          phone: request.phone,
-          age: request.age,
+          roles: request.roles,
+          photoURL: request.photoURL || null,
           createdAt: serverTimestamp(),
           enabled: true,
-          lastModified: serverTimestamp(),
+          lastModified: serverTimestamp()
         };
 
         return from(addDoc(this.usersCollection, userData)).pipe(
-          map(
-            (docRef) =>
-              ({
-                id: docRef.id,
-                uid: userCredential.user.uid,
-                fullName: request.fullName,
-                email: request.email,
-                role: request.role || 'user',
-                profileImage: request.profileImage || null,
-                phone: request.phone,
-                age: request.age,
-                createdAt: new Date(),
-                enabled: true,
-              }) as UserResponse,
-          ),
+          map(docRef => ({
+            id: docRef.id,
+            uid: userCredential.user.uid,
+            displayName: request.displayName,
+            email: request.email,
+            roles: request.roles,
+            photoURL: request.photoURL || null,
+            createdAt: new Date(),
+            enabled: true
+          }) as UserResponse)
         );
       }),
       tap(() => {
         this.toastService.addToast({
-          message: `Usuario ${request.fullName} creado exitosamente`,
+          message: `Usuario ${request.displayName} creado exitosamente`,
           type: 'success',
-          duration: 3000,
+          duration: 3000
         });
       }),
-      catchError((error) =>
-        this.handleFirebaseError('Error al crear usuario', error),
-      ),
+      catchError(error => this.handleFirebaseError("Error al crear usuario", error))
     );
   }
   update(id: string, request: Partial<UserRequest>): Observable<UserResponse> {
-    const userDoc = doc(this.usersCollection, id);
+    const userDoc = doc(this.usersCollection, id)
     const updateData = {
       ...request,
-      lastModified: serverTimestamp(),
-    };
+      lastModified: serverTimestamp()
+    }
 
     return from(updateDoc(userDoc, updateData)).pipe(
-      map(
-        () =>
-          ({
-            id,
-            fullName: request.fullName || '',
-            email: request.email || '',
-            role: request.role || 'user',
-            profileImage: request.profileImage || null,
-            phone: request.phone,
-            age: request.age,
-            createdAt: new Date(),
-            enabled: true,
-          }) as UserResponse,
-      ),
+      map(() => ({
+        id,
+        displayName: request.displayName || '',
+        email: request.email || '',
+        roles: request.roles || ['user'],
+        photoURL: request.photoURL || null,
+        createdAt: new Date(),
+        enabled: true
+      }) as UserResponse),
       tap(() => {
         this.toastService.addToast({
-          message: `Usuario ${request.fullName} actualizado exitosamente`,
+          message: `Usuario ${request.displayName} actualizado exitosamente`,
           type: 'success',
-          duration: 3000,
-        });
+          duration: 3000
+        })
       }),
-      catchError((error) =>
-        this.handleFirebaseError('Error al actualizar al usuario', error),
-      ),
-    );
+      catchError(error => this.handleFirebaseError("Error al actualizar al usuario", error))
+    )
   }
 
   delete(id: string): Observable<void> {
-    const userDoc = doc(this.usersCollection, id);
-    return from(
-      updateDoc(userDoc, {
-        enabled: false,
-        deletedAt: serverTimestamp(),
-      }),
-    ).pipe(
+    const userDoc = doc(this.usersCollection, id)
+    return from(updateDoc(userDoc, {
+      enabled: false,
+      deletedAt: serverTimestamp()
+    })).pipe(
       tap(() => {
         this.toastService.addToast({
           message: `Usuario eliminado exitosamente`,
           type: 'success',
-          duration: 3000,
-        });
+          duration: 3000
+        })
         if (this._selectedUser()?.id === id) {
-          this.clearSelectedUser();
+          this.clearSelectedUser()
         }
       }),
-      catchError((error) =>
-        this.handleFirebaseError('Error al eliminar el usuario', error),
-      ),
-    );
+      catchError(error => this.handleFirebaseError("Error al eliminar el usuario", error))
+    )
   }
 
   hardDelete(id: string): Observable<void> {
@@ -268,49 +206,37 @@ export class UserService {
         this.toastService.addToast({
           message: 'Usuario eliminado permanentemente',
           type: 'warning',
-          duration: 4000,
+          duration: 4000
         });
         if (this._selectedUser()?.id === id) {
           this.clearSelectedUser();
         }
       }),
-      catchError((error) =>
-        this.handleFirebaseError(
-          'Error al eliminar usuario permanentemente',
-          error,
-        ),
-      ),
+      catchError(error => this.handleFirebaseError('Error al eliminar usuario permanentemente', error))
     );
   }
 
   restore(id: string): Observable<UserResponse> {
     const userDoc = doc(this.usersCollection, id);
 
-    return from(
-      updateDoc(userDoc, {
-        enabled: true,
-        restoredAt: serverTimestamp(),
-        deletedAt: null,
-      }),
-    ).pipe(
+    return from(updateDoc(userDoc, {
+      enabled: true,
+      restoredAt: serverTimestamp(),
+      deletedAt: null
+    })).pipe(
       map(() => ({ id, enabled: true }) as UserResponse),
       tap(() => {
         this.toastService.addToast({
           message: 'Usuario restaurado exitosamente',
           type: 'success',
-          duration: 3000,
+          duration: 3000
         });
       }),
-      catchError((error) =>
-        this.handleFirebaseError('Error al restaurar usuario', error),
-      ),
+      catchError(error => this.handleFirebaseError('Error al restaurar usuario', error))
     );
   }
 
-  private handleFirebaseError(
-    userMessage: string,
-    error: any,
-  ): Observable<never> {
+  private handleFirebaseError(userMessage: string, error: any): Observable<never> {
     console.error(`${userMessage}:`, error);
 
     let errorMessage = userMessage;
@@ -321,8 +247,7 @@ export class UserService {
           errorMessage = 'No tienes permisos para realizar esta acción';
           break;
         case 'unavailable':
-          errorMessage =
-            'Servicio temporalmente no disponible. Intenta más tarde';
+          errorMessage = 'Servicio temporalmente no disponible. Intenta más tarde';
           break;
         case 'not-found':
           errorMessage = 'El recurso solicitado no fue encontrado';
@@ -338,7 +263,7 @@ export class UserService {
     this.toastService.addToast({
       message: errorMessage,
       type: 'error',
-      duration: 5000,
+      duration: 5000
     });
 
     return throwError(() => new Error(errorMessage));
@@ -349,36 +274,32 @@ export class UserService {
       this.usersCollection,
       where('roles', 'array-contains', role),
       where('enabled', '==', true),
-      orderBy('createdAt', 'desc'),
+      orderBy('createdAt', 'desc')
     );
 
     return from(getDocs(roleQuery)).pipe(
-      map((snapshot) =>
-        snapshot.docs.map((doc) => {
+      map(snapshot =>
+        snapshot.docs.map(doc => {
           const data = doc.data();
           return {
             id: doc.id,
-            fullName: data['fullName'] || data['displayName'],
+            displayName: data['displayName'],
             email: data['email'],
             createdAt: data['createdAt'],
             enabled: data['enabled'] ?? true,
-            role: data['role'] || 'user',
-            profileImage: data['profileImage'] || data['photoURL'] || null,
-            phone: data['phone'],
-            age: data['age'],
-            uid: data['uid'],
+            roles: data['roles'] || ['user'],
+            photoURL: data['photoURL'] || null,
+            uid: data['uid']
           } as UserResponse;
-        }),
+        })
       ),
-      catchError((error) =>
-        this.handleFirebaseError('Error al obtener usuarios por rol', error),
-      ),
+      catchError(error => this.handleFirebaseError('Error al obtener usuarios por rol', error))
     );
   }
 
   toggleUserStatus(id: string): Observable<UserResponse> {
     return this.getById(id).pipe(
-      switchMap((user) => {
+      switchMap(user => {
         if (!user) {
           throw new Error('Usuario no encontrado');
         }
@@ -388,25 +309,21 @@ export class UserService {
 
         const updatedUser = { ...user, enabled: newStatus };
 
-        return from(
-          updateDoc(userDoc, {
-            enabled: newStatus,
-            statusChangedAt: serverTimestamp(),
-          }),
-        ).pipe(
+        return from(updateDoc(userDoc, {
+          enabled: newStatus,
+          statusChangedAt: serverTimestamp()
+        })).pipe(
           map(() => updatedUser),
           tap(() => {
             this.toastService.addToast({
               message: `Usuario ${newStatus ? 'habilitado' : 'deshabilitado'} exitosamente`,
               type: newStatus ? 'success' : 'warning',
-              duration: 3000,
+              duration: 3000
             });
-          }),
+          })
         );
       }),
-      catchError((error) =>
-        this.handleFirebaseError('Error al cambiar estado del usuario', error),
-      ),
+      catchError(error => this.handleFirebaseError('Error al cambiar estado del usuario', error))
     );
   }
 }
