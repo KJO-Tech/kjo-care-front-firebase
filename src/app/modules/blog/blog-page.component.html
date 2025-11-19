@@ -54,13 +54,19 @@
 
   <input type="radio" name="blogs" class="tab" aria-label="Table view" />
   <div class="tab-content bg-base-100 border-base-300 p-6">
-    <blog-table [blogs]="filteredBlogs()"></blog-table>
+    <blog-table
+      [blogs]="filteredBlogs()"
+      [categories]="categories()"
+    ></blog-table>
   </div>
 </div>
 
 <!--SECTION FOR MODALS-->
 @if (blogService.selectedBlog) {
-  <blog-detail [blog]="blogService.selectedBlog!"></blog-detail>
+  <blog-detail
+    [blog]="blogService.selectedBlog!"
+    [categories]="categories()"
+  ></blog-detail>
 }
 
 <blog-modal [categories]="categories()" (reload)="reload()"></blog-modal>

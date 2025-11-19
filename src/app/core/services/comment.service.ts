@@ -10,6 +10,7 @@ import {
   query,
   Timestamp,
   updateDoc,
+  getCountFromServer,
 } from '@angular/fire/firestore';
 import { from, map, Observable, throwError } from 'rxjs';
 import { Comment } from '../models/blog';
@@ -110,5 +111,15 @@ export class CommentService {
       `${this.collectionName}/${blogId}/comments/${commentId}`,
     );
     return from(deleteDoc(commentRef));
+  }
+
+  getCommentCount(blogId: string): Observable<number> {
+    const commentsRef = collection(
+      this.firestore,
+      `${this.collectionName}/${blogId}/comments`,
+    );
+    return from(getCountFromServer(commentsRef)).pipe(
+      map((snapshot) => snapshot.data().count),
+    );
   }
 }

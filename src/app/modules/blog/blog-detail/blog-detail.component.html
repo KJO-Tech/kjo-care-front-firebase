@@ -9,19 +9,19 @@
 
     <h2 class="text-lg font-semibold">{{ blog().title }}</h2>
     <div class="flex items-center gap-2 text-xs py-2">
-      <span>{{ blog().author?.fullName || "Unknown" }}</span>
+      <span>{{ blog().author.fullName || "Unknown" }}</span>
       <span>•</span>
       <span class="flex items-center">
         <!-- CALENDAR ICON HERE -->
         {{ blog().createdAt.toDate() | date }}
       </span>
       <span>•</span>
-      <span>{{ blog().categoryId || "Unknown" }}</span>
+      <span>{{ getCategoryName(blog().categoryId || "") || "Unknown" }}</span>
     </div>
 
     <div class="space-y-4 pt-4">
       <div
-        class="aspect-video w-full bg-muted rounded-md flex items-center justify-center"
+        class="aspect-video w-full bg-base-200 rounded-md flex items-center justify-center"
       >
         @if (blog().mediaType == "VIDEO") {
           <video controls class="w-full h-full">
