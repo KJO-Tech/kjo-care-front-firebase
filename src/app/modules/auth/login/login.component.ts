@@ -1,13 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ICONS } from '../../../shared/icons';
-import { LogoComponent } from "../../../shared/components/logo.component";
+import { LogoComponent } from '../../../shared/components/logo.component';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NEVER } from 'rxjs';
 import { LoginEmail } from '../../../core/interfaces/auth-http.interface';
+import { effect } from '@angular/core';
 
 @Component({
   selector: 'auth-login',
@@ -24,31 +30,43 @@ export default class LoginComponent {
 
   protected readonly ICONS = ICONS;
 
+  private readonly router = inject(Router);
   protected readonly loading = signal(false);
-  readonly loginSignal = signal({ email: "", password: "" })
+  readonly loginSignal = signal({ email: '', password: '' });
   readonly loginResource = rxResource({
     request: () => this.loginSignal(),
-    loader: () => this.isLoginEmpy(this.loginSignal()) ? NEVER : this.authService.loginWithEmail(this.loginSignal())
-  })
+    loader: () =>
+      this.isLoginEmpy(this.loginSignal())
+        ? NEVER
+        : this.authService.loginWithEmail(this.loginSignal()),
+  });
 
+  constructor() {
+    effect(() => {
+      if (this.loginResource.value()?.success) {
+        this.router.navigate(['/app']);
+      }
+    });
+  }
 
   protected readonly loginForm = this.fb.nonNullable.group({
-    email: ['', [
-      Validators.required,
-      Validators.email,
-      Validators.pattern(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-    ]],
-    password: ['', [
-      Validators.required,
-      Validators.minLength(6)
-    ]]
+    email: [
+      '',
+      [
+        Validators.required,
+        Validators.email,
+        Validators.pattern(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
+      ],
+    ],
+    password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
   protected get emailErrors(): string {
     const control = this.loginForm.get('email');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'El email es requerido';
-      if (control.errors['email'] || control.errors['pattern']) return 'Email inválido';
+      if (control.errors['email'] || control.errors['pattern'])
+        return 'Email inválido';
     }
     return '';
   }
@@ -57,7 +75,8 @@ export default class LoginComponent {
     const control = this.loginForm.get('password');
     if (control?.errors && control.touched) {
       if (control.errors['required']) return 'La contraseña es requerida';
-      if (control.errors['minlength']) return 'La contraseña debe tener al menos 6 caracteres';
+      if (control.errors['minlength'])
+        return 'La contraseña debe tener al menos 6 caracteres';
     }
     return '';
   }
@@ -66,20 +85,25 @@ export default class LoginComponent {
     if (this.loginForm.valid) {
       this.loginSignal.set({
         email: this.loginForm.value.email ?? '',
-        password: this.loginForm.value.password ?? ''
-      })
+        password: this.loginForm.value.password ?? '',
+      });
     } else {
       this.loginForm.markAllAsTouched();
     }
   }
   isLoginEmpy(login: LoginEmail): boolean {
-    return !login.email || !login.password
+    return !login.email || !login.password;
   }
   protected loginWithGoogle(): void {
     this.loadingGoogle.set(true);
     this.authService.loginWithGoogle().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.router.navigate(['/app']);
+        }
+      },
       error: () => this.loadingGoogle.set(false),
-      complete: () => this.loadingGoogle.set(false)
+      complete: () => this.loadingGoogle.set(false),
     });
   }
 
@@ -94,7 +118,7 @@ export default class LoginComponent {
     this.loadingReset.set(true);
     this.authService.resetPassword(email).subscribe({
       next: () => this.loadingReset.set(false),
-      error: () => this.loadingReset.set(false)
+      error: () => this.loadingReset.set(false),
     });
   }
 }

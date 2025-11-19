@@ -26,15 +26,11 @@ import {
 import {
   AuthState,
   LoginEmail,
+  LoginResponse,
   RegisterForm,
 } from '../interfaces/auth-http.interface';
 import { UserModel } from '../models/user.model';
 import { ToastService } from './toast.service';
-
-interface LoginResponse {
-  success: boolean;
-  error?: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -47,11 +43,13 @@ export class AuthService {
 
   private readonly state = signal<AuthState>({
     user: null,
-    isLoading: false,
+    userData: null,
+    isLoading: true,
     error: null,
   });
 
   public readonly currentUser = computed(() => this.state().user);
+  public readonly userData = computed(() => this.state().userData);
   public readonly isLoading = computed(() => this.state().isLoading);
   public readonly isAuthenticated = computed(() => !!this.state().user);
   public readonly error = computed(() => this.state().error);
@@ -60,12 +58,25 @@ export class AuthService {
     this.auth.setPersistence(browserLocalPersistence);
 
     this.auth.onAuthStateChanged((user) => {
-      this.state.update((state) => ({
-        ...state,
-        user,
-        isLoading: false,
-        error: null,
-      }));
+      if (user) {
+        this.getUserData(user.uid).subscribe((userData) => {
+          this.state.update((state) => ({
+            ...state,
+            user,
+            userData,
+            isLoading: false,
+            error: null,
+          }));
+        });
+      } else {
+        this.state.update((state) => ({
+          ...state,
+          user: null,
+          userData: null,
+          isLoading: false,
+          error: null,
+        }));
+      }
     });
   }
 
@@ -73,11 +84,7 @@ export class AuthService {
     return from(
       signInWithEmailAndPassword(this.auth, user.email, user.password),
     ).pipe(
-      switchMap((userCredential) =>
-        from(this.router.navigate(['/dashboard'])).pipe(
-          map(() => ({ success: true })),
-        ),
-      ),
+      map(() => ({ success: true })),
       catchError((error) => {
         const errorMessage = this.handleAuthError(error);
         return throwError(
@@ -98,21 +105,25 @@ export class AuthService {
           throw new Error('No se pudo obtener la información del usuario');
         }
 
-        const userData: UserModel = {
-          uid: result.user.uid,
-          email: result.user.email!,
-          displayName: result.user.displayName || 'Usuario de Google',
-          photoURL: result.user.photoURL || undefined,
-          createdAt: new Date(),
-        };
-
-        return from(
-          setDoc(doc(this.firestore, 'users', result.user.uid), userData, {
-            merge: true,
+        const userRef = doc(this.firestore, 'users', result.user.uid);
+        return from(getDoc(userRef)).pipe(
+          switchMap((docSnap) => {
+            if (docSnap.exists()) {
+              return of({ success: true });
+            } else {
+              const userData: UserModel = {
+                uid: result.user.uid,
+                email: result.user.email!,
+                fullName: result.user.displayName || 'Usuario de Google',
+                profileImage: result.user.photoURL || undefined,
+                createdAt: new Date(),
+                role: 'user',
+              };
+              return from(setDoc(userRef, userData)).pipe(
+                map(() => ({ success: true })),
+              );
+            }
           }),
-        ).pipe(
-          switchMap(() => from(this.router.navigate(['/dashboard']))),
-          map(() => ({ success: true })),
         );
       }),
       catchError((error) => {
@@ -131,8 +142,9 @@ export class AuthService {
         const userData: UserModel = {
           uid: userCredential.user.uid,
           email: user.email,
-          displayName: user.displayName,
+          fullName: user.displayName, // Mapping displayName from form to fullName in model
           createdAt: new Date(),
+          role: 'user',
         };
 
         return from(
@@ -140,10 +152,7 @@ export class AuthService {
             doc(this.firestore, 'users', userCredential.user.uid),
             userData,
           ),
-        ).pipe(
-          switchMap(() => from(this.router.navigate(['/dashboard']))),
-          map(() => ({ success: true })),
-        );
+        ).pipe(map(() => ({ success: true })));
       }),
       catchError((error) => {
         const errorMessage = this.handleAuthError(error);

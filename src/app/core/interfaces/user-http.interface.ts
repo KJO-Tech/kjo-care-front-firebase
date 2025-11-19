@@ -1,28 +1,26 @@
 export interface UserRequest {
   id?: string;
-  displayName: string;
+  fullName: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  username?: string
   password?: string;
-  roles: string[];
-  photoURL?: string;
-  uid?: string
+  role?: 'admin' | 'user';
+  profileImage?: string;
+  phone?: string;
+  age?: number;
+  uid?: string;
 }
 
 export interface UserResponse extends Omit<UserRequest, 'password'> {
   id: string;
-  displayName: string;
+  fullName: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  username?: string;
-  roles: string[];
+  role?: 'admin' | 'user'; // Simplified from roles array as per plan
   enabled: boolean;
   createdAt: any;
-  photoURL?: string;
-  uid?: string
+  profileImage?: string;
+  phone?: string;
+  age?: number;
+  uid?: string;
 }
 
-export type UserInfo = Omit<UserRequest, 'password' | 'roles' | 'email'>;
+export type UserInfo = Omit<UserRequest, 'password' | 'role' | 'email'>;
