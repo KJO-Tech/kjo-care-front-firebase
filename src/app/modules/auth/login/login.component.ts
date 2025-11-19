@@ -2,23 +2,30 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { Router, RouterLink } from '@angular/router';
-import { ICONS } from '../../../shared/icons';
-import { LogoComponent } from '../../../shared/components/logo.component';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { NEVER } from 'rxjs';
 import { LoginEmail } from '../../../core/interfaces/auth-http.interface';
-import { effect } from '@angular/core';
+import { AuthService } from '../../../core/services/auth.service';
+import { ThemeControllerComponent } from '../../../shared/components/layout/theme-controller/theme-controller.component';
+import { LogoComponent } from '../../../shared/components/logo.component';
+import { ICONS } from '../../../shared/icons';
 
 @Component({
   selector: 'auth-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, LogoComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    LogoComponent,
+    ThemeControllerComponent,
+  ],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

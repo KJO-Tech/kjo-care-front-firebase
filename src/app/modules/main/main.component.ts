@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NotificationsComponent } from '../../shared/components/layout/notifications/notifications.component';
 import { NgClass } from '@angular/common';
 import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-main',
@@ -17,7 +18,8 @@ import { ThemeControllerComponent } from '../../shared/components/layout/theme-c
   templateUrl: './main.component.html',
 })
 export default class MainComponent {
-  isAdmin = signal(false); // FIXME: authorization
+  private readonly authService = inject(AuthService);
+  isAdmin = signal(this.authService.userData()?.role === 'admin');
 
   links = [
     {

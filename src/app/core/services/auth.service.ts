@@ -188,7 +188,7 @@ export class AuthService {
 
   logout(): Observable<void> {
     return from(
-      Promise.all([this.router.navigate(['/']), signOut(this.auth)]),
+      Promise.all([this.router.navigate(['/app']), signOut(this.auth)]),
     ).pipe(
       map(() => void 0),
       catchError((error) => {

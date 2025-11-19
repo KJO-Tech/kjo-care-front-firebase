@@ -1,22 +1,29 @@
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   signal,
-  effect,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { LogoComponent } from '../../../shared/components/logo.component';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { NEVER } from 'rxjs';
 import { RegisterForm } from '../../../core/interfaces/auth-http.interface';
+import { AuthService } from '../../../core/services/auth.service';
+import { ThemeControllerComponent } from '../../../shared/components/layout/theme-controller/theme-controller.component';
+import { LogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
   selector: 'auth-register',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, LogoComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    LogoComponent,
+    ThemeControllerComponent,
+  ],
   templateUrl: './register.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

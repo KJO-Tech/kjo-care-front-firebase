@@ -16,9 +16,7 @@
       @if (comment().createdAt) {
         <relative-time
           class="text-xs opacity-80"
-          [datetime]="comment().createdAt.toDate().toISOString()"
-          precision="day"
-          tense="past"
+          [datetime]="comment().createdAt.toDate()"
         ></relative-time>
       } @else {
         <span class="text-xs opacity-80">Just now</span>
