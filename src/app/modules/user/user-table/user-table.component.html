@@ -37,8 +37,8 @@
     </thead>
     <tbody>
       @for (user of users(); track user.id) {
-        @let isAdmin = user.roles.includes('admin');
-        @let isUser = user.roles.includes('user');
+        @let isAdmin = user.role === "admin";
+        @let isUser = user.role === "user";
 
         <tr class="hover">
           <td>
@@ -46,17 +46,23 @@
               <!-- Avatar -->
               <div class="avatar">
                 <div class="w-10 h-10 rounded-full">
-                  @if (user.photoURL) {
-                    <img [src]="user.photoURL" [alt]="user.displayName" class="w-full h-full object-cover" />
+                  @if (user.profileImage) {
+                    <img
+                      [src]="user.profileImage"
+                      [alt]="user.fullName"
+                      class="w-full h-full object-cover"
+                    />
                   } @else {
-                    <div class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm">
-                      {{ getInitials(user.displayName) }}
+                    <div
+                      class="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm"
+                    >
+                      {{ getInitials(user.fullName) }}
                     </div>
                   }
                 </div>
               </div>
               <div>
-                <div class="font-medium">{{ user.displayName }}</div>
+                <div class="font-medium">{{ user.fullName }}</div>
               </div>
             </div>
           </td>
@@ -64,7 +70,7 @@
           <td>
             <div class="flex items-center gap-2">
               <span>{{ user.email }}</span>
-              @if (user.email.includes('admin')) {
+              @if (user.email.includes("admin")) {
                 <div class="badge badge-xs badge-info">Admin Email</div>
               }
             </div>
@@ -74,7 +80,9 @@
           <td>
             @if (isAdmin) {
               <div class="badge badge-warning gap-1">
-                <i class="material-icons-outlined text-xs">admin_panel_settings</i>
+                <i class="material-icons-outlined text-xs"
+                  >admin_panel_settings</i
+                >
                 Administrador
               </div>
             } @else if (isUser) {
@@ -108,10 +116,10 @@
           <!-- Fecha -->
           <td>
             <div class="text-sm">
-              {{ user.createdAt?.toDate() | date:'dd/MM/yyyy' }}
+              {{ user.createdAt?.toDate() | date: "dd/MM/yyyy" }}
             </div>
             <div class="text-xs text-base-content/50">
-              {{ user.createdAt?.toDate() | date:'HH:mm' }}
+              {{ user.createdAt?.toDate() | date: "HH:mm" }}
             </div>
           </td>
 
@@ -126,25 +134,34 @@
                   classes="btn btn-ghost btn-sm"
                   (click)="userService.setSelectedUser(user)"
                 >
-                  <i class="material-icons-outlined text-lg text-primary">edit</i>
+                  <i class="material-icons-outlined text-lg text-primary">
+                    edit
+                  </i>
                 </modal-open-button>
               </div>
 
               <!-- Toggle Estado -->
-              <div class="tooltip" [attr.data-tip]="user.enabled ? 'Desactivar' : 'Activar'">
+              <div
+                class="tooltip"
+                [attr.data-tip]="user.enabled ? 'Desactivar' : 'Activar'"
+              >
                 <button
                   class="btn btn-ghost btn-sm"
                   (click)="toggleUserStatus(user.id)"
                 >
                   @if (user.enabled) {
-                    <i class="material-icons-outlined text-lg text-warning">visibility_off</i>
+                    <i class="material-icons-outlined text-lg text-warning">
+                      visibility_off
+                    </i>
                   } @else {
-                    <i class="material-icons-outlined text-lg text-success">visibility</i>
+                    <i class="material-icons-outlined text-lg text-success">
+                      visibility
+                    </i>
                   }
                 </button>
               </div>
 
-              @if (!isAdmin || (isAdmin && user.roles.length > 1)) {
+              @if (!isAdmin || (isAdmin && user.role !== "admin")) {
                 <div class="tooltip" data-tip="Eliminar usuario">
                   <modal-open-button
                     [modalName]="'modal_user_delete'"
@@ -152,13 +169,20 @@
                     classes="btn btn-ghost btn-sm"
                     (click)="userService.setSelectedUser(user)"
                   >
-                    <i class="material-icons-outlined text-lg text-error">delete</i>
+                    <i class="material-icons-outlined text-lg text-error">
+                      delete
+                    </i>
                   </modal-open-button>
                 </div>
               } @else {
-                <div class="tooltip" data-tip="No se puede eliminar el último administrador">
+                <div
+                  class="tooltip"
+                  data-tip="No se puede eliminar el último administrador"
+                >
                   <button class="btn btn-ghost btn-sm" disabled>
-                    <i class="material-icons-outlined text-lg text-base-300">delete</i>
+                    <i class="material-icons-outlined text-lg text-base-300"
+                      >delete</i
+                    >
                   </button>
                 </div>
               }
@@ -169,7 +193,9 @@
         <tr>
           <td colspan="6" class="text-center py-8">
             <div class="flex flex-col items-center gap-2">
-              <i class="material-icons-outlined text-4xl text-base-300">inbox</i>
+              <i class="material-icons-outlined text-4xl text-base-300"
+                >inbox</i
+              >
               <p class="text-base-content/70">No hay usuarios para mostrar</p>
             </div>
           </td>

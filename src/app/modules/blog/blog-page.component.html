@@ -1,11 +1,8 @@
 <div class="flex justify-between items-center gap-2 flex-wrap">
   <h1 class="sm:text-3xl text-2xl font-bold">Blog Management</h1>
-  <modal-open-button
-    modalName="modal_blog_create"
-    [classes]="'btn-primary'"
-  >
+  <modal-open-button modalName="modal_blog_create" [classes]="'btn-primary'">
     <i class="material-symbols-outlined">add</i>
-     New Post
+    New Post
   </modal-open-button>
 </div>
 
@@ -17,12 +14,20 @@
 </div>
 
 <div class="tabs tabs-box">
-  <input type="radio" name="blogs" class="tab" aria-label="Grid View" checked="checked" />
+  <input
+    type="radio"
+    name="blogs"
+    class="tab"
+    aria-label="Grid View"
+    checked="checked"
+  />
   <div class="tab-content bg-base-100 border-base-300 p-6">
     @if (blogs.isLoading()) {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (i of [1, 2, 3]; track $index) {
-          <div class="card bg-base-100 shadow-sm border-[0.5px] border-base-300 h-full">
+          <div
+            class="card bg-base-100 shadow-sm border-[0.5px] border-base-300 h-full"
+          >
             <div class="card-body">
               <div class="flex items-center justify-between">
                 <div class="skeleton h-5 w-1/2"></div>
@@ -49,12 +54,20 @@
 
   <input type="radio" name="blogs" class="tab" aria-label="Table view" />
   <div class="tab-content bg-base-100 border-base-300 p-6">
-    <blog-table [blogs]="filteredBlogs()"></blog-table>
+    <blog-table
+      [blogs]="filteredBlogs()"
+      [categories]="categories()"
+    ></blog-table>
   </div>
 </div>
 
 <!--SECTION FOR MODALS-->
-<blog-detail [blog]="blogService.selectedBlog"></blog-detail>
+@if (blogService.selectedBlog) {
+  <blog-detail
+    [blog]="blogService.selectedBlog!"
+    [categories]="categories()"
+  ></blog-detail>
+}
 
 <blog-modal [categories]="categories()" (reload)="reload()"></blog-modal>
 

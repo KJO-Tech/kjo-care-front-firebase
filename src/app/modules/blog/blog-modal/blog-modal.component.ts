@@ -1,51 +1,71 @@
-import { Component, computed, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
-import { Blog, Category, Status } from '../../../core/models/blog';
+import {
+  Blog,
+  BlogStatus,
+  Category,
+  MediaType,
+} from '../../../core/models/blog';
 
-import { FormUtils } from '../../../shared/utils/form-utils';
+import { of, switchMap } from 'rxjs';
 import { BlogService } from '../../../core/services/blog.service';
+import { CloudinaryService } from '../../../core/services/cloudinary.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { FormUtils } from '../../../shared/utils/form-utils';
 
 @Component({
   selector: 'blog-modal',
   templateUrl: './blog-modal.component.html',
-  imports: [
-    ReactiveFormsModule,
-    NgClass
-  ]
+  imports: [ReactiveFormsModule, NgClass],
 })
 export class BlogModalComponent implements OnInit {
-
-  protected readonly Status = Status;
+  protected readonly Status = BlogStatus;
 
   private fb = inject(FormBuilder);
   private blogService = inject(BlogService);
   private toastService = inject(ToastService);
+  private cloudinaryService = inject(CloudinaryService);
 
   reload = output();
 
   formUtils = FormUtils;
 
-  blog = input<Blog>();
+  blog = input<Blog | null>();
   categories = input.required<Category[]>();
   type = input<'create' | 'edit'>('create');
 
   title = signal('Add new blog');
   nameButton = signal('Save');
-  nameModal = computed(() => this.type() === 'create' ? 'modal_blog_create' : 'modal_blog_edit');
+  nameModal = computed(() =>
+    this.type() === 'create' ? 'modal_blog_create' : 'modal_blog_edit',
+  );
 
   message = signal<string | null>(null);
+  isUploading = this.cloudinaryService.isUploading;
 
   blogForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     content: ['', [Validators.required, Validators.minLength(5)]],
     image: [null],
     video: [null],
-    categoryId: [0, [Validators.required, Validators.min(1)]]
+    categoryId: ['', [Validators.required]],
   });
 
   ngOnInit(): void {
@@ -61,7 +81,7 @@ export class BlogModalComponent implements OnInit {
         this.blogForm.patchValue({
           title: this.blog()?.title,
           content: this.blog()?.content,
-          categoryId: this.blog()?.categoryId
+          categoryId: this.blog()?.categoryId,
         });
       }
     });
@@ -74,66 +94,79 @@ export class BlogModalComponent implements OnInit {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('title', this.blogForm.value.title);
-    formData.append('content', this.blogForm.value.content);
+    const imageFile = this.blogForm.get('image')?.value;
+    const videoFile = this.blogForm.get('video')?.value;
 
-    const image = this.blogForm.get('image')?.value;
-    const video = this.blogForm.get('video')?.value;
+    let upload$ = of<{ url: string | null; type: MediaType | null }>({
+      url: null,
+      type: null,
+    });
 
-    if (image instanceof File) {
-      formData.append('image', image);
+    if (imageFile instanceof File) {
+      upload$ = this.cloudinaryService
+        .uploadFile({ file: imageFile, resourceType: 'image' })
+        .pipe(
+          switchMap((res) =>
+            of({ url: res.secure_url, type: MediaType.IMAGE }),
+          ),
+        );
+    } else if (videoFile instanceof File) {
+      upload$ = this.cloudinaryService
+        .uploadFile({ file: videoFile, resourceType: 'video' })
+        .pipe(
+          switchMap((res) =>
+            of({ url: res.secure_url, type: MediaType.VIDEO }),
+          ),
+        );
+    } else if (this.blog()?.mediaUrl) {
+      // Keep existing media if no new file
+      upload$ = of({
+        url: this.blog()!.mediaUrl!,
+        type: this.blog()!.mediaType!,
+      });
     }
-    if (video instanceof File) {
-      formData.append('video', video);
-    }
-    formData.append('categoryId', this.blogForm.value.categoryId);
 
-    if (this.blog()) {
-      return this.blogService.update(formData, this.blog()!.id).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'Blog updated successfully',
-              type: 'success',
-              duration: 4000
-            });
+    upload$
+      .pipe(
+        switchMap((media) => {
+          const blogData: Partial<Blog> = {
+            title: this.blogForm.value.title,
+            content: this.blogForm.value.content,
+            categoryId: this.blogForm.value.categoryId,
+            mediaUrl: media.url,
+            mediaType: media.type,
+          };
 
-            this.reload.emit();
-            this.blogForm.clearValidators();
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error updating blog',
-              type: 'error',
-              duration: 4000
-            });
+          if (this.blog()) {
+            return this.blogService.update(this.blog()!.id, blogData);
+          } else {
+            return this.blogService.create(blogData);
           }
-        });
-    } else {
-      return this.blogService.create(formData).pipe()
-        .subscribe({
-          next: () => {
-            this.toastService.addToast({
-              message: 'Blog created successfully',
-              type: 'success',
-              duration: 4000
-            });
-
-            this.reload.emit();
-
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.addToast({
+            message: this.blog()
+              ? 'Blog updated successfully'
+              : 'Blog created successfully',
+            type: 'success',
+            duration: 4000,
+          });
+          this.reload.emit();
+          if (!this.blog()) {
             this.blogForm.reset();
-            this.blogForm.clearValidators()
-          },
-          error: (error) => {
-            this.toastService.addToast({
-              message: 'Error creating blog',
-              type: 'error',
-              duration: 4000
-            });
+            this.blogForm.clearValidators();
           }
-        });
-    }
+        },
+        error: (error) => {
+          this.toastService.addToast({
+            message: 'Error saving blog',
+            type: 'error',
+            duration: 4000,
+          });
+        },
+      });
   }
 
   onFileChange(event: Event, field: 'image' | 'video') {
@@ -141,7 +174,7 @@ export class BlogModalComponent implements OnInit {
     if (input.files?.length) {
       const file = input.files[0];
       this.blogForm.patchValue({
-        [field]: file
+        [field]: file,
       });
       this.blogForm.get(field)?.updateValueAndValidity();
     }
