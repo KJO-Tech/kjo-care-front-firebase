@@ -1,4 +1,4 @@
-import { DatePipe, Location } from '@angular/common';
+import { Location } from '@angular/common';
 import {
   Component,
   computed,
@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { map, of } from 'rxjs';
 import { Blog } from '../../../../core/models/blog';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -20,7 +20,6 @@ import { ReactionService } from '../../../../core/services/reaction.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { DialogComponent } from '../../../../shared/components/dialog/dialog.component';
 import { BlogCommentModalComponent } from '../../../blog/blog-comment-modal/blog-comment-modal.component';
-import { CommunityBlogCommentComponent } from '../components/community-blog-comment/community-blog-comment.component';
 import { CommunityCommentFormComponent } from '../components/community-comment-form/community-comment-form.component';
 
 @Component({
@@ -28,11 +27,8 @@ import { CommunityCommentFormComponent } from '../components/community-comment-f
   templateUrl: './community-blog.component.html',
   imports: [
     DialogComponent,
-    CommunityBlogCommentComponent,
     CommunityCommentFormComponent,
     BlogCommentModalComponent,
-    DatePipe,
-    RouterLink,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -94,7 +90,14 @@ export default class CommunityBlogComponent {
   }
 
   private updateSEO(blog: Blog) {
-    this.titleService.setTitle(`${blog.title} | KJO Mind Care`);
+    // Preserve notification count if present
+    const currentTitle = this.titleService.getTitle();
+    const countMatch = currentTitle.match(/^\((\d+)\)\s*/);
+    const newTitle = countMatch
+      ? `${countMatch[0]}${blog.title} | KJO Mind Care`
+      : `${blog.title} | KJO Mind Care`;
+
+    this.titleService.setTitle(newTitle);
     this.metaService.updateTag({
       name: 'description',
       content: blog.content.substring(0, 150) + '...',

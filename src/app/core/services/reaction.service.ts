@@ -1,15 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import {
   collection,
-  deleteDoc,
   doc,
   docData,
   Firestore,
   getDocs,
+  increment,
   query,
-  setDoc,
+  runTransaction,
   Timestamp,
-  where,
+  where
 } from '@angular/fire/firestore';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -44,6 +44,8 @@ export class ReactionService {
       `${this.collectionName}/${blogId}/reaction/${user.uid}`,
     );
 
+    const blogRef = doc(this.firestore, `${this.collectionName}/${blogId}`);
+
     return from(
       getDocs(
         query(
@@ -57,15 +59,25 @@ export class ReactionService {
     ).pipe(
       switchMap((snapshot) => {
         if (!snapshot.empty) {
-          // Unlike
-          return from(deleteDoc(reactionRef));
+          // Unlike: Delete reaction and decrement counter
+          return from(
+            runTransaction(this.firestore, async (transaction) => {
+              transaction.delete(reactionRef);
+              transaction.update(blogRef, { reaction: increment(-1) });
+            }),
+          );
         } else {
-          // Like
+          // Like: Add reaction and increment counter
           const reaction: Reaction = {
             userId: user.uid,
             timestamp: Timestamp.now(),
           };
-          return from(setDoc(reactionRef, reaction));
+          return from(
+            runTransaction(this.firestore, async (transaction) => {
+              transaction.set(reactionRef, reaction);
+              transaction.update(blogRef, { reaction: increment(1) });
+            }),
+          );
         }
       }),
     );

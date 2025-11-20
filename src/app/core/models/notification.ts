@@ -24,3 +24,16 @@ export interface Notification {
   targetRoute: string;
   targetId?: string | null;
 }
+
+export const NOTIFICATION_TYPE_ICON: Record<NotificationType, string> = {
+  // Social & Blog Icons
+  [NotificationType.LIKE]: 'favorite',
+  [NotificationType.COMMENT]: 'comment',
+  [NotificationType.NEW_BLOG_POST]: 'article',
+  // [NotificationType.BLOG_REJECTED]: 'unpublished',
+  // Health & System Icons
+  [NotificationType.SYSTEM]: 'info',
+  [NotificationType.MOOD_REMINDER]: 'sentiment_very_dissatisfied',
+  [NotificationType.ACTIVITY_REMINDER]: 'fitness_center',
+  [NotificationType.UNKNOWN]: 'info',
+};

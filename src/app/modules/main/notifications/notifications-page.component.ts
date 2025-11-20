@@ -63,6 +63,13 @@ export default class NotificationsPageComponent {
     }
   }
 
+  markAllAsRead() {
+    const user = this.authService.userData();
+    if (user) {
+      this.notificationService.markAllAsRead(user.uid).subscribe();
+    }
+  }
+
   onFilterChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedFilter.set(selectElement.value as NotificationType | 'all');

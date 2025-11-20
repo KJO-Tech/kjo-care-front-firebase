@@ -8,10 +8,11 @@ import {
   orderBy,
   query,
   setDoc,
+  Timestamp,
   updateDoc,
   writeBatch,
 } from '@angular/fire/firestore';
-import { getToken, Messaging } from '@angular/fire/messaging';
+import { getToken, Messaging, onMessage } from '@angular/fire/messaging';
 import { Router } from '@angular/router';
 import { catchError, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -20,6 +21,7 @@ import {
   NotificationStatus,
   NotificationType,
 } from '../models/notification';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +30,7 @@ export class NotificationService {
   private firestore = inject(Firestore);
   private messaging = inject(Messaging);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   private _notifications = signal<Notification[]>([]);
 
@@ -58,63 +61,56 @@ export class NotificationService {
       });
   }
 
-  requestPermission(userId: string): Observable<boolean> {
-    console.log('🔔 Requesting notification permission for user:', userId);
-    console.log(
-      '🔑 VAPID Key configured:',
-      environment.firebase.vapidKey ? 'Yes' : 'No',
-    );
-    console.log(
-      '🔑 VAPID Key value:',
-      environment.firebase.vapidKey?.substring(0, 20) + '...',
-    );
+  setupForegroundListener() {
+    onMessage(this.messaging, (payload) => {
+      console.log('Foreground message received:', payload);
 
+      // Convert Firebase MessagePayload to our Notification model
+      const notification: Notification = {
+        id: payload.messageId || Date.now().toString(),
+        type:
+          (payload.data?.['type'] as NotificationType) ||
+          NotificationType.SYSTEM,
+        status: NotificationStatus.NEW,
+        timestamp: Timestamp.now(),
+        args: payload.data?.['args']
+          ? JSON.parse(payload.data['args'] as string)
+          : [],
+        targetRoute:
+          (payload.data?.['targetRoute'] as string) || '/app/notifications',
+        targetId: (payload.data?.['targetId'] as string) || null,
+      };
+
+      // Show toast notification
+      this.toastService.addNotification(notification);
+    });
+  }
+
+  requestPermission(userId: string): Observable<boolean> {
     return from(Notification.requestPermission()).pipe(
-      tap((permission) => {
-        console.log('✅ Permission result:', permission);
-      }),
       switchMap((permission) => {
         if (permission === 'granted') {
-          console.log('🎉 Permission granted! Attempting to get FCM token...');
-
           return from(
             getToken(this.messaging, {
               vapidKey: environment.firebase.vapidKey,
             }),
           ).pipe(
             tap((token) => {
-              console.log('📱 Token received:', token ? 'Yes' : 'No');
               if (token) {
-                console.log('🔐 Token value:', token.substring(0, 30) + '...');
                 this.saveToken(token, userId);
-                console.log('💾 Token saved to Firestore');
-              } else {
-                console.error('❌ No token received from Firebase');
               }
             }),
             map(() => true),
             catchError((error) => {
-              console.error('❌ Error getting token:', error);
-              console.error('Error details:', {
-                message: error.message,
-                code: error.code,
-                stack: error.stack,
-              });
+              console.error('Error getting FCM token:', error);
               return of(false);
             }),
           );
-        } else {
-          console.warn('⚠️ Permission not granted:', permission);
-          return of(false);
         }
+        return of(false);
       }),
       catchError((error) => {
-        console.error('❌ Error requesting permission:', error);
-        console.error('Error details:', {
-          message: error.message,
-          code: error.code,
-          stack: error.stack,
-        });
+        console.error('Error requesting notification permission:', error);
         return of(false);
       }),
     );
@@ -122,27 +118,17 @@ export class NotificationService {
 
   private saveToken(token: string, userId: string) {
     if (!userId) {
-      console.error('❌ Cannot save token: userId is missing');
       return;
     }
-
-    console.log('💾 Saving token to Firestore...');
-    console.log('   User ID:', userId);
-    console.log('   Token (first 30 chars):', token.substring(0, 30) + '...');
-    console.log('   Path:', `users/${userId}/deviceTokens/${token}`);
 
     const tokenRef = doc(
       this.firestore,
       `users/${userId}/deviceTokens/${token}`,
     );
 
-    setDoc(tokenRef, { token, createdAt: Date.now() })
-      .then(() => {
-        console.log('✅ Token successfully saved to Firestore');
-      })
-      .catch((error) => {
-        console.error('❌ Error saving token to Firestore:', error);
-      });
+    setDoc(tokenRef, { token, createdAt: Date.now() }).catch((error) => {
+      console.error('Error saving FCM token:', error);
+    });
   }
 
   deleteToken(userId: string): Observable<void> {

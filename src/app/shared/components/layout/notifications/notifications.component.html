@@ -2,8 +2,10 @@
   <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
     <div class="indicator">
       <i class="material-symbols-outlined">notifications</i>
-      @if (hasUnread()) {
-        <span class="badge badge-xs badge-primary indicator-item"></span>
+      @if (unreadCount() > 0) {
+        <span class="badge badge-xs badge-primary indicator-item">{{
+          unreadCount()
+        }}</span>
       }
     </div>
   </div>
@@ -107,6 +109,19 @@
     }
 
     <hr />
+
+    @if (hasUnread()) {
+      <li>
+        <button
+          class="btn btn-sm btn-ghost w-full justify-center"
+          (click)="markAllAsRead()"
+        >
+          <i class="material-symbols-outlined text-base">done_all</i>
+          Marcar todas como leídas
+        </button>
+      </li>
+    }
+
     <li>
       <a class="justify-center" [routerLink]="['/app/notifications']"
         >Ver todas las notificaciones</a

@@ -13,6 +13,7 @@ import {
   NotificationType,
 } from '../../../../core/models/notification';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'navbar-notifications',
@@ -23,6 +24,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class NotificationsComponent {
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
+  private titleService = inject(Title);
+
   notifications = this.notificationService.notifications;
   NotificationStatus = NotificationStatus;
   NotificationType = NotificationType;
@@ -32,6 +35,23 @@ export class NotificationsComponent {
       const user = this.authService.userData();
       if (user) {
         this.notificationService.listenToNotifications(user.uid);
+        this.notificationService.setupForegroundListener();
+      }
+    });
+
+    // Update page title with unread count
+    effect(() => {
+      const count = this.unreadCount();
+      const currentTitle = this.titleService.getTitle();
+
+      // Remove existing count if present
+      const titleWithoutCount = currentTitle.replace(/^\(\d+\)\s*/, '');
+
+      // Add new count if there are unread notifications
+      if (count > 0) {
+        this.titleService.setTitle(`(${count}) ${titleWithoutCount}`);
+      } else {
+        this.titleService.setTitle(titleWithoutCount);
       }
     });
   }
@@ -49,6 +69,12 @@ export class NotificationsComponent {
 
   hasUnread = computed(() =>
     this.notifications().some((n) => n.status === NotificationStatus.NEW),
+  );
+
+  unreadCount = computed(
+    () =>
+      this.notifications().filter((n) => n.status === NotificationStatus.NEW)
+        .length,
   );
 
   markAllAsRead() {
