@@ -31,6 +31,7 @@ import {
 } from '../interfaces/auth-http.interface';
 import { UserModel } from '../models/user.model';
 import { ToastService } from './toast.service';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +41,7 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
   private readonly firestore = inject(Firestore);
+  private readonly notificationService = inject(NotificationService);
 
   private readonly state = signal<AuthState>({
     user: null,
@@ -187,9 +189,15 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return from(
-      Promise.all([this.router.navigate(['/app']), signOut(this.auth)]),
-    ).pipe(
+    const user = this.currentUser();
+    const deleteToken$ = user
+      ? this.notificationService.deleteToken(user.uid)
+      : of(void 0);
+
+    return deleteToken$.pipe(
+      switchMap(() =>
+        from(Promise.all([this.router.navigate(['/app']), signOut(this.auth)])),
+      ),
       map(() => void 0),
       catchError((error) => {
         this.toastService.addToast({

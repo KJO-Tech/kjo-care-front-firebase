@@ -160,7 +160,7 @@ export class BlogService {
   private checkIfLiked(blogId: string, userId: string): Observable<boolean> {
     const reactionDocRef = doc(
       this.firestore,
-      `${this.collectionName}/${blogId}/reactions/${userId}`,
+      `${this.collectionName}/${blogId}/reaction/${userId}`,
     );
     return docData(reactionDocRef).pipe(
       map((doc) => !!doc),

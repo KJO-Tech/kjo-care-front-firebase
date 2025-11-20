@@ -1,71 +1,144 @@
-<!--<div class="space-y-5">-->
-<!--  <div class="sticky top-16 left-0 right-0 z-10 backdrop-blur-xl p-4 w-full -mt-4">-->
-<!--    &lt;!&ndash; Header &ndash;&gt;-->
-<!--    <header class="flex items-center justify-between mb-6">-->
-<!--      <div class="flex items-center gap-4">-->
-<!--        <button (click)="goBack()" class="btn btn-ghost btn-circle">-->
-<!--          <i class="material-symbols-outlined">arrow_back</i>-->
-<!--        </button>-->
-<!--        <div>-->
-<!--          <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">-->
-<!--            Notificaciones</h1>-->
-<!--          @if (unreadCount() > 0) {-->
-<!--            <div class="">{{ unreadCount() }} sin leer</div>-->
-<!--          }-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </header>-->
+<div class="space-y-5">
+  <div
+    class="sticky top-16 left-0 right-0 z-10 backdrop-blur-xl p-4 w-full -mt-4"
+  >
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-4">
+        <button (click)="goBack()" class="btn btn-ghost btn-circle">
+          <i class="material-symbols-outlined">arrow_back</i>
+        </button>
+        <div>
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text"
+          >
+            Notificaciones
+          </h1>
+          @if (unreadCount() > 0) {
+            <div class="">{{ unreadCount() }} sin leer</div>
+          }
+        </div>
+      </div>
+    </header>
 
-<!--    &lt;!&ndash; Filters &ndash;&gt;-->
-<!--    <div class="">-->
-<!--      <label class="form-control w-full max-w-xs space-x-3">-->
-<!--        <div class="label">-->
-<!--          <span class="label-text">Filtrar por tipo: </span>-->
-<!--        </div>-->
-<!--        <select class="select select-bordered" [value]="selectedFilter()" (change)="onFilterChange($event)">-->
-<!--          <option value="all">Todas</option>-->
-<!--          @for (type of notificationTypes; track type) {-->
-<!--            <option [value]="type.type">{{ type.message }}</option>-->
-<!--          }-->
-<!--        </select>-->
-<!--      </label>-->
-<!--    </div>-->
-<!--  </div>-->
+    <!-- Filters -->
+    <div class="">
+      <label class="form-control w-full max-w-xs space-x-3">
+        <div class="label">
+          <span class="label-text">Filtrar por tipo: </span>
+        </div>
+        <select
+          class="select select-bordered"
+          [value]="selectedFilter()"
+          (change)="onFilterChange($event)"
+        >
+          <option value="all">Todas</option>
+          @for (type of notificationTypes; track type) {
+            <option [value]="type.type">{{ type.message }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </div>
 
-<!--  &lt;!&ndash; Notifications List &ndash;&gt;-->
-<!--  <div class="space-y-3">-->
-<!--    @if (allNotifications().length === 0) {-->
-<!--      <div class="text-center py-10">-->
-<!--        <p class="text-lg text-base-content/70">No hay notificaciones disponibles.</p>-->
-<!--      </div>-->
-<!--    } @else if (filteredNotifications().length === 0) {-->
-<!--      <div class="text-center py-10">-->
-<!--        <p class="text-lg text-base-content/70">No hay notificaciones que coincidan con el filtro.</p>-->
-<!--      </div>-->
-<!--    } @else {-->
-<!--      @for (notification of filteredNotifications(); track notification.id) {-->
-<!--        <div-->
-<!--          (click)="handleNotificationClick(notification)"-->
-<!--          class="card card-side card-border shadow-md hover:shadow-lg hover:scale-[1.01] transition-all cursor-pointer border-l-4 rounded-xl"-->
-<!--          [ngClass]="!notification.read ? 'border-l-primary' : 'border-l-base-300'">-->
-<!--          <div class="card-body p-4 flex-row items-center gap-4">-->
-<!--            <i class="material-symbols-outlined text-3xl text-primary">{{ notificationIcons[notification.type] }}</i>-->
-<!--            <div class="flex-grow">-->
-<!--              <h2 class="card-title text-base">{{ notification.title }}</h2>-->
-<!--              <p class="text-sm text-base-content/80 mb-2">{{ notification.message }}</p>-->
-<!--              <relative-time-->
-<!--                class="text-xs opacity-60"-->
-<!--                datetime="{{ formatDateToISO8601(notification.createdAt) }}"-->
-<!--                timeZone="America/Bogota"-->
-<!--              ></relative-time>-->
-<!--            </div>-->
-<!--            @if (!notification.read) {-->
-<!--              <div class="w-3 h-3 rounded-full bg-primary self-start mt-1 flex-shrink-0"></div>-->
-<!--            }-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      }-->
-<!--    }-->
-<!--  </div>-->
-
-<!--</div>-->
+  <!-- Notifications List -->
+  <div class="space-y-3">
+    @if (allNotifications().length === 0) {
+      <div class="text-center py-10">
+        <p class="text-lg text-base-content/70">
+          No hay notificaciones disponibles.
+        </p>
+      </div>
+    } @else if (filteredNotifications().length === 0) {
+      <div class="text-center py-10">
+        <p class="text-lg text-base-content/70">
+          No hay notificaciones que coincidan con el filtro.
+        </p>
+      </div>
+    } @else {
+      @for (notification of filteredNotifications(); track notification.id) {
+        <div
+          (click)="handleNotificationClick(notification)"
+          class="card card-side card-border shadow-md hover:shadow-lg hover:scale-[1.01] transition-all cursor-pointer border-l-4 rounded-xl"
+          [ngClass]="
+            notification.status === 'NEW'
+              ? 'border-l-primary'
+              : 'border-l-base-300'
+          "
+        >
+          <div class="card-body p-4 flex-row items-center gap-4">
+            <!-- Icon based on type could be added here if needed, for now just type name -->
+            <div class="flex-grow">
+              <h2 class="card-title text-base">
+                @switch (notification.type) {
+                  @case (NotificationType.NEW_BLOG_POST) {
+                    Nuevo Blog Publicado
+                  }
+                  @case (NotificationType.LIKE) {
+                    Nuevo Me Gusta en tu Blog
+                  }
+                  @case (NotificationType.COMMENT) {
+                    Nuevo Comentario en tu Blog
+                  }
+                  @case (NotificationType.MOOD_REMINDER) {
+                    Recordatorio de estado de ánimo
+                  }
+                  @case (NotificationType.ACTIVITY_REMINDER) {
+                    Recordatorio de actividad
+                  }
+                  @case (NotificationType.SYSTEM) {
+                    Notificación del sistema
+                  }
+                  @default {
+                    Notificación desconocida
+                  }
+                }
+              </h2>
+              <p class="text-sm text-base-content/80 mb-2">
+                @switch (notification.type) {
+                  @case (NotificationType.NEW_BLOG_POST) {
+                    Un nuevo blog de {{ notification.args[0] }} ha sido
+                    publicado:
+                    {{ notification.args[1] }}
+                  }
+                  @case (NotificationType.LIKE) {
+                    {{ notification.args[0] }} le ha dado me gusta a tu blog:
+                    {{ notification.args[1] }}
+                  }
+                  @case (NotificationType.COMMENT) {
+                    {{ notification.args[0] }} ha comentado en tu blog:
+                    {{ notification.args[1] }}
+                  }
+                  @case (NotificationType.MOOD_REMINDER) {
+                    Es hora de registrar tu estado de ánimo. Tómate un momento
+                    para reflexionar.
+                  }
+                  @case (NotificationType.ACTIVITY_REMINDER) {
+                    No olvides realizar tu actividad diaria:
+                    {{ notification.args[0] }}.
+                  }
+                  @case (NotificationType.SYSTEM) {
+                    Hemos lanzado nuevas funciones. ¡Descúbrelas ahora!
+                  }
+                  @default {
+                    Notificación desconocida
+                  }
+                }
+              </p>
+              <relative-time
+                class="text-xs opacity-60"
+                datetime="{{ notification.timestamp.toDate() }}"
+                tense="past"
+              ></relative-time>
+            </div>
+            @if (notification.status === "NEW") {
+              <div
+                class="w-3 h-3 rounded-full bg-primary self-start mt-1 flex-shrink-0"
+              ></div>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

@@ -15,6 +15,7 @@ import {
 import { from, map, Observable, throwError } from 'rxjs';
 import { Comment } from '../models/blog';
 import { AuthService } from './auth.service';
+import { CommentRequest } from '../interfaces/blog-http.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -24,13 +25,13 @@ export class CommentService {
   private authService = inject(AuthService);
   private collectionName = 'blogs';
 
-  readonly _selectedComment = signal<Comment | null>(null);
+  readonly _selectedComment = signal<CommentRequest | null>(null);
 
-  get selectedComment(): Comment | null {
+  get selectedComment(): CommentRequest | null {
     return this._selectedComment();
   }
 
-  set selectedComment(comment: Comment | null) {
+  set selectedComment(comment: CommentRequest | null) {
     this._selectedComment.set(comment);
   }
 

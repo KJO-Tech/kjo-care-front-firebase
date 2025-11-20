@@ -27,7 +27,7 @@ export class ReactionService {
   checkIfLiked(blogId: string, userId: string): Observable<boolean> {
     const reactionDocRef = doc(
       this.firestore,
-      `${this.collectionName}/${blogId}/reactions/${userId}`,
+      `${this.collectionName}/${blogId}/reaction/${userId}`,
     );
     return docData(reactionDocRef).pipe(
       map((doc) => !!doc),
@@ -41,7 +41,7 @@ export class ReactionService {
 
     const reactionRef = doc(
       this.firestore,
-      `${this.collectionName}/${blogId}/reactions/${user.uid}`,
+      `${this.collectionName}/${blogId}/reaction/${user.uid}`,
     );
 
     return from(
@@ -49,7 +49,7 @@ export class ReactionService {
         query(
           collection(
             this.firestore,
-            `${this.collectionName}/${blogId}/reactions`,
+            `${this.collectionName}/${blogId}/reaction`,
           ),
           where('userId', '==', user.uid),
         ),

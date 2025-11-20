@@ -1,9 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { NotificationsComponent } from '../../shared/components/layout/notifications/notifications.component';
 import { NgClass } from '@angular/common';
-import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationsComponent } from '../../shared/components/layout/notifications/notifications.component';
+import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
 
 @Component({
   selector: 'app-main',
@@ -16,10 +21,12 @@ import { AuthService } from '../../core/services/auth.service';
     ThemeControllerComponent,
   ],
   templateUrl: './main.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class MainComponent {
   private readonly authService = inject(AuthService);
-  isAdmin = signal(this.authService.userData()?.role === 'admin');
+
+  isAdmin = computed(() => this.authService.userData()?.role === 'admin');
 
   links = [
     {
