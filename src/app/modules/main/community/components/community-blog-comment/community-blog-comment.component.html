@@ -3,7 +3,14 @@
     <div
       class="bg-gradient-to-l from-primary to-secondary text-neutral-content w-10 h-10 rounded-full"
     >
-      <span class="text-xs">{{ userLetters() }}</span>
+      @if (comment().author?.profileImage) {
+        <img
+          [src]="comment().author.profileImage"
+          [alt]="comment().author.fullName"
+        />
+      } @else {
+        <span class="text-xs">{{ userLetters() }}</span>
+      }
     </div>
   </div>
   <div
@@ -14,11 +21,11 @@
 
   <div class="flex items-center gap-2 w-full">
     <div class="w-full">
-      <div class="font-semibold">{{ comment().userId.fullName }}</div>
-      @if (comment().date) {
+      <div class="font-semibold">{{ comment().author.fullName }}</div>
+      @if (comment().createdAt.toDate()) {
         <relative-time
           class="text-xs opacity-80"
-          datetime="{{ comment().date }}"
+          datetime="{{ comment().createdAt.toDate() }}"
           precision="day"
         ></relative-time>
       } @else {
@@ -36,7 +43,7 @@
         <i class="material-symbols-outlined !text-xl">reply</i>
       </modal-open-button>
 
-      @if (comment().userId.id === userId()) {
+      @if (isMine()) {
         <modal-open-button
           [modalName]="'modal_blog_comment'"
           [classes]="
@@ -59,9 +66,9 @@
 
   <div class="list-col-wrap">
     <p>{{ comment().content }}</p>
-    @if (comment().childrenComments.length > 0) {
+    @if (comment().replies.length > 0) {
       <div class="list">
-        @for (child of comment().childrenComments; track child) {
+        @for (child of comment().replies; track child) {
           <community-blog-comment
             [comment]="child"
             [commentParentId]="comment().id.toString()"

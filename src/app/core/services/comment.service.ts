@@ -40,7 +40,7 @@ export class CommentService {
       this.firestore,
       `${this.collectionName}/${blogId}/comments`,
     );
-    const q = query(commentsRef, orderBy('createdAt', 'asc'));
+    const q = query(commentsRef, orderBy('createdAt', 'desc'));
 
     return collectionData(q, { idField: 'id' }).pipe(
       map((comments: any[]) => {

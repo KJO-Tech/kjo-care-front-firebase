@@ -20,6 +20,7 @@ import { ReactionService } from '../../../../core/services/reaction.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { DialogComponent } from '../../../../shared/components/dialog/dialog.component';
 import { BlogCommentModalComponent } from '../../../blog/blog-comment-modal/blog-comment-modal.component';
+import { CommunityBlogCommentComponent } from '../components/community-blog-comment/community-blog-comment.component';
 import { CommunityCommentFormComponent } from '../components/community-comment-form/community-comment-form.component';
 
 @Component({
@@ -29,6 +30,7 @@ import { CommunityCommentFormComponent } from '../components/community-comment-f
     DialogComponent,
     CommunityCommentFormComponent,
     BlogCommentModalComponent,
+    CommunityBlogCommentComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -53,10 +55,10 @@ export default class CommunityBlogComponent {
   userId = computed(() => this.authService.userData()?.uid);
 
   readonly blog = rxResource({
-    request: () => this.blogId(),
+    request: () => ({ blogId: this.blogId(), userId: this.userId() }),
     loader: ({ request }) => {
-      if (!request) return of(null);
-      return this.blogService.getById(request).pipe(
+      if (!request.blogId) return of(null);
+      return this.blogService.getById(request.blogId).pipe(
         map((blog) => {
           this.isLoading.set(false);
           if (blog) {

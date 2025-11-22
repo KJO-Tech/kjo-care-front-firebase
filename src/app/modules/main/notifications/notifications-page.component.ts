@@ -1,3 +1,4 @@
+import { Location, NgClass } from '@angular/common';
 import {
   Component,
   computed,
@@ -5,20 +6,19 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatePipe, Location, NgClass } from '@angular/common';
-import { NotificationService } from '../../../core/services/notification.service';
-import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import {
   Notification,
   NotificationStatus,
   NotificationType,
 } from '../../../core/models/notification';
+import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-notifications-page',
   templateUrl: './notifications-page.component.html',
-  imports: [NgClass, DatePipe],
+  imports: [NgClass],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export default class NotificationsPageComponent {

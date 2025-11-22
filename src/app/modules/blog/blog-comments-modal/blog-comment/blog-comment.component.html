@@ -1,7 +1,14 @@
 <li class="list-row gap-y-2 px-0">
   <div class="avatar avatar-placeholder">
     <div class="bg-neutral text-neutral-content w-12 rounded-full">
-      <span class="">{{ userLetters() }}</span>
+      @if (comment().author?.profileImage) {
+        <img
+          [src]="comment().author.profileImage"
+          [alt]="comment().author.fullName"
+        />
+      } @else {
+        <span class="">{{ userLetters() }}</span>
+      }
     </div>
   </div>
   <div
@@ -33,7 +40,7 @@
 
       <modal-open-button
         [modalName]="'modal_blog_comment'"
-        [classes]="'btn-square btn-ghost'"
+        [classes]="'btn-square btn-ghost text-info'"
         (click)="commentService.selectedComment = selectComment('edit')"
       >
         <i class="material-symbols-outlined !text-xl">edit</i>
@@ -41,7 +48,7 @@
 
       <modal-open-button
         [modalName]="'modal_blog_comment_delete'"
-        [classes]="'btn-square btn-ghost'"
+        [classes]="'btn-square btn-ghost text-error'"
         (click)="commentService.selectedComment = selectComment('delete')"
       >
         <i class="material-symbols-outlined !text-xl">delete</i>

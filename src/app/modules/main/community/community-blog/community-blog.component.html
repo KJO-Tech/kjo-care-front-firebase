@@ -86,26 +86,27 @@
       </div>
     </div>
 
-    <div
-      class="shadow-lg card backdrop-blur-sm overflow-hidden card-border rounded-xl"
-    >
+    @if (blog.value()?.mediaUrl) {
       <div
-        class="w-full bg-base-200 flex items-center justify-center max-h-[min(800px,80dvh)]"
+        class="shadow-lg card backdrop-blur-sm overflow-hidden card-border rounded-xl"
       >
-        @if (blog.value()?.mediaType === "VIDEO" && blog.value()?.mediaUrl) {
-          <video controls class="w-full h-full">
-            <source [src]="blog.value()?.mediaUrl" type="video/mp4" />
-          </video>
-        } @else if (blog.value()?.mediaUrl) {
-          <img
-            [src]="blog.value()?.mediaUrl"
-            alt="{{ blog.value()?.title }}"
-            class="object-cover h-full w-full"
-          />
-        }
+        <div
+          class="w-full bg-base-200 flex items-center justify-center max-h-[min(800px,80dvh)]"
+        >
+          @if (blog.value()?.mediaType === "VIDEO" && blog.value()?.mediaUrl) {
+            <video controls class="w-full h-full">
+              <source [src]="blog.value()?.mediaUrl" type="video/mp4" />
+            </video>
+          } @else if (blog.value()?.mediaUrl) {
+            <img
+              [src]="blog.value()?.mediaUrl"
+              alt="{{ blog.value()?.title }}"
+              class="object-cover h-full w-full"
+            />
+          }
+        </div>
       </div>
-    </div>
-
+    }
     <div class="rounded-xl shadow-lg card space-y-3 backdrop-blur-sm">
       <div class="card-body">
         <p class="whitespace-pre-wrap">{{ blog.value()?.content }}</p>
@@ -157,11 +158,12 @@
         ></community-comment-form>
         <ul class="list pl-4 space-y-4 mt-4">
           @for (comment of commentsResource.value() || []; track comment.id) {
-            <app-community-blog-comment
+            <community-blog-comment
               [comment]="comment"
               [currentUserId]="userId()"
+              [commentParentId]="comment.parentCommentId ?? null"
               (deleteComment)="openDeleteCommentModal($any($event))"
-            ></app-community-blog-comment>
+            ></community-blog-comment>
           } @empty {
             <div class="text-center py-8 opacity-50">
               <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>

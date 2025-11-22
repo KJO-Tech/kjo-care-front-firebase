@@ -22,8 +22,7 @@ export class BlogCommentComponent {
   readonly commentParentId = input.required<string | null>();
 
   readonly blogService = inject(BlogService);
-
-  commentService = inject(CommentService);
+  readonly commentService = inject(CommentService);
 
   readonly userLetters = computed<string>(() => {
     const fullName = this.comment().author?.fullName || '?';
