@@ -181,99 +181,151 @@
     </div>
   } @else {
     @for (blog of filteredBlogs(); track blog.id) {
-      <div
-        class="card card-border bg-base-100 w-full shadow-lg hover:scale-[1.01] transition-all duration-300 hover:cursor-pointer hover:shadow-xl"
+      <article
+        class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
         (click)="goToBlog(blog.id)"
       >
-        @if (blog.mediaType === "VIDEO" && blog.mediaUrl) {
-          <figure
-            class="aspect-video w-full max-h-72 sm:max-h-52 bg-base-200 flex items-center justify-center"
-          >
-            <video class="w-full h-full">
-              <source [src]="blog.mediaUrl" type="video/mp4" />
-            </video>
-          </figure>
-        } @else if (blog.mediaType === "IMAGE" && blog.mediaUrl) {
-          <figure
-            class="aspect-video w-full max-h-72 sm:max-h-52 bg-base-200 flex items-center justify-center"
-          >
-            <img
-              [src]="blog.mediaUrl"
-              [alt]="blog.title"
-              class="w-full max-h-72 sm:max-h-52 h-full object-cover object-center sm:object-contain"
-            />
-          </figure>
-        }
-        <div class="card-body">
-          <div class="flex gap-3">
-            <div class="avatar avatar-placeholder">
+        <div class="card-body p-0">
+          <!-- Author Header -->
+          <div class="flex items-start gap-3 p-4">
+            <div class="avatar">
               <div
-                class="bg-gradient-to-r from-primary to-accent text-primary-content w-12 rounded-full font-semibold"
+                class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-accent"
               >
                 @if (blog.author.profileImage) {
                   <img
                     [src]="blog.author.profileImage"
                     [alt]="blog.author.fullName"
+                    class="rounded-full"
                   />
                 } @else {
-                  <span class="">{{ getUserLetters(blog.author) }}</span>
+                  <div
+                    class="flex items-center justify-center h-full text-primary-content font-semibold text-sm"
+                  >
+                    {{ getUserLetters(blog.author) }}
+                  </div>
                 }
               </div>
             </div>
-            <div class="w-full">
-              <div class="font-semibold">{{ blog.author.fullName }}</div>
-              <div class="flex items-center gap-2">
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-sm text-base-content">
+                {{ blog.author.fullName }}
+              </div>
+              <div class="flex items-center gap-2 text-xs text-base-content/60">
                 @if (blog.createdAt) {
                   <relative-time
-                    class="text-sm opacity-80"
                     [datetime]="blog.createdAt.toDate()"
                     precision="day"
                   ></relative-time>
                 } @else {
-                  <span class="text-xs opacity-80">No date</span>
+                  <span>No date</span>
                 }
+                <span>·</span>
+                <span class="badge badge-xs badge-ghost">
+                  {{ getCategoryName(blog.categoryId) }}
+                </span>
               </div>
             </div>
           </div>
 
-          <h2 class="card-title">{{ blog.title }}</h2>
-          <div class="badge badge-soft rounded-full badge-primary">
-            {{ getCategoryName(blog.categoryId) }}
+          <!-- Content -->
+          <div class="px-4 space-y-2">
+            <h2
+              class="text-xl font-bold leading-tight hover:text-primary transition-colors"
+            >
+              {{ blog.title }}
+            </h2>
+            <p
+              class="text-sm text-base-content/70 line-clamp-2 leading-relaxed"
+            >
+              {{ blog.content }}
+            </p>
           </div>
-          <p class="line-clamp-2">{{ blog.content }}</p>
-          <div class="card-actions justify-end">
-            <div class="flex-1 flex gap-4">
+
+          <!-- Media (Reduced Size) -->
+          @if (blog.mediaType === "VIDEO" && blog.mediaUrl) {
+            <div class="mt-3 mx-4 mb-3 rounded-lg overflow-hidden bg-base-200">
+              <video class="w-full max-h-64 object-cover">
+                <source [src]="blog.mediaUrl" type="video/mp4" />
+              </video>
+            </div>
+          } @else if (blog.mediaType === "IMAGE" && blog.mediaUrl) {
+            <div class="mt-3 mx-4 mb-3 rounded-lg overflow-hidden bg-base-200">
+              <img
+                [src]="blog.mediaUrl"
+                [alt]="blog.title"
+                class="w-full max-h-64 object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          }
+
+          <!-- Actions Footer -->
+          <div
+            class="flex items-center justify-between px-4 py-3 border-t border-base-300"
+          >
+            <div class="flex items-center gap-4">
+              <!-- Like Button with Functionality -->
               <button
-                class="flex items-center justify-center gap-1 hover:cursor-pointer hover:scale-[1.1] transition-all duration-300 hover:text-error text-base-content/60"
+                type="button"
+                class="flex items-center gap-1.5 group transition-colors"
                 [class.text-error]="blog.isLiked"
+                [class.hover:text-error]="!blog.isLiked"
+                (click)="toggleLike($event, blog.id)"
+                title="Me gusta"
               >
-                <i class="material-icons-outlined !text-2xl">{{
-                  blog.isLiked ? "favorite" : "favorite_border"
-                }}</i>
-                <span class="text-base">{{ blog.reaction || 0 }}</span>
+                <i
+                  class="material-icons-outlined text-lg group-hover:scale-110 transition-transform"
+                >
+                  {{ blog.isLiked ? "favorite" : "favorite_border" }}
+                </i>
+                <span class="text-sm font-medium">{{
+                  blog.reaction || 0
+                }}</span>
               </button>
+
+              <!-- Comments Button -->
               <button
-                class="flex items-center justify-center gap-1 hover:cursor-pointer hover:scale-[1.1] transition-all duration-300 hover:text-info text-base-content/60"
+                type="button"
+                class="flex items-center gap-1.5 group hover:text-info transition-colors"
                 (click)="goToBlogCommentSection($event, blog.id)"
+                title="Comentarios"
               >
-                <i class="material-symbols-outlined !text-2xl">comment</i>
-                <span class="text-base">{{ blog.comments || 0 }}</span>
+                <i
+                  class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform"
+                >
+                  comment
+                </i>
+                <span class="text-sm font-medium">{{
+                  blog.comments || 0
+                }}</span>
               </button>
+
+              <!-- Share Button -->
               <button
-                class="flex items-center justify-center gap-1 hover:cursor-pointer hover:scale-[1.1] transition-all duration-300 hover:text-success text-base-content/60"
+                type="button"
+                class="flex items-center gap-1.5 group hover:text-success transition-colors"
+                (click)="shareBlog($event, blog)"
+                title="Compartir"
               >
-                <i class="material-symbols-outlined !text-2xl">ios_share</i>
+                <i
+                  class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform"
+                >
+                  ios_share
+                </i>
               </button>
             </div>
+
+            <!-- Read More -->
             <button
-              class="btn btn-outline btn-primary btn-sm"
+              class="btn btn-sm btn-ghost gap-1 btn-primary"
               (click)="goToBlog(blog.id)"
             >
               Leer más
+              <i class="material-symbols-outlined !text-base">arrow_forward</i>
             </button>
           </div>
         </div>
-      </div>
+      </article>
     } @empty {
       <div class="text-center my-6">
         <i

@@ -8,11 +8,12 @@ import {
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Blog, BlogStatus } from '../../../../core/models/blog';
-import { Category } from '../../../../core/models/blog';
+import { UserModel } from '../../../../core/models/user.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { BlogService } from '../../../../core/services/blog.service';
 import { CategoryService } from '../../../../core/services/category.service';
-import { UserModel } from '../../../../core/models/user.model';
+import { ReactionService } from '../../../../core/services/reaction.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'community-blogs',
@@ -23,8 +24,10 @@ import { UserModel } from '../../../../core/models/user.model';
 export default class CommunityBlogsComponent {
   private router = inject(Router);
   private blogService = inject(BlogService);
+  private reactionService = inject(ReactionService);
   private categoryService = inject(CategoryService);
   private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
   blogs = rxResource({
     loader: () => this.blogService.findAll(),
@@ -127,5 +130,61 @@ export default class CommunityBlogsComponent {
     this.search.set('');
     this.category.set('');
     this.type.set('default');
+  }
+
+  toggleLike(event: Event, blogId: string) {
+    event.stopPropagation();
+    const user = this.authService.userData();
+
+    if (!user) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    this.reactionService.toggleLike(blogId).subscribe({
+      next: () => {
+        // this.blogs.reload();
+      },
+      error: (error: any) => {
+        console.error('Error toggling reaction:', error);
+      },
+    });
+  }
+
+  shareBlog(event: Event, blog: Blog) {
+    event.stopPropagation();
+    if (!blog) return;
+
+    const shareData = {
+      title: blog.title,
+      text: blog.content.substring(0, 100) + '...',
+      url: window.location.href + '/post/' + blog.id,
+    };
+
+    if (navigator.share) {
+      navigator
+        .share(shareData)
+        .then(() => console.log('Blog shared successfully'))
+        .catch((error) => console.error('Error sharing blog:', error));
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(window.location.href).then(
+        () => {
+          this.toastService.addToast({
+            message: 'Enlace copiado al portapapeles',
+            type: 'success',
+            duration: 3000,
+          });
+        },
+        (err) => {
+          console.error('Could not copy text: ', err);
+          this.toastService.addToast({
+            message: 'Error al copiar el enlace',
+            type: 'error',
+            duration: 3000,
+          });
+        },
+      );
+    }
   }
 }
