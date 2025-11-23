@@ -5,8 +5,6 @@ import { ToastComponent } from './shared/components/layout/toast/toast.component
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, ToastComponent],
-  template: `
-  <router-outlet /> <app-toast/>
-  `,
+  template: ` <router-outlet /> <app-toast /> `,
 })
 export class AppComponent {}

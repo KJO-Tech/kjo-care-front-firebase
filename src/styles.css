@@ -18,7 +18,7 @@
   --color-base-content: oklch(22% 0.04 290);
 
   /* Colores principales */
-  --color-primary: oklch(65% 0.20 290);
+  --color-primary: oklch(65% 0.2 290);
   --color-primary-content: oklch(98% 0.01 20);
   --color-secondary: oklch(72% 0.18 230);
   --color-secondary-content: oklch(98% 0.01 18);
@@ -36,7 +36,7 @@
   --color-warning-content: oklch(15% 0.01 70);
   --color-error: oklch(72% 0.18 350);
   --color-error-content: oklch(98% 0.01 15);
-  --color-info: oklch(70% 0.20 220);
+  --color-info: oklch(70% 0.2 220);
   --color-info-content: oklch(98% 0.01 230);
 
   /* Geometría juvenil */
@@ -67,7 +67,7 @@
   --color-primary-content: oklch(98% 0.01 25);
   --color-secondary: oklch(80% 0.22 230);
   --color-secondary-content: oklch(98% 0.01 22);
-  --color-accent: oklch(85% 0.20 340);
+  --color-accent: oklch(85% 0.2 340);
   --color-accent-content: oklch(15% 0.01 20);
 
   /* Neutral */
@@ -75,7 +75,7 @@
   --color-neutral-content: oklch(88% 0.02 280);
 
   /* Estados */
-  --color-success: oklch(82% 0.20 170);
+  --color-success: oklch(82% 0.2 170);
   --color-success-content: oklch(98% 0.01 150);
   --color-warning: oklch(86% 0.22 50);
   --color-warning-content: oklch(15% 0.01 70);
@@ -95,8 +95,22 @@
   --noise: 1;
 }
 
+[data-theme="cosmic-dark"] {
+  --tw-shadow-color: rgb(255 255 255 / 0.15);
+}
+
+[data-theme="cosmic-dark"] .shadow-lg,
+[data-theme="cosmic-dark"] .shadow-xl {
+  --tw-shadow-color: rgb(255 255 255 / 0.15);
+}
+
+[data-theme="cosmic-dark"] .card {
+  border: 1px solid oklch(20% 0.05 280);
+}
+
 /* Estilos específicos para el mapa de Leaflet */
-#map, .leaflet-container {
+#map,
+.leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 1;
@@ -176,7 +190,6 @@
     opacity: 1;
   }
 }
-
 
 /*Quitar los scrollbar de la pagina principal*/
 :root {
