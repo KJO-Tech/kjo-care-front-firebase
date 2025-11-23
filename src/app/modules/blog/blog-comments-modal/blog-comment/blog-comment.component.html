@@ -1,7 +1,7 @@
 <li class="list-row gap-y-2 px-0">
   <div class="avatar avatar-placeholder">
     <div class="bg-neutral text-neutral-content w-12 rounded-full">
-      @if (comment().author?.profileImage) {
+      @if (comment().author.profileImage) {
         <img
           [src]="comment().author.profileImage"
           [alt]="comment().author.fullName"

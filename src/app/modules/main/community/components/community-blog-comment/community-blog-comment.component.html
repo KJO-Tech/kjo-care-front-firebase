@@ -3,7 +3,7 @@
     <div
       class="bg-gradient-to-l from-primary to-secondary text-neutral-content w-10 h-10 rounded-full"
     >
-      @if (comment().author?.profileImage) {
+      @if (comment().author.profileImage) {
         <img
           [src]="comment().author.profileImage"
           [alt]="comment().author.fullName"
