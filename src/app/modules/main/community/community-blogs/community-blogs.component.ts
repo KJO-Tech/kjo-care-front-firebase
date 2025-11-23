@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { of, tap } from 'rxjs';
 import { Blog, BlogStatus } from '../../../../core/models/blog';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -29,8 +30,29 @@ export default class CommunityBlogsComponent {
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
 
+  // Cache for blogs to prevent loading on back navigation
+  private blogsCache = signal<Blog[] | null>(null);
+
   blogs = rxResource({
-    loader: () => this.blogService.findAll(),
+    loader: () => {
+      // If we have cached data, return it immediately and refresh in background
+      if (this.blogsCache()) {
+        // Return cached data immediately
+        const cached$ = of(this.blogsCache()!);
+
+        // Refresh in background
+        this.blogService.findAll().subscribe((freshBlogs) => {
+          this.blogsCache.set(freshBlogs);
+        });
+
+        return cached$;
+      }
+
+      // No cache, fetch and cache
+      return this.blogService
+        .findAll()
+        .pipe(tap((blogs) => this.blogsCache.set(blogs)));
+    },
   });
 
   categories = rxResource({
@@ -108,7 +130,15 @@ export default class CommunityBlogsComponent {
   }
 
   goToBlog(blogId: string) {
-    this.router.navigate(['/app/community/post', blogId]);
+    // Find the blog to pass it via state for view transitions
+    const blog = this.filteredBlogs().find((b) => b.id === blogId);
+
+    // Scroll to top before navigation for better UX
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    this.router.navigate(['/app/community/post', blogId], {
+      state: { blog }, // Pass blog data for instant rendering
+    });
   }
 
   goToBlogCommentSection(event: Event, blogId: string) {

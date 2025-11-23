@@ -215,3 +215,52 @@ html {
   transition: all 0.5s ease-in-out;
   will-change: transform, opacity, z-index;
 }
+
+/* View Transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Blog card transitions */
+::view-transition-old(blog-card),
+::view-transition-new(blog-card) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Title transitions */
+::view-transition-old(blog-title),
+::view-transition-new(blog-title) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Media transitions */
+::view-transition-old(blog-media),
+::view-transition-new(blog-media) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Avatar transitions */
+::view-transition-old(blog-avatar),
+::view-transition-new(blog-avatar) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Author name transitions */
+::view-transition-old(blog-author),
+::view-transition-new(blog-author) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Content transitions */
+::view-transition-old(blog-content),
+::view-transition-new(blog-content) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -26,12 +26,16 @@
       </button>
     </div>
   } @else {
-    <div class="rounded-xl shadow-lg card backdrop-blur-sm">
+    <div
+      class="rounded-xl shadow-lg card backdrop-blur-sm"
+      [style.view-transition-name]="'blog-card-' + blogId()"
+    >
       <div class="card-body">
         <div class="flex gap-3">
           <div class="avatar avatar-placeholder">
             <div
               class="bg-gradient-to-r from-primary to-accent text-primary-content w-12 rounded-full font-semibold"
+              [style.view-transition-name]="'blog-avatar-' + blogId()"
             >
               @if (blog.value()?.author?.profileImage) {
                 <img
@@ -44,7 +48,10 @@
             </div>
           </div>
           <div class="w-full">
-            <div class="font-semibold">
+            <div
+              class="font-semibold"
+              [style.view-transition-name]="'blog-author-' + blogId()"
+            >
               {{ blog.value()?.author?.fullName }}
             </div>
             <div class="flex items-center gap-2">
@@ -77,7 +84,10 @@
           }
         </div>
 
-        <h2 class="card-title text-2xl md:text-3xl font-bold">
+        <h2
+          class="card-title text-2xl md:text-3xl font-bold"
+          [style.view-transition-name]="'blog-title-' + blogId()"
+        >
           {{ blog.value()?.title }}
         </h2>
         <div class="badge badge-soft rounded-full badge-primary">
@@ -89,6 +99,7 @@
     @if (blog.value()?.mediaUrl) {
       <div
         class="shadow-lg card backdrop-blur-sm overflow-hidden card-border rounded-xl"
+        [style.view-transition-name]="'blog-media-' + blogId()"
       >
         <div
           class="w-full bg-base-200 flex items-center justify-center max-h-[min(800px,80dvh)]"

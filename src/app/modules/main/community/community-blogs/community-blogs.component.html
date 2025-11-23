@@ -183,6 +183,7 @@
     @for (blog of filteredBlogs(); track blog.id) {
       <article
         class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+        [style.view-transition-name]="'blog-card-' + blog.id"
         (click)="goToBlog(blog.id)"
       >
         <div class="card-body p-0">
@@ -191,6 +192,7 @@
             <div class="avatar">
               <div
                 class="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-accent"
+                [style.view-transition-name]="'blog-avatar-' + blog.id"
               >
                 @if (blog.author.profileImage) {
                   <img
@@ -208,7 +210,10 @@
               </div>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="font-semibold text-sm text-base-content">
+              <div
+                class="font-semibold text-sm text-base-content"
+                [style.view-transition-name]="'blog-author-' + blog.id"
+              >
                 {{ blog.author.fullName }}
               </div>
               <div class="flex items-center gap-2 text-xs text-base-content/60">
@@ -232,11 +237,13 @@
           <div class="px-4 space-y-2">
             <h2
               class="text-xl font-bold leading-tight hover:text-primary transition-colors"
+              [style.view-transition-name]="'blog-title-' + blog.id"
             >
               {{ blog.title }}
             </h2>
             <p
               class="text-sm text-base-content/70 line-clamp-2 leading-relaxed"
+              [style.view-transition-name]="'blog-content-' + blog.id"
             >
               {{ blog.content }}
             </p>
@@ -244,13 +251,19 @@
 
           <!-- Media (Reduced Size) -->
           @if (blog.mediaType === "VIDEO" && blog.mediaUrl) {
-            <div class="mt-3 mx-4 mb-3 rounded-lg overflow-hidden bg-base-200">
+            <div
+              class="mt-3 mx-4 mb-3 rounded-lg overflow-hidden bg-base-200"
+              [style.view-transition-name]="'blog-media-' + blog.id"
+            >
               <video class="w-full max-h-64 object-cover">
                 <source [src]="blog.mediaUrl" type="video/mp4" />
               </video>
             </div>
           } @else if (blog.mediaType === "IMAGE" && blog.mediaUrl) {
-            <div class="mt-3 mx-4 mb-3 rounded-lg overflow-hidden bg-base-200">
+            <div
+              class="mt-3 mx-4 mb-3 rounded-lg overflow-hidden bg-base-200"
+              [style.view-transition-name]="'blog-media-' + blog.id"
+            >
               <img
                 [src]="blog.mediaUrl"
                 [alt]="blog.title"

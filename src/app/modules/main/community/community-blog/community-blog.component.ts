@@ -54,10 +54,33 @@ export default class CommunityBlogComponent {
 
   userId = computed(() => this.authService.userData()?.uid);
 
+  // Get blog from navigation state if available (for view transitions)
+  private initialBlogState = signal<Blog | null>(null);
+
   readonly blog = rxResource({
-    request: () => ({ blogId: this.blogId(), userId: this.userId() }),
+    request: () => ({
+      blogId: this.blogId(),
+      userId: this.userId(),
+      initialState: this.initialBlogState(),
+    }),
     loader: ({ request }) => {
       if (!request.blogId) return of(null);
+
+      // If we have initial state from navigation, use it immediately
+      if (request.initialState && request.initialState.id === request.blogId) {
+        this.isLoading.set(false);
+        this.blogService.selectedBlog = request.initialState;
+        this.updateSEO(request.initialState);
+        // Still fetch fresh data in background but return state data first
+        this.blogService.getById(request.blogId).subscribe((freshBlog) => {
+          if (freshBlog) {
+            this.blog.reload();
+          }
+        });
+        return of(request.initialState);
+      }
+
+      // Otherwise fetch from API
       return this.blogService.getById(request.blogId).pipe(
         map((blog) => {
           this.isLoading.set(false);
@@ -84,6 +107,13 @@ export default class CommunityBlogComponent {
   });
 
   constructor() {
+    // Check for navigation state
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state as { blog?: Blog };
+    if (state?.blog) {
+      this.initialBlogState.set(state.blog);
+    }
+
     effect(() => {
       this.route.paramMap.subscribe((params) => {
         this.blogId.set(params.get('id') ?? '');
