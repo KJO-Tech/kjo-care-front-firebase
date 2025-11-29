@@ -109,6 +109,23 @@
               </div>
             </div>
           </div>
+
+          <!-- Legend -->
+          <div
+            class="flex flex-wrap items-center justify-center gap-3 mt-4 px-4"
+          >
+            @for (mood of moodDefinitions.value(); track mood.id) {
+              <div class="flex items-center gap-1.5">
+                <div
+                  class="w-3 h-3 rounded-full shadow-sm"
+                  [style.backgroundColor]="mood.color"
+                ></div>
+                <span class="text-xs text-gray-600 font-medium">{{
+                  mood.name["es"] || mood.name["en"]
+                }}</span>
+              </div>
+            }
+          </div>
         </div>
       </div>
     </div>

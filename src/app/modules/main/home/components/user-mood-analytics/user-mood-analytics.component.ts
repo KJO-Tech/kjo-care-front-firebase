@@ -321,6 +321,35 @@ export class UserMoodAnalyticsComponent {
       });
     });
 
+    // Main Series Data (The Shape)
+    const mainData = moodNames.map((name) => moodCounts[name]);
+
+    // Auxiliary Series for Colored Points
+    const pointSeries = moodNames.map((name, index) => {
+      // Create an array of 0s, with the value only at the specific index
+      const data = new Array(moodNames.length).fill(0);
+      data[index] = moodCounts[name];
+
+      return {
+        name: name,
+        type: 'radar',
+        symbol: 'circle',
+        symbolSize: (val: number) => (val > 0 ? 8 : 0), // Hide point if value is 0
+        itemStyle: {
+          color: moodColors[name],
+        },
+        lineStyle: { width: 0 }, // Hide line
+        areaStyle: { opacity: 0 }, // Hide area
+        data: [
+          {
+            value: data,
+            name: name,
+          },
+        ],
+        z: 10, // Ensure points are on top
+      };
+    });
+
     return {
       tooltip: {},
       radar: {
@@ -329,16 +358,17 @@ export class UserMoodAnalyticsComponent {
         splitNumber: 5,
         axisName: {
           fontWeight: 'bold',
+          color: '#6b7280', // Gray-500 for better visibility in light mode
         },
         splitLine: {
           lineStyle: {
             color: [
-              'rgba(238, 197, 102, 0.1)',
-              'rgba(238, 197, 102, 0.2)',
-              'rgba(238, 197, 102, 0.4)',
-              'rgba(238, 197, 102, 0.6)',
-              'rgba(238, 197, 102, 0.8)',
-              'rgba(238, 197, 102, 1)',
+              'rgba(139, 92, 246, 0.1)', // Violet-500 with opacity
+              'rgba(139, 92, 246, 0.2)',
+              'rgba(139, 92, 246, 0.4)',
+              'rgba(139, 92, 246, 0.6)',
+              'rgba(139, 92, 246, 0.8)',
+              'rgba(139, 92, 246, 1)',
             ].reverse(),
           },
         },
@@ -347,27 +377,31 @@ export class UserMoodAnalyticsComponent {
         },
         axisLine: {
           lineStyle: {
-            color: 'rgba(238, 197, 102, 0.5)',
+            color: 'rgba(139, 92, 246, 0.5)',
           },
         },
       },
       series: [
+        // Main Shape
         {
           name: 'Perfil Emocional',
           type: 'radar',
           data: [
             {
-              value: moodNames.map((name) => moodCounts[name]),
+              value: mainData,
               name: 'Frecuencia',
               areaStyle: {
-                color: 'rgba(255, 228, 52, 0.6)',
+                color: 'rgba(139, 92, 246, 0.5)', // Violet-500 with opacity
               },
               itemStyle: {
-                color: '#FFD700',
+                color: '#8b5cf6', // Violet-500
               },
             },
           ],
+          z: 1,
         },
+        // Colored Points
+        ...(pointSeries as any),
       ],
     };
   }

@@ -53,8 +53,8 @@
 @plugin "daisyui/theme" {
   name: "cosmic-dark";
   default: false;
-  prefersdark: true;
-  color-scheme: "dark";
+  /* prefersdark: true; */
+  /* color-scheme: "dark"; */
 
   /* Fondos */
   --color-base-100: oklch(8% 0.03 290);
@@ -96,12 +96,12 @@
 }
 
 [data-theme="cosmic-dark"] {
-  --tw-shadow-color: rgb(255 255 255 / 0.15);
+  --tw-shadow-color: rgb(255 255 255 / 0.06);
 }
 
 [data-theme="cosmic-dark"] .shadow-lg,
 [data-theme="cosmic-dark"] .shadow-xl {
-  --tw-shadow-color: rgb(255 255 255 / 0.15);
+  --tw-shadow-color: rgb(255 255 255 / 0.06);
 }
 
 [data-theme="cosmic-dark"] .card {
