@@ -32,7 +32,10 @@
                 class="w-6 h-6 object-cover"
               />
             </span>
-            <span>{{ mood.name }}</span>
+            <div class="flex flex-col">
+              <span class="font-bold">{{ mood.name["es"] }}</span>
+              <span class="text-xs opacity-70">Valor: {{ mood.value }}</span>
+            </div>
           </div>
           <div class="flex items-center gap-3">
             <div class="form-control">

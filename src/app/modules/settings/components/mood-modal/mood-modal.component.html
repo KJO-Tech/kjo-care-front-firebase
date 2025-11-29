@@ -7,34 +7,77 @@
 
       @if (moodForm) {
         <form [formGroup]="moodForm" class="py-4">
-          <div class="form-control flex flex-col">
-            <label class="label">
-              <span class="label-text">Nombre</span>
-              @if (nameControl?.invalid && nameControl?.touched) {
-                <span class="label-text-alt text-error"
-                  >El nombre es requerido</span
-                >
-              }
-            </label>
-            <input
-              type="text"
-              class="input input-bordered"
-              formControlName="name"
-              placeholder="Happy"
-              [class.input-error]="nameControl?.invalid && nameControl?.touched"
-            />
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-control flex flex-col">
+              <label class="label">
+                <span class="label-text">Nombre (ES)</span>
+                @if (nameEsControl?.invalid && nameEsControl?.touched) {
+                  <span class="label-text-alt text-error">Requerido</span>
+                }
+              </label>
+              <input
+                type="text"
+                class="input input-bordered"
+                formControlName="nameEs"
+                placeholder="Feliz"
+                [class.input-error]="
+                  nameEsControl?.invalid && nameEsControl?.touched
+                "
+              />
+            </div>
+            <div class="form-control flex flex-col">
+              <label class="label">
+                <span class="label-text">Nombre (EN)</span>
+                @if (nameEnControl?.invalid && nameEnControl?.touched) {
+                  <span class="label-text-alt text-error">Requerido</span>
+                }
+              </label>
+              <input
+                type="text"
+                class="input input-bordered"
+                formControlName="nameEn"
+                placeholder="Happy"
+                [class.input-error]="
+                  nameEnControl?.invalid && nameEnControl?.touched
+                "
+              />
+            </div>
           </div>
 
           <div class="form-control mt-4 flex flex-col">
             <label class="label">
-              <span class="label-text">Descripcion</span>
+              <span class="label-text">Descripcion (ES)</span>
             </label>
             <textarea
               class="textarea textarea-bordered"
-              formControlName="description"
-              placeholder="Añade una descripcion"
+              formControlName="descriptionEs"
+              placeholder="Descripción en español"
               rows="2"
             ></textarea>
+          </div>
+
+          <div class="form-control mt-4 flex flex-col">
+            <label class="label">
+              <span class="label-text">Descripcion (EN)</span>
+            </label>
+            <textarea
+              class="textarea textarea-bordered"
+              formControlName="descriptionEn"
+              placeholder="Description in English"
+              rows="2"
+            ></textarea>
+          </div>
+
+          <div class="form-control mt-4 flex flex-col">
+            <label class="label">
+              <span class="label-text">Valor</span>
+            </label>
+            <input
+              type="number"
+              class="input input-bordered"
+              formControlName="value"
+              placeholder="0"
+            />
           </div>
 
           <div class="form-control mt-4 flex flex-col">

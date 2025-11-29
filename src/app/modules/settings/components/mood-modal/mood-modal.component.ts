@@ -33,11 +33,12 @@ export class MoodModalComponent implements OnInit {
   modalId = input<string>('mood_editor_modal');
   mood = input<Mood>({
     id: '',
-    name: '',
+    name: { es: '', en: '' },
     color: '#9172FE',
     isActive: true,
-    description: '',
+    description: { es: '', en: '' },
     image: '',
+    value: 0,
   });
   isNewMood = input<boolean>(false);
 
@@ -60,10 +61,13 @@ export class MoodModalComponent implements OnInit {
       const currentMood = this.mood();
       if (this.moodForm) {
         this.moodForm.patchValue({
-          name: currentMood.name,
+          nameEs: currentMood.name['es'],
+          nameEn: currentMood.name['en'],
           color: currentMood.color,
-          description: currentMood.description || '',
+          descriptionEs: currentMood.description['es'] || '',
+          descriptionEn: currentMood.description['en'] || '',
           image: currentMood.image || '',
+          value: currentMood.value || 0,
         });
       }
     });
@@ -77,10 +81,19 @@ export class MoodModalComponent implements OnInit {
     const currentMood = this.mood();
 
     this.moodForm = this.fb.group({
-      name: [currentMood.name, [Validators.required, Validators.minLength(2)]],
+      nameEs: [
+        currentMood.name['es'],
+        [Validators.required, Validators.minLength(2)],
+      ],
+      nameEn: [
+        currentMood.name['en'],
+        [Validators.required, Validators.minLength(2)],
+      ],
       color: [currentMood.color, Validators.required],
-      description: [currentMood.description || ''],
+      descriptionEs: [currentMood.description['es'] || ''],
+      descriptionEn: [currentMood.description['en'] || ''],
       image: [currentMood.image || ''],
+      value: [currentMood.value || 0, [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -98,9 +111,21 @@ export class MoodModalComponent implements OnInit {
       return;
     }
 
+    const formValue = this.moodForm.value;
     const updatedMood: Mood = {
       ...this.mood(),
-      ...this.moodForm.value,
+      name: {
+        es: formValue.nameEs,
+        en: formValue.nameEn,
+      },
+      description: {
+        es: formValue.descriptionEs,
+        en: formValue.descriptionEn,
+      },
+      color: formValue.color,
+      image: formValue.image,
+      value: formValue.value,
+      isActive: this.mood().isActive, // Preserve active state
     };
 
     this.save.emit(updatedMood);
@@ -119,8 +144,11 @@ export class MoodModalComponent implements OnInit {
     }
   }
 
-  get nameControl() {
-    return this.moodForm.get('name');
+  get nameEsControl() {
+    return this.moodForm.get('nameEs');
+  }
+  get nameEnControl() {
+    return this.moodForm.get('nameEn');
   }
   get colorControl() {
     return this.moodForm.get('color');

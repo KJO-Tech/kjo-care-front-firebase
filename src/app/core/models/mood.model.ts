@@ -1,8 +1,9 @@
 export interface Mood {
   id: string;
-  name: string;
-  description: string;
+  name: { [key: string]: string };
+  description: { [key: string]: string };
   image: string;
   color: string;
   isActive: boolean;
+  value: number;
 }

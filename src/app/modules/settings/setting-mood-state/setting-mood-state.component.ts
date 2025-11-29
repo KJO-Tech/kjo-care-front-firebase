@@ -18,11 +18,16 @@ import type {
 import { ToastService } from '../../../core/services/toast.service';
 import { NEVER, timer } from 'rxjs';
 import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
-import { ModalOpenButtonComponent } from "../../../shared/components/modal-open-button/modal-open-button.component";
+import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
 
 @Component({
   selector: 'setting-mood-state',
-  imports: [FormsModule, MoodModalComponent, DialogComponent, ModalOpenButtonComponent],
+  imports: [
+    FormsModule,
+    MoodModalComponent,
+    DialogComponent,
+    ModalOpenButtonComponent,
+  ],
   templateUrl: './setting-mood-state.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,11 +37,12 @@ export default class SettingMoodStateComponent {
   private destroyRef = inject(DestroyRef);
 
   readonly moodStateSignal = signal<MoodStateRequest>({
-    name: '',
-    description: '',
+    name: { es: '', en: '' },
+    description: { es: '', en: '' },
     image: '',
     color: '#6d28d9',
     materialIcon: '',
+    value: 0,
   });
 
   readonly moodStateResource = rxResource({
@@ -86,17 +92,18 @@ export default class SettingMoodStateComponent {
   }
 
   private isMoodStateEmpty(moodState: MoodStateRequest): boolean {
-    return !moodState.name.trim() || !moodState.color.trim();
+    return !moodState.name['es']?.trim() || !moodState.color.trim();
   }
 
   addMoodState(): void {
     const newMood: Mood = {
       id: '',
-      name: '',
-      description: '',
+      name: { es: '', en: '' },
+      description: { es: '', en: '' },
       color: '#6d28d9',
       isActive: true,
       image: '',
+      value: 0,
     };
 
     this.isNewMood.set(true);
