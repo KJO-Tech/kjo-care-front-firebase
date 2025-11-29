@@ -3,11 +3,13 @@
   <modal-open-button
     modalName="modal_category"
     [classes]="'btn-primary'"
-    (click)="categoryService.selectedCategory.set({
-      id: '',
-      nameTranslations: {es: '', en: ''},
-      isActive: true
-    })"
+    (click)="
+      categoryService.selectedCategory.set({
+        id: '',
+        nameTranslations: { es: '', en: '' },
+        isActive: true,
+      })
+    "
   >
     Add Category
   </modal-open-button>
@@ -16,10 +18,11 @@
 <div class="overflow-x-auto">
   <table class="table">
     <thead>
-    <tr>
-      <th>Name</th>
-      <th>Actions</th>
-    </tr>
+      <tr>
+        <th>Name</th>
+        <th>Active</th>
+        <th>Actions</th>
+      </tr>
     </thead>
     <tbody>
       @if (categories.isLoading()) {
@@ -30,29 +33,37 @@
         <td colspan="2">
           <div class="alert alert-error mt-4">
             <i class="material-symbols-outlined !text-xl">error</i>
-            <span>Error al cargar las categorías. Por favor intenta de nuevo.</span>
-            <button class="btn btn-sm" (click)="reload()">
-              Retry
-            </button>
+            <span
+              >Error al cargar las categorías. Por favor intenta de nuevo.</span
+            >
+            <button class="btn btn-sm" (click)="reload()">Retry</button>
           </div>
         </td>
       } @else {
         @for (category of categories.value(); track category.id) {
           <tr class="hover:bg-base-200">
-            <td>{{ category.nameTranslations['es'] || 'Unknown' }}</td>
-            <td>{{ category.isActive ? 'Active' : 'Inactive' }}</td>
+            <td>{{ category.nameTranslations["es"] || "Unknown" }}</td>
+            <td>
+              <input
+                type="checkbox"
+                class="toggle toggle-primary"
+                [checked]="category.isActive"
+                (change)="toggleCategory(category)"
+              />
+            </td>
             <td class="flex items-center gap-1">
               <modal-open-button
                 [modalName]="'modal_category'"
                 [type]="'icon'"
                 (click)="categoryService.selectedCategory.set(category)"
               >
-                <i class="material-symbols-outlined !text-xl">edit_square</i>
+                <i class="material-symbols-outlined !text-xl">edit</i>
               </modal-open-button>
 
               <modal-open-button
                 [modalName]="'modal_category_delete'"
                 [type]="'icon'"
+                classes="btn-ghost text-error"
                 (click)="categoryService.selectedCategory.set(category)"
               >
                 <i class="material-symbols-outlined !text-xl">delete</i>
