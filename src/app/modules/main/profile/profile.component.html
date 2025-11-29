@@ -1,89 +1,128 @@
-<div class="p-4">
-  <!-- Encabezado -->
-  <div class="mb-8">
-    <h1 class="text-3xl font-semibold bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">Mi
-      Perfil</h1>
-    <p class="text-base-content/70 mt-1">Gestiona la información de tu cuenta y tu configuración de seguridad.</p>
+<div class="p-4 pb-20 max-w-4xl mx-auto">
+  <!-- Header with Gradient Title -->
+  <div class="mb-8 text-center sm:text-left">
+    <h1
+      class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text inline-flex items-center gap-2"
+    >
+      Mi Perfil
+    </h1>
+    <p class="text-base-content/70 mt-2">
+      Gestiona tu información personal y preferencias.
+    </p>
   </div>
 
-  <!-- Tarjeta de Perfil -->
-  @if (userProfile(); as profile) {
-    <div class="card bg-base-100 shadow-xl border border-base-300">
-      <div class="card-body">
-        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <!-- Avatar -->
-          <div class="avatar avatar-placeholder">
+  <!-- User Info Card -->
+  <div class="card bg-base-100 shadow-lg border border-base-300 mb-6">
+    <div class="card-body">
+      @if (userProfile(); as profile) {
+        <div class="flex flex-col sm:flex-row items-center gap-6">
+          <div class="avatar placeholder">
             <div
-              class="bg-primary text-primary-content rounded-full w-24 h-24 ring ring-primary ring-offset-base-100 ring-offset-2">
-              <span class="text-4xl font-bold">{{ profile.firstName ? profile.firstName!.charAt(0) : 'U' }}</span>
+              class="bg-primary text-primary-content rounded-full w-24 h-24 ring ring-primary ring-offset-base-100 ring-offset-2 shadow-md"
+            >
+              @if (profile.profileImage) {
+                <img [src]="profile.profileImage" alt="Avatar" />
+              } @else {
+                <span
+                  class="text-5xl font-bold w-full h-full inline-flex items-center justify-center"
+                  >{{
+                    profile.fullName
+                      ? profile.fullName.charAt(0).toUpperCase()
+                      : "U"
+                  }}</span
+                >
+              }
             </div>
           </div>
-
-          <!-- Información del Usuario -->
           <div class="text-center sm:text-left">
-            <h2 class="text-2xl font-bold">{{ profile.firstName }} {{ profile.lastName }}</h2>
-            <p class="text-base-content/60 mt-1">{{ profile.email }}</p>
-            @if (profile.username && profile.username !== profile.email) {
-              <p class="text-sm text-base-content/50">Usuario: {{ profile.username }}</p>
-            }
-          </div>
-        </div>
-
-        <div class="divider my-4"></div>
-
-        <!-- Acciones -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Editar Perfil -->
-          <div class="card bg-base-200/50 border border-base-300/50">
-            <div class="card-body">
-              <h3 class="card-title text-lg">Información Personal</h3>
-              <p class="text-sm text-base-content/70 mb-4">
-                Actualiza tu nombre, correo electrónico y otros datos personales.
-              </p>
-              <div class="card-actions justify-end">
-                <button class="btn btn-primary" (click)="editProfile()">
-                  <i class="material-symbols-outlined">edit</i>
-                  Editar Perfil
-                </button>
-              </div>
+            <h2 class="text-2xl font-bold">{{ profile.fullName }}</h2>
+            <p class="text-base-content/60">{{ profile.email }}</p>
+            <div class="badge badge-outline mt-2">
+              {{ profile.role === "admin" ? "Administrador" : "Usuario" }}
             </div>
           </div>
-
-          <!-- Cerrar Sesión -->
-          <div class="card bg-error/10 border border-error/30">
-            <div class="card-body flex-row items-center justify-between">
-              <div>
-                <h3 class="card-title text-lg text-error">Cerrar Sesión</h3>
-                <p class="text-sm text-error/80">Finaliza tu sesión actual en este dispositivo.</p>
-              </div>
-              <div class="card-actions">
-                <button class="btn btn-error" (click)="logout()">
-                  <i class="material-symbols-outlined">logout</i>
-                  Cerrar Sesión
-                </button>
-              </div>
-            </div>
-          </div>
-
         </div>
+      } @else {
+        <div class="flex flex-col items-center animate-pulse">
+          <div class="w-24 h-24 bg-base-300 rounded-full mb-4"></div>
+          <div class="h-6 w-48 bg-base-300 rounded mb-2"></div>
+          <div class="h-4 w-32 bg-base-300 rounded"></div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Settings Options Grouped -->
+  <div
+    class="card bg-base-100 shadow-lg border border-base-300 overflow-hidden"
+  >
+    <!-- Personal Info -->
+    <div
+      class="p-4 hover:bg-base-200 transition-colors cursor-pointer flex items-center gap-4 border-b border-base-300"
+      (click)="editProfile()"
+    >
+      <div
+        class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+      >
+        <span class="material-symbols-outlined">person</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-medium text-lg">Información Personal</h3>
+        <p class="text-sm text-base-content/70">Actualizar datos del perfil</p>
+      </div>
+      <span class="material-symbols-outlined text-base-content/40"
+        >chevron_right</span
+      >
+    </div>
+
+    <!-- Subscriptions -->
+    <div
+      class="p-4 hover:bg-base-200 transition-colors cursor-pointer flex items-center gap-4 border-b border-base-300"
+      (click)="manageSubscriptions()"
+    >
+      <div
+        class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary"
+      >
+        <span class="material-symbols-outlined">category</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-medium text-lg">Suscripciones</h3>
+        <p class="text-sm text-base-content/70">Gestionar actividades</p>
+      </div>
+      <span class="material-symbols-outlined text-base-content/40"
+        >chevron_right</span
+      >
+    </div>
+
+    <!-- Notifications -->
+    <div class="p-4 flex items-center gap-4">
+      <div
+        class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent"
+      >
+        <span class="material-symbols-outlined">notifications</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-medium text-lg">Notificaciones</h3>
+        <p class="text-sm text-base-content/70">Alertas diarias</p>
+      </div>
+      <input type="checkbox" class="toggle toggle-accent" checked />
+    </div>
+  </div>
+
+  <!-- Logout Separate -->
+  <div
+    class="card bg-base-100 shadow-md hover:shadow-lg transition-all border border-error/20 cursor-pointer group hover:bg-error/5 mt-6"
+    (click)="logout()"
+  >
+    <div class="card-body flex-row items-center gap-4 p-4">
+      <div
+        class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center text-error group-hover:bg-error group-hover:text-error-content transition-colors"
+      >
+        <span class="material-symbols-outlined">logout</span>
+      </div>
+      <div class="flex-1">
+        <h3 class="font-medium text-lg text-error">Cerrar Sesión</h3>
       </div>
     </div>
-  } @else {
-    <!-- Skeleton Loader -->
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <div class="flex items-center space-x-6">
-          <div class="skeleton w-24 h-24 rounded-full shrink-0 bg-base-200"></div>
-          <div class="flex flex-col gap-4 w-full">
-            <div class="skeleton h-8 w-1/2 bg-base-200"></div>
-            <div class="skeleton h-4 w-3/4 bg-base-200"></div>
-          </div>
-        </div>
-        <div class="divider my-6"></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="skeleton h-32 w-full bg-base-200"></div>
-        </div>
-      </div>
-    </div>
-  }
+  </div>
 </div>

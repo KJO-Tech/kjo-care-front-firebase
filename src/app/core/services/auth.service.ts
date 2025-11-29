@@ -196,7 +196,12 @@ export class AuthService {
 
     return deleteToken$.pipe(
       switchMap(() =>
-        from(Promise.all([this.router.navigate(['/app']), signOut(this.auth)])),
+        from(
+          Promise.all([
+            this.router.navigate(['/auth/login']),
+            signOut(this.auth),
+          ]),
+        ),
       ),
       map(() => void 0),
       catchError((error) => {

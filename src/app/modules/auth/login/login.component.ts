@@ -50,10 +50,35 @@ export default class LoginComponent {
 
   constructor() {
     effect(() => {
-      if (this.loginResource.value()?.success) {
-        this.router.navigate(['/app']);
+      const user = this.authService.currentUser();
+      const userData = this.authService.userData();
+
+      if (user && userData) {
+        this.handleRedirect(userData);
       }
     });
+  }
+
+  private handleRedirect(userData: any) {
+    // Check if createdAt is today
+    let createdAt = userData.createdAt;
+    if (createdAt && typeof createdAt.toDate === 'function') {
+      createdAt = createdAt.toDate();
+    } else if (!(createdAt instanceof Date)) {
+      createdAt = new Date(createdAt);
+    }
+
+    const today = new Date();
+    const isNewUser =
+      createdAt.getDate() === today.getDate() &&
+      createdAt.getMonth() === today.getMonth() &&
+      createdAt.getFullYear() === today.getFullYear();
+
+    if (isNewUser) {
+      this.router.navigate(['/app/activity-subscription']);
+    } else {
+      this.router.navigate(['/app']);
+    }
   }
 
   protected readonly loginForm = this.fb.nonNullable.group({
@@ -106,7 +131,7 @@ export default class LoginComponent {
     this.authService.loginWithGoogle().subscribe({
       next: (response) => {
         if (response.success) {
-          this.router.navigate(['/app']);
+          // The effect will handle redirection once userData is available
         }
       },
       error: () => this.loadingGoogle.set(false),

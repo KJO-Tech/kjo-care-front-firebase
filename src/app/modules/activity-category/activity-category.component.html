@@ -45,7 +45,14 @@
             <td>
               {{ category.localizedDescription["es"] || "Sin descripción" }}
             </td>
-            <td>{{ category.iconResName }}</td>
+            <td>
+              <img
+                [src]="category.imageUrl"
+                alt="Category Icon"
+                class="h-10 w-10 object-cover rounded-full"
+                onerror="this.src='assets/images/placeholder.png'"
+              />
+            </td>
             <td class="flex items-center gap-1">
               <modal-open-button
                 [modalName]="'modal_activity_category'"

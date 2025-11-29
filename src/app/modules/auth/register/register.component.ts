@@ -50,7 +50,7 @@ export default class RegisterComponent {
   constructor() {
     effect(() => {
       if (this.registerResource.value()?.success) {
-        this.router.navigate(['/app']);
+        this.router.navigate(['/app/activity-subscription']);
       }
     });
   }

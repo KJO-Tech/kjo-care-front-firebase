@@ -38,7 +38,7 @@ export default class ActivityCategoryComponent {
       id: '',
       localizedName: {},
       localizedDescription: {},
-      iconResName: '',
+      imageUrl: '',
       order: 0,
     });
   }

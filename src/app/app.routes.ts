@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import LandingComponent from './modules/landing/landing.component';
 
@@ -99,6 +99,13 @@ export const routes: Routes = [
         path: 'notifications',
         loadComponent: () =>
           import('./modules/main/notifications/notifications-page.component'),
+      },
+      {
+        path: 'activity-subscription',
+        loadComponent: () =>
+          import(
+            './modules/main/activity-subscription/activity-subscription.component'
+          ),
       },
       { path: '**', redirectTo: '' },
     ],

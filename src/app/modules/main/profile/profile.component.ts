@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { KeycloakService } from '../../auth/services/keycloak.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -7,16 +8,23 @@ import { KeycloakService } from '../../auth/services/keycloak.service';
   templateUrl: './profile.component.html',
 })
 export default class ProfileComponent {
-  private keycloakService = inject(KeycloakService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  userProfile = this.keycloakService.profile;
-
+  userProfile = this.authService.userData;
 
   editProfile(): void {
-    this.keycloakService.goToAccountManagement();
+    // Placeholder for edit profile logic
+    console.log('Edit profile clicked');
+  }
+
+  manageSubscriptions(): void {
+    this.router.navigate(['/app/activity-subscription'], {
+      queryParams: { returnUrl: '/app/profile' },
+    });
   }
 
   logout(): void {
-    this.keycloakService.logout();
+    this.authService.logout().subscribe();
   }
 }

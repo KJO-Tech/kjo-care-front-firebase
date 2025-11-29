@@ -1,20 +1,20 @@
 import {
   Component,
-  signal,
-  effect,
-  input,
-  Output,
-  EventEmitter,
-  OnInit,
-  inject,
   computed,
+  effect,
+  inject,
+  input,
   output
 } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import { ActivityCategory } from '../../../core/models/activity.model';
 import { ActivityCategoryService } from '../../../core/services/activity-category.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { FormUtils } from '../../../shared/utils/form-utils';
-import { ActivityCategory } from '../../../core/models/activity.model';
 
 @Component({
   selector: 'app-category-modal',
@@ -24,7 +24,9 @@ import { ActivityCategory } from '../../../core/models/activity.model';
       <div class="modal-box max-h-11/12">
         <!-- X BUTTON -->
         <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+          <button
+            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >
             <i class="material-icons-outlined !text-xl">close</i>
           </button>
         </form>
@@ -71,7 +73,7 @@ import { ActivityCategory } from '../../../core/models/activity.model';
               placeholder="Descripción de la categoría"
               required
               autocomplete="off"
-            >
+            />
             <p class="validator-hint hidden">
               {{ FormUtils.getFieldError(categoryForm, 'description') }}
             </p>
@@ -86,26 +88,37 @@ import { ActivityCategory } from '../../../core/models/activity.model';
               placeholder="Descripción de la categoría en Inglés"
               required
               autocomplete="off"
-            >
+            />
             <p class="validator-hint hidden">
               {{ FormUtils.getFieldError(categoryForm, 'descriptionEn') }}
             </p>
           </fieldset>
 
           <fieldset class="fieldset">
-            <legend class="fieldset-legend">Nombre del ícono</legend>
+            <legend class="fieldset-legend">URL de la imagen</legend>
             <input
               type="text"
               class="input validator w-full"
-              formControlName="iconName"
-              placeholder="Nombre del ícono"
+              formControlName="imageUrl"
+              placeholder="URL de la imagen"
               required
               autocomplete="off"
-            >
+            />
             <p class="validator-hint hidden">
-              {{ FormUtils.getFieldError(categoryForm, 'iconName') }}
+              {{ FormUtils.getFieldError(categoryForm, 'imageUrl') }}
             </p>
           </fieldset>
+
+          @if (categoryForm.value.imageUrl) {
+            <div class="mt-4 flex justify-center">
+              <img
+                [src]="categoryForm.value.imageUrl"
+                alt="Preview"
+                class="h-24 w-24 object-cover rounded-lg shadow-md"
+                onerror="this.style.display='none'"
+              />
+            </div>
+          }
 
           <div class="modal-action mt-4">
             <form method="dialog" class="space-x-2">
@@ -120,7 +133,6 @@ import { ActivityCategory } from '../../../core/models/activity.model';
                 {{ nameButton() }}
               </button>
             </form>
-
           </div>
         </form>
       </div>
@@ -129,9 +141,7 @@ import { ActivityCategory } from '../../../core/models/activity.model';
       </form>
     </dialog>
   `,
-  imports: [
-    ReactiveFormsModule
-  ]
+  imports: [ReactiveFormsModule],
 })
 export class ActivityCategoryModalComponent {
   private fb = inject(FormBuilder);
@@ -139,17 +149,19 @@ export class ActivityCategoryModalComponent {
   private toastService = inject(ToastService);
 
   category = input<ActivityCategory | null>(null);
-  title = computed(() => this.category()?.id ? 'Editar Categoría' : 'Nueva Categoría');
-  nameButton = computed(() => this.category()?.id ? 'Actualizar' : 'Guardar');
+  title = computed(() =>
+    this.category()?.id ? 'Editar Categoría' : 'Nueva Categoría',
+  );
+  nameButton = computed(() => (this.category()?.id ? 'Actualizar' : 'Guardar'));
 
-  reload = output()
+  reload = output();
 
   categoryForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     nameEn: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', [Validators.required, Validators.minLength(3)]],
     descriptionEn: ['', [Validators.required, Validators.minLength(3)]],
-    iconName: ['', [Validators.required, Validators.minLength(3)]]
+    imageUrl: ['', [Validators.required, Validators.minLength(3)]],
   });
 
   constructor() {
@@ -160,7 +172,7 @@ export class ActivityCategoryModalComponent {
           nameEn: this.category()?.localizedName['en'],
           description: this.category()?.localizedDescription['es'],
           descriptionEn: this.category()?.localizedDescription['en'],
-          iconName: this.category()?.iconResName
+          imageUrl: this.category()?.imageUrl,
         });
       }
     });
@@ -174,35 +186,59 @@ export class ActivityCategoryModalComponent {
     }
 
     const category: Omit<ActivityCategory, 'id'> = {
-      localizedName: { es: this.categoryForm.value.name!, en: this.categoryForm.value.nameEn! },
-      localizedDescription: { es: this.categoryForm.value.description!, en: this.categoryForm.value.descriptionEn! },
-      iconResName: this.categoryForm.value.iconName!,
-      order: 0
+      localizedName: {
+        es: this.categoryForm.value.name!,
+        en: this.categoryForm.value.nameEn!,
+      },
+      localizedDescription: {
+        es: this.categoryForm.value.description!,
+        en: this.categoryForm.value.descriptionEn!,
+      },
+      imageUrl: this.categoryForm.value.imageUrl!,
+      order: 0,
     };
 
     if (this.category()?.id) {
-      this.categoryService.updateCategory(this.category()?.id!, category).subscribe({
-        next: () => {
-          this.toastService.addToast({ message: 'Categoría actualizada', type: 'success', duration: 4000 });
-          this.categoryForm.reset();
-          this.categoryForm.clearValidators()
-          this.reload.emit()
-        },
-        error: (err) => {
-          this.toastService.addToast({ message: 'Error al actualizar', type: 'error', duration: 4000 });
-        }
-      });
+      this.categoryService
+        .updateCategory(this.category()?.id!, category)
+        .subscribe({
+          next: () => {
+            this.toastService.addToast({
+              message: 'Categoría actualizada',
+              type: 'success',
+              duration: 4000,
+            });
+            this.categoryForm.reset();
+            this.categoryForm.clearValidators();
+            this.reload.emit();
+          },
+          error: (err) => {
+            this.toastService.addToast({
+              message: 'Error al actualizar',
+              type: 'error',
+              duration: 4000,
+            });
+          },
+        });
     } else {
       this.categoryService.createCategory(category).subscribe({
         next: (id) => {
-          this.toastService.addToast({ message: 'Categoría creada', type: 'success', duration: 4000 });
+          this.toastService.addToast({
+            message: 'Categoría creada',
+            type: 'success',
+            duration: 4000,
+          });
           this.categoryForm.reset();
-          this.categoryForm.clearValidators()
-          this.reload.emit()
+          this.categoryForm.clearValidators();
+          this.reload.emit();
         },
         error: (err) => {
-          this.toastService.addToast({ message: 'Error al crear', type: 'error', duration: 4000 });
-        }
+          this.toastService.addToast({
+            message: 'Error al crear',
+            type: 'error',
+            duration: 4000,
+          });
+        },
       });
     }
   }
