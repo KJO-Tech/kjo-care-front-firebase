@@ -1,6 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  Input,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AnalyticsService } from '../../../../core/services/analytics.service';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -12,34 +19,51 @@ import { FormsModule } from '@angular/forms';
 })
 export class MoodTrendsAnalysisComponent {
   private analyticsService = inject(AnalyticsService);
+  private moodService = inject(MoodStateService);
 
-  month = signal<number>(6);
+  month = signal<number>(3);
+
+  @Input()
+  set range(value: string) {
+    let months = 3;
+    switch (value) {
+      case 'Last Week':
+        months = 0.25;
+        break;
+      case 'Last Month':
+        months = 1;
+        break;
+      case 'Last 3 Months':
+        months = 3;
+        break;
+      case 'Last Year':
+        months = 12;
+        break;
+      default:
+        months = 3;
+    }
+    this.month.set(months);
+  }
+
+  // Load mood definitions
+  moodDefinitions = rxResource({
+    loader: () => this.moodService.getMoods(),
+  });
 
   loadTrendsAnalysis = rxResource({
     request: () => ({ month: this.month() }),
-    loader: ({ request }) => this.analyticsService.getMoodTrendsAnalysis(request.month)
+    loader: ({ request }) =>
+      this.analyticsService.getMoodTrendsAnalysis(request.month),
   });
-
-  timeOptions = [
-    { value: 1, label: '1 mes' },
-    { value: 3, label: '3 meses' },
-    { value: 6, label: '6 meses' },
-    { value: 12, label: '12 meses' }
-  ];
-
-  updateTimePeriod(months: number): void {
-    this.month.set(months);
-    this.loadTrendsAnalysis.reload();
-  }
 
   getTrendColor(direction: string): string {
     switch (direction) {
       case 'Improving':
-        return 'text-success';
+        return '#36d399'; // success
       case 'Declining':
-        return 'text-error';
+        return '#f87272'; // error
       default:
-        return 'text-info';
+        return '#3abff8'; // info
     }
   }
 
@@ -57,47 +81,56 @@ export class MoodTrendsAnalysisComponent {
   getVariabilityColor(level: string): string {
     switch (level) {
       case 'Low':
-        return 'text-success';
+        return '#36d399'; // success
       case 'Moderate':
-        return 'text-warning';
+        return '#fbbd23'; // warning
       case 'High':
-        return 'text-error';
+        return '#f87272'; // error
       default:
-        return 'text-info';
+        return '#3abff8'; // info
     }
   }
 
-  getMoodIcon(mood: string): string {
-    switch (mood?.toLowerCase()) {
-      case 'happy':
-        return 'sentiment_very_satisfied';
-      case 'sad':
-        return 'sentiment_very_dissatisfied';
-      case 'anxious':
-        return 'flutter_dash';
-      case 'energetic':
-        return 'bolt';
-      case 'neutral':
-        return 'sentiment_neutral';
-      default:
-        return 'mood';
-    }
+  getMoodIcon(moodKey: string): string {
+    const moods = this.moodDefinitions.value();
+    if (!moods) return 'mood';
+
+    // Try to find by name (legacy or current) or ID
+    const mood = moods.find(
+      (m) =>
+        m.name['en'] === moodKey ||
+        m.name['es'] === moodKey ||
+        m.id === moodKey,
+    );
+
+    return 'mood';
   }
 
-  getMoodColor(mood: string): string {
-    switch (mood?.toLowerCase()) {
-      case 'happy':
-        return 'text-success';
-      case 'sad':
-        return 'text-purple-500';
-      case 'anxious':
-        return 'text-amber-500';
-      case 'energetic':
-        return 'text-orange-500';
-      case 'neutral':
-        return 'text-blue-500';
-      default:
-        return 'text-primary';
-    }
+  getMoodImage(moodKey: string): string | undefined {
+    const moods = this.moodDefinitions.value();
+    if (!moods) return undefined;
+
+    const mood = moods.find(
+      (m) =>
+        m.name['en'] === moodKey ||
+        m.name['es'] === moodKey ||
+        m.id === moodKey,
+    );
+
+    return mood?.image;
+  }
+
+  getMoodColor(moodKey: string): string {
+    const moods = this.moodDefinitions.value();
+    if (!moods) return '#570df8'; // primary
+
+    const mood = moods.find(
+      (m) =>
+        m.name['en'] === moodKey ||
+        m.name['es'] === moodKey ||
+        m.id === moodKey,
+    );
+
+    return mood ? mood.color : '#570df8'; // primary
   }
 }

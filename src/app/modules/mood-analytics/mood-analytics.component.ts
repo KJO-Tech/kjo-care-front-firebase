@@ -16,27 +16,21 @@ import {
   RouterOutlet,
   RouterLink,
   RouterLinkActive,
+  ActivatedRoute,
 } from '@angular/router';
-import { SettingAnalysisComponent } from "./setting-analysis/setting-analysis.component";
+import { SettingAnalysisComponent } from './setting-analysis/setting-analysis.component';
+import { MoodStateService } from '../../core/services/mood-tracking.service';
+import { Mood } from '../../core/models/mood.model';
 
-interface Mood {
+interface MoodDisplay {
   label: string;
   percent: number;
   entries: number;
   delta: number;
-  color?: string;
+  color: string;
+  icon?: string;
+  image?: string;
 }
-
-const MOOD_COLORS: Record<string, string> = {
-  Happy: '#68D391',
-  Neutral: '#90CDF4',
-  Sad: '#9F7AEA',
-  Anxious: '#FBD38D',
-  Energetic: '#F6AD55',
-  Default: '#A3A3A3',
-};
-
-const STANDARD_MOODS = ['Happy', 'Neutral', 'Sad', 'Anxious', 'Energetic'];
 
 @Component({
   selector: 'mood-analytics',
@@ -46,21 +40,30 @@ const STANDARD_MOODS = ['Happy', 'Neutral', 'Sad', 'Anxious', 'Energetic'];
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    SettingAnalysisComponent
-],
+    SettingAnalysisComponent,
+  ],
   templateUrl: './mood-analytics.component.html',
   styleUrl: './mood-analytics.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MoodAnalyticsComponent implements OnInit {
+export class MoodAnalyticsComponent {
   private moodAnalytics = inject(AnalyticsService);
+  private moodService = inject(MoodStateService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  analyticsResource = rxResource({
-    loader: () => this.moodAnalytics.getMoodAnalytics(this.getMonthsForRange()),
+  // Load mood definitions
+  moodDefinitions = rxResource({
+    loader: () => this.moodService.getMoods(),
   });
 
-  moods = signal<Mood[]>([]);
+  analyticsResource = rxResource({
+    request: () => ({ months: this.getMonthsForRange() }),
+    loader: ({ request }) =>
+      this.moodAnalytics.getMoodAnalytics(request.months),
+  });
+
+  moods = signal<MoodDisplay[]>([]);
 
   ranges = signal<string[]>([
     'Last Week',
@@ -79,52 +82,99 @@ export class MoodAnalyticsComponent implements OnInit {
   activeTab = signal<string>('Mood Heatmap');
 
   constructor() {
+    // Sync query params to selectedRange
+    this.route.queryParams.subscribe((params) => {
+      if (params['range']) {
+        this.selectedRange.set(params['range']);
+      }
+    });
+
     effect(() => {
-      const data = this.analyticsResource.value();
-      if (data) {
-        this.processMoodData(data);
+      const analyticsData = this.analyticsResource.value();
+      const moodDefs = this.moodDefinitions.value();
+
+      if (analyticsData && moodDefs) {
+        this.processMoodData(analyticsData, moodDefs);
       }
     });
   }
 
-  ngOnInit(): void {
-    const initialMoods: Mood[] = STANDARD_MOODS.map((label) => ({
-      label,
-      percent: 0,
-      entries: 0,
-      delta: 0,
-      color: MOOD_COLORS[label],
-    }));
+  private processMoodData(data: MoodAnalyticsResponse, moodDefs: Mood[]): void {
+    const newMoods: MoodDisplay[] = [];
 
-    this.moods.set(initialMoods);
-  }
+    // Filter active moods or show all that have data?
+    // Usually show active ones + ones with data even if inactive.
+    // For now, let's iterate over defined moods.
 
-  private processMoodData(data: MoodAnalyticsResponse): void {
-    const newMoods: Mood[] = [];
+    for (const moodDef of moodDefs) {
+      // Try to match by ID first, then by name (legacy)
+      // The analytics service returns keys. Ideally keys are IDs or Names.
+      // Our analytics service logic tries to use Name (EN/ES) or ID.
 
-    for (const moodLabel of STANDARD_MOODS) {
-      const percent =
-        data.moodPercentages?.[
-          moodLabel as keyof typeof data.moodPercentages
-        ] || 0;
-      const entries =
-        data.moodCounts?.[moodLabel as keyof typeof data.moodCounts] || 0;
+      // We need to check all possible keys for this mood definition
+      const possibleKeys = [
+        moodDef.id,
+        moodDef.name['en'],
+        moodDef.name['es'],
+      ].filter((k) => !!k);
 
-      newMoods.push({
-        label: moodLabel,
-        percent: Number(percent.toFixed(1)),
-        entries,
-        delta: 0,
-        color: MOOD_COLORS[moodLabel],
+      let entries = 0;
+      let percent = 0;
+
+      // Sum up counts if multiple keys match (e.g. legacy name + new ID)
+      // Though analytics service likely normalizes to one key per entry.
+      // But we need to find which key in 'data.moodCounts' corresponds to this moodDef.
+
+      // Actually, the analytics service logic I wrote tries to normalize to ONE key per entry.
+      // But here we don't know which key was used for a specific entry without checking the data.
+      // Let's iterate over the data keys and see if they match this moodDef.
+
+      Object.keys(data.moodCounts).forEach((key) => {
+        if (
+          possibleKeys.includes(key) ||
+          key === moodDef.name['en'] ||
+          key === moodDef.name['es']
+        ) {
+          entries += data.moodCounts[key] || 0;
+          // Percentages might be tricky to sum if they are pre-calculated, better to recalc or sum
+          // But since totalEntries is available:
+        }
       });
+
+      if (data.totalEntries > 0) {
+        percent = Number(((entries / data.totalEntries) * 100).toFixed(1));
+      }
+
+      // Only add if it has entries or is active
+      if (entries > 0 || moodDef.isActive) {
+        newMoods.push({
+          label: moodDef.name['es'] || moodDef.name['en'] || 'Unknown', // Prefer Spanish for display or use current locale
+          percent,
+          entries,
+          delta: 0, // Delta logic would require previous period data
+          color: moodDef.color,
+          image: moodDef.image,
+        });
+      }
     }
+
+    // Sort by entries or percent desc
+    newMoods.sort((a, b) => b.entries - a.entries);
 
     this.moods.set(newMoods);
   }
 
   updateRange(range: string): void {
     this.selectedRange.set(range);
-    this.analyticsResource.reload();
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { range: range },
+      queryParamsHandling: 'merge', // Merge with existing params
+    });
+    // Resource reload is handled by signal dependency if we used request() in rxResource,
+    // but here we might need to trigger it if getMonthsForRange uses the signal.
+    // Yes, getMonthsForRange uses selectedRange(), so if we use request() in rxResource it will auto-reload.
+    // I updated analyticsResource to use request() above.
   }
 
   private getMonthsForRange(): number {
@@ -139,23 +189,6 @@ export class MoodAnalyticsComponent implements OnInit {
         return 12;
       default:
         return 3;
-    }
-  }
-
-  getMoodIcon(mood: string): string {
-    switch (mood) {
-      case 'Happy':
-        return 'sentiment_very_satisfied';
-      case 'Neutral':
-        return 'sentiment_neutral';
-      case 'Sad':
-        return 'sentiment_dissatisfied';
-      case 'Anxious':
-        return 'flutter_dash';
-      case 'Energetic':
-        return 'bolt';
-      default:
-        return 'mood';
     }
   }
 
