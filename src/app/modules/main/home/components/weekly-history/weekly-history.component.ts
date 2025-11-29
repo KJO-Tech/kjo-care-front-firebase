@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { Content } from '../../../../../core/models/mood.model';
+import { Mood } from '../../../../../core/models/mood.model';
 import { CommonModule } from '@angular/common';
 
 interface WeeklyMoodEntry {
   day: string;
   date: Date;
-  mood: Content;
+  mood: Mood;
 }
 
 @Component({

@@ -1,47 +1,73 @@
-import { ChangeDetectionStrategy, Component, input, OnInit, output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  OnInit,
+  output,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Content } from '../../../../core/models/mood.model';
+import { Mood } from '../../../../core/models/mood.model';
 
 @Component({
   selector: 'app-mood-modal',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './mood-modal.component.html',
   styles: `
-  .color-picker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
+    .color-picker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoodModalComponent implements OnInit {
-  modalId = input<string>("mood_editor_modal");
-  mood = input<Content>({
-    id: "",
-    name: "",
-    color: "#6d28d9",
+  modalId = input<string>('mood_editor_modal');
+  mood = input<Mood>({
+    id: '',
+    name: '',
+    color: '#9172FE',
     isActive: true,
-    description: "",
-    state: "active",
-    image: ""
+    description: '',
+    image: '',
   });
   isNewMood = input<boolean>(false);
 
-  save = output<Content>();
+  save = output<Mood>();
   cancel = output<void>();
 
   moodForm!: FormGroup;
 
-
   colorPresets: string[] = [
-    "#FF5252", "#E040FB", "#7C4DFF", "#536DFE",
-    "#448AFF", "#40C4FF", "#18FFFF"
+    '#68D391',
+    '#90CDF4',
+    '#9F7AEA',
+    '#FBD38D',
+    '#F6AD55',
+    '#9172FE',
   ];
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {
+    effect(() => {
+      const currentMood = this.mood();
+      if (this.moodForm) {
+        this.moodForm.patchValue({
+          name: currentMood.name,
+          color: currentMood.color,
+          description: currentMood.description || '',
+          image: currentMood.image || '',
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -54,6 +80,7 @@ export class MoodModalComponent implements OnInit {
       name: [currentMood.name, [Validators.required, Validators.minLength(2)]],
       color: [currentMood.color, Validators.required],
       description: [currentMood.description || ''],
+      image: [currentMood.image || ''],
     });
   }
 
@@ -63,7 +90,7 @@ export class MoodModalComponent implements OnInit {
 
   saveMood(): void {
     if (this.moodForm.invalid) {
-      Object.keys(this.moodForm.controls).forEach(key => {
+      Object.keys(this.moodForm.controls).forEach((key) => {
         const control = this.moodForm.get(key);
         control?.markAsTouched();
       });
@@ -71,9 +98,9 @@ export class MoodModalComponent implements OnInit {
       return;
     }
 
-    const updatedMood: Content = {
+    const updatedMood: Mood = {
       ...this.mood(),
-      ...this.moodForm.value
+      ...this.moodForm.value,
     };
 
     this.save.emit(updatedMood);
@@ -92,7 +119,16 @@ export class MoodModalComponent implements OnInit {
     }
   }
 
-  get nameControl() { return this.moodForm.get('name'); }
-  get colorControl() { return this.moodForm.get('color'); }
-  get isActiveControl() { return this.moodForm.get('isActive'); }
+  get nameControl() {
+    return this.moodForm.get('name');
+  }
+  get colorControl() {
+    return this.moodForm.get('color');
+  }
+  get imageControl() {
+    return this.moodForm.get('image');
+  }
+  get isActiveControl() {
+    return this.moodForm.get('isActive');
+  }
 }

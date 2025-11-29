@@ -10,19 +10,7 @@
       </div>
     } @else if (loadMoodTracking.error()) {
       <div class="alert alert-error">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="stroke-current shrink-0 h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
+        <i class="material-symbols-outlined !text-xl">error</i>
         <span
           >Error al cargar los estados de ánimo. Por favor intenta de
           nuevo.</span
@@ -37,10 +25,13 @@
           class="flex items-center justify-between bg-base-100 rounded p-4 mb-2 shadow hover:shadow-md transition-shadow"
         >
           <div class="flex items-center gap-4">
-            <span
-              class="w-4 h-4 rounded-full"
-              [style.backgroundColor]="mood.color"
-            ></span>
+            <span class="rounded-full p-2" [style.backgroundColor]="mood.color">
+              <img
+                [src]="mood.image"
+                alt="Icono de estado de ánimo"
+                class="w-6 h-6 object-cover"
+              />
+            </span>
             <span>{{ mood.name }}</span>
           </div>
           <div class="flex items-center gap-3">
@@ -58,59 +49,26 @@
               </label>
             </div>
 
-            <button class="btn btn-ghost btn-sm" (click)="editMood(i)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                />
-              </svg>
+            <button
+              class="btn btn-ghost btn-sm btn-circle"
+              (click)="editMood(i)"
+            >
+              <i class="material-symbols-outlined !text-xl">edit</i>
             </button>
 
-            <button
-              class="btn btn-ghost btn-sm text-error"
+            <modal-open-button
+              [modalName]="'delete_confirmation_modal'"
+              [type]="'icon'"
+              [classes]="'btn-ghost text-error'"
               (click)="deleteMood(mood.id)"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-4 h-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                />
-              </svg>
-            </button>
+              <i class="material-symbols-outlined !text-xl">delete</i>
+            </modal-open-button>
           </div>
         </div>
       } @empty {
         <div class="alert alert-info">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="stroke-current shrink-0 w-6 h-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
+          <i class="material-symbols-outlined !text-xl">add</i>
           <span>Ningún estado de ánimo. Añade un estado de ánimo.</span>
         </div>
       }
@@ -128,26 +86,13 @@
 
   <div class="flex gap-2 mt-4">
     <button class="btn btn-outline btn-primary" (click)="addMoodState()">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-5 h-5 mr-1"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 4.5v15m7.5-7.5h-15"
-        />
-      </svg>
+      <i class="material-symbols-outlined !text-xl">add</i>
       Añadir Nuevo Estado de Ánimo
     </button>
   </div>
 </div>
 
-@defer (when editingMood();prefetch on idle) {
+@defer (when editingMood(); prefetch on idle) {
   <app-mood-modal
     [modalId]="'mood_editor_modal'"
     [mood]="editingMood()!"
@@ -158,26 +103,13 @@
 }
 
 @defer (when showDeleteModal()) {
-  <dialog
-    id="delete_confirmation_modal"
-    class="modal modal-bottom sm:modal-middle"
-  >
-    <div class="modal-box">
-      <h3 class="font-bold text-lg">Confirmar eliminación</h3>
-      <p class="py-4">
-        ¿Estás seguro que deseas eliminar este estado de ánimo? Esta acción no
-        se puede deshacer.
-      </p>
-      <div class="modal-action">
-        <form method="dialog">
-          <button class="btn btn-outline mr-2" (click)="closeDeleteModal()">
-            Cancelar
-          </button>
-        </form>
-        <button class="btn btn-error" (click)="confirmDelete()">
-          Eliminar
-        </button>
-      </div>
-    </div>
-  </dialog>
+  <app-dialog
+    [title]="'Confirmar eliminación'"
+    [message]="
+      '¿Estás seguro que deseas eliminar este estado de ánimo? Esta acción no se puede deshacer.'
+    "
+    [modalName]="'delete_confirmation_modal'"
+    [buttonText]="'Eliminar'"
+    (callback)="confirmDelete()"
+  ></app-dialog>
 }
