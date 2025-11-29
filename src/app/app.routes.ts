@@ -22,7 +22,7 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./modules/dashboard/dashboard-page.component'),
+          import('./modules/admin/dashboard/dashboard-page.component'),
       },
       {
         path: 'users',

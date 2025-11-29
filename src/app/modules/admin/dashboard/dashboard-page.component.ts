@@ -1,12 +1,12 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { DashboardService } from '../../core/services/dashboard.service';
+import { DashboardService } from '../../../core/services/dashboard.service';
 import { DecimalPipe, CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
 import {
   DailyBlogsStats,
   UserMoodStats,
-} from '../../core/interfaces/dashboard-http.interface';
+} from '../../../core/interfaces/dashboard-http.interface';
 
 @Component({
   selector: 'app-dashboard',
