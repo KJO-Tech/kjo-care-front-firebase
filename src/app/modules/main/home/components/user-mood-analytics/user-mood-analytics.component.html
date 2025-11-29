@@ -1,0 +1,144 @@
+<div class="flex flex-col gap-6">
+  <!-- Header & Filters -->
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <h3 class="text-xl font-semibold text-base-content">Análisis Detallado</h3>
+
+    <div class="join">
+      <button
+        class="join-item btn btn-sm"
+        [class.btn-primary]="timeRange() === '1m'"
+        [class.btn-active]="timeRange() === '1m'"
+        (click)="setTimeRange('1m')"
+      >
+        1 Mes
+      </button>
+      <button
+        class="join-item btn btn-sm"
+        [class.btn-primary]="timeRange() === '3m'"
+        [class.btn-active]="timeRange() === '3m'"
+        (click)="setTimeRange('3m')"
+      >
+        3 Meses
+      </button>
+      <button
+        class="join-item btn btn-sm"
+        [class.btn-primary]="timeRange() === '1y'"
+        [class.btn-active]="timeRange() === '1y'"
+        (click)="setTimeRange('1y')"
+      >
+        1 Año
+      </button>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Heatmap (Full Width) -->
+    <div
+      class="col-span-1 lg:col-span-2 card bg-base-100 shadow-xl border border-base-200"
+    >
+      <div class="card-body p-4">
+        <h4 class="card-title text-sm opacity-70">
+          Frecuencia de Estados de Ánimo
+        </h4>
+
+        <div class="flex flex-col items-center w-full">
+          <div class="w-full overflow-x-auto pb-4">
+            <div class="min-w-fit mx-auto">
+              <!-- Month Labels -->
+              <div class="flex mb-2 pl-8 text-xs text-gray-400 relative h-4">
+                @for (
+                  month of monthLabels();
+                  track month.label + month.offset
+                ) {
+                  <div class="absolute" [style.left.px]="month.offset * 16">
+                    {{ month.label }}
+                  </div>
+                }
+              </div>
+
+              <div class="flex gap-1">
+                <!-- Day Labels (Mon, Wed, Fri) -->
+                <div
+                  class="flex flex-col gap-1 text-[10px] text-gray-400 pr-2 pt-4"
+                >
+                  <div class="h-3"></div>
+                  <!-- Sun -->
+                  <div class="h-3 leading-3">Lun</div>
+                  <div class="h-3"></div>
+                  <!-- Tue -->
+                  <div class="h-3 leading-3">Mié</div>
+                  <div class="h-3"></div>
+                  <!-- Thu -->
+                  <div class="h-3 leading-3">Vie</div>
+                  <div class="h-3"></div>
+                  <!-- Sat -->
+                </div>
+
+                <!-- Heatmap Grid -->
+                <div class="flex gap-1">
+                  @for (week of weeks(); track $index) {
+                    <div class="flex flex-col gap-1">
+                      @for (day of week.days; track day.date) {
+                        <div
+                          class="w-3 h-3 rounded-sm transition-all hover:ring-2 hover:ring-offset-1 hover:ring-primary/50 relative group"
+                          [style.backgroundColor]="day.color"
+                        >
+                          <!-- Tooltip -->
+                          <div
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 w-max"
+                          >
+                            <div
+                              class="bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg"
+                            >
+                              <div class="font-semibold">
+                                {{ day.date | date: "mediumDate" }}
+                              </div>
+                              @if (day.mood) {
+                                <div>{{ day.mood }}</div>
+                              } @else {
+                                <div class="text-gray-400">Sin registro</div>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut Chart -->
+    <div class="card bg-base-100 shadow-xl border border-base-200">
+      <div class="card-body p-4">
+        <h4 class="card-title text-sm opacity-70">Distribución de Emociones</h4>
+        <div class="w-full h-64">
+          @if (donutOption()) {
+            <div echarts [options]="donutOption()!" class="w-full h-full"></div>
+          } @else {
+            <div class="skeleton w-full h-full"></div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Radar Chart -->
+    <div class="card bg-base-100 shadow-xl border border-base-200">
+      <div class="card-body p-4">
+        <h4 class="card-title text-sm opacity-70">Perfil de Intensidad</h4>
+        <div class="w-full h-64">
+          @if (radarOption()) {
+            <div echarts [options]="radarOption()!" class="w-full h-full"></div>
+          } @else {
+            <div class="skeleton w-full h-full"></div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

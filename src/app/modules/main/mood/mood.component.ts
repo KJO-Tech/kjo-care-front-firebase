@@ -3,15 +3,10 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-mood',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive
-  ],
-  templateUrl: './mood.component.html'
+  templateUrl: './mood.component.html',
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
 })
 export default class MoodComponent {
-
   links = [
     {
       name: 'Registrar',
@@ -24,7 +19,6 @@ export default class MoodComponent {
     {
       name: 'Resumen',
       path: '/app/mood/summary',
-    }
+    },
   ];
-
 }

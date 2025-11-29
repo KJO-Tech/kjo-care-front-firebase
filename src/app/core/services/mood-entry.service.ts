@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import {
   addDoc,
   collection,
@@ -9,11 +10,10 @@ import {
   serverTimestamp,
   where,
 } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
 import { from, map, Observable, switchMap, throwError } from 'rxjs';
 import { MoodEntry } from '../interfaces/mood-entry.interface';
-import { MoodStateService } from './mood-tracking.service';
 import { Mood } from '../models/mood.model';
+import { MoodStateService } from './mood-tracking.service';
 
 export interface WeeklyStats {
   average: number;
@@ -70,6 +70,31 @@ export class MoodEntryService {
     const entriesQuery = query(
       collection(this.firestore, this.collectionName),
       where('userId', '==', user.uid),
+      orderBy('createdAt', 'desc'),
+    );
+
+    return collectionData(entriesQuery, { idField: 'id' }) as Observable<
+      MoodEntry[]
+    >;
+  }
+
+  /**
+   * Get mood entries for the current user within a date range
+   */
+  getMoodEntriesByDateRange(
+    startDate: Date,
+    endDate: Date,
+  ): Observable<MoodEntry[]> {
+    const user = this.auth.currentUser;
+    if (!user) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+
+    const entriesQuery = query(
+      collection(this.firestore, this.collectionName),
+      where('userId', '==', user.uid),
+      where('createdAt', '>=', startDate),
+      where('createdAt', '<=', endDate),
       orderBy('createdAt', 'desc'),
     );
 

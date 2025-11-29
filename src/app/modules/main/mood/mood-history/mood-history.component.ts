@@ -1,16 +1,16 @@
+import { DatePipe } from '@angular/common';
 import {
   Component,
   computed,
-  inject,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
 } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { MoodEntry } from '../../../../core/interfaces/mood-entry.interface';
+import { Mood } from '../../../../core/models/mood.model';
 import { MoodEntryService } from '../../../../core/services/mood-entry.service';
 import { MoodStateService } from '../../../../core/services/mood-tracking.service';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { DatePipe } from '@angular/common';
-import { Mood } from '../../../../core/models/mood.model';
-import { MoodEntry } from '../../../../core/interfaces/mood-entry.interface';
 
 @Component({
   selector: 'mood-history',

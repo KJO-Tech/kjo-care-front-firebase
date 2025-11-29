@@ -1,17 +1,17 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MoodStateService } from '../../../../core/services/mood-tracking.service';
-import { MoodEntryService } from '../../../../core/services/mood-entry.service';
-import { ToastService } from '../../../../core/services/toast.service';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MoodStateResponse } from '../../../../core/interfaces/mood-http.interface';
+import { MoodEntryService } from '../../../../core/services/mood-entry.service';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'mood-register',
-  imports: [NgClass, FormsModule],
   templateUrl: './mood-register.component.html',
+  imports: [NgClass, FormsModule],
 })
 export default class MoodRegisterComponent {
   private router = inject(Router);

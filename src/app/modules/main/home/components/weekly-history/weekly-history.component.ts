@@ -1,15 +1,13 @@
-import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  MoodEntryService,
-  WeeklyMoodEntry,
-} from '../../../../../core/services/mood-entry.service';
+import { Component, computed, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { MoodEntryService } from '../../../../../core/services/mood-entry.service';
+import { UserMoodAnalyticsComponent } from '../user-mood-analytics/user-mood-analytics.component';
 
 @Component({
   selector: 'mood-weekly-history',
-  imports: [CommonModule],
   templateUrl: './weekly-history.component.html',
+  imports: [CommonModule, UserMoodAnalyticsComponent],
 })
 export class WeeklyHistoryComponent {
   private moodEntryService = inject(MoodEntryService);

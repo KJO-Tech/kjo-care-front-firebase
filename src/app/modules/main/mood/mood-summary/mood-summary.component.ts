@@ -3,10 +3,7 @@ import { WeeklyHistoryComponent } from '../../home/components/weekly-history/wee
 
 @Component({
   selector: 'mood-summary',
-  imports: [
-    WeeklyHistoryComponent
-  ],
-  templateUrl: './mood-summary.component.html'
+  templateUrl: './mood-summary.component.html',
+  imports: [WeeklyHistoryComponent],
 })
-export default class MoodSummaryComponent {
-}
+export default class MoodSummaryComponent {}
