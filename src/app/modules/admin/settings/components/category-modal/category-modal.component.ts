@@ -1,20 +1,17 @@
 import { Component, effect, inject, output, signal } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ToastService } from '../../../../core/services/toast.service';
-import { CategoryService } from '../../../../core/services/category.service';
-import { FormUtils } from '../../../../shared/utils/form-utils';
-import { Category } from '../../../../core/models/blog';
+import { ToastService } from '../../../../../core/services/toast.service';
+import { CategoryService } from '../../../../../core/services/category.service';
+import { FormUtils } from '../../../../../shared/utils/form-utils';
+import { Category } from '../../../../../core/models/blog';
 
 @Component({
   selector: 'category-modal',
   templateUrl: './category-modal.component.html',
-  imports: [
-    ReactiveFormsModule
-  ]
+  imports: [ReactiveFormsModule],
 })
 export class CategoryModalComponent {
-
   private fb = inject(FormBuilder);
   private categoryService = inject(CategoryService);
   private toastService = inject(ToastService);
@@ -22,7 +19,6 @@ export class CategoryModalComponent {
   reload = output();
 
   formUtils = FormUtils;
-
 
   title = signal('Add new user');
   nameButton = signal('Save');
@@ -32,7 +28,6 @@ export class CategoryModalComponent {
     nameEn: ['', [Validators.required, Validators.minLength(3)]],
     active: [true],
   });
-
 
   constructor() {
     effect(() => {
@@ -65,7 +60,7 @@ export class CategoryModalComponent {
         es: this.categoryForm.value.name!,
         en: this.categoryForm.value.nameEn!,
       },
-      isActive: this.categoryForm.value.active!
+      isActive: this.categoryForm.value.active!,
     };
 
     if (this.categoryService.selectedCategory().id.length > 0) {
@@ -74,7 +69,7 @@ export class CategoryModalComponent {
           this.toastService.addToast({
             message: 'Category updated successfully',
             type: 'success',
-            duration: 4000
+            duration: 4000,
           });
 
           this.reload.emit();
@@ -85,9 +80,9 @@ export class CategoryModalComponent {
           this.toastService.addToast({
             message: 'Error updating category',
             type: 'error',
-            duration: 4000
+            duration: 4000,
           });
-        }
+        },
       });
     } else {
       this.categoryService.create(request).subscribe({
@@ -95,7 +90,7 @@ export class CategoryModalComponent {
           this.toastService.addToast({
             message: 'Category created successfully',
             type: 'success',
-            duration: 4000
+            duration: 4000,
           });
 
           this.reload.emit();
@@ -106,9 +101,9 @@ export class CategoryModalComponent {
           this.toastService.addToast({
             message: 'Error creating category',
             type: 'error',
-            duration: 4000
+            duration: 4000,
           });
-        }
+        },
       });
     }
   }

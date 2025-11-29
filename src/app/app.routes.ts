@@ -44,7 +44,7 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadChildren: () => import('./modules/settings/settings.routes'),
+        loadChildren: () => import('./modules/admin/settings/settings.routes'),
       },
       // { path: 'health-centers', loadComponent: () => import('./modules/health-center/health-center.component') },
       {

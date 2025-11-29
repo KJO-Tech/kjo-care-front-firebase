@@ -1,10 +1,10 @@
 import { Component, inject } from '@angular/core';
 
 import { rxResource } from '@angular/core/rxjs-interop';
-import { CategoryService } from '../../../../core/services/category.service';
-import { ToastService } from '../../../../core/services/toast.service';
-import { DialogComponent } from '../../../../shared/components/dialog/dialog.component';
-import { ModalOpenButtonComponent } from '../../../../shared/components/modal-open-button/modal-open-button.component';
+import { CategoryService } from '../../../../../core/services/category.service';
+import { ToastService } from '../../../../../core/services/toast.service';
+import { DialogComponent } from '../../../../../shared/components/dialog/dialog.component';
+import { ModalOpenButtonComponent } from '../../../../../shared/components/modal-open-button/modal-open-button.component';
 import { CategoryModalComponent } from '../category-modal/category-modal.component';
 
 @Component({

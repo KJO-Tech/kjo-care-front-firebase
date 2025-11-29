@@ -9,16 +9,16 @@ import {
 import { FormsModule } from '@angular/forms';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MoodModalComponent } from '../components/mood-modal/mood-modal.component';
-import { MoodStateService } from '../../../core/services/mood-tracking.service';
-import type { Mood } from '../../../core/models/mood.model';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import type { Mood } from '../../../../core/models/mood.model';
 import type {
   MoodStateRequest,
   MoodStateResponse,
-} from '../../../core/interfaces/mood-http.interface';
-import { ToastService } from '../../../core/services/toast.service';
+} from '../../../../core/interfaces/mood-http.interface';
+import { ToastService } from '../../../../core/services/toast.service';
 import { NEVER, timer } from 'rxjs';
-import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
-import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
+import { DialogComponent } from '../../../../shared/components/dialog/dialog.component';
+import { ModalOpenButtonComponent } from '../../../../shared/components/modal-open-button/modal-open-button.component';
 
 @Component({
   selector: 'setting-mood-state',

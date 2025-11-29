@@ -13,7 +13,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Mood } from '../../../../core/models/mood.model';
+import { Mood } from '../../../../../core/models/mood.model';
 
 @Component({
   selector: 'app-mood-modal',
