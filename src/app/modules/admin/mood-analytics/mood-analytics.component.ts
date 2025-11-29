@@ -8,9 +8,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MoodAnalyticsResponse } from '../../core/interfaces/mood-analytics.response';
+import { MoodAnalyticsResponse } from '../../../core/interfaces/mood-analytics.response';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AnalyticsService } from '../../core/services/analytics.service';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 import {
   Router,
   RouterOutlet,
@@ -19,8 +19,8 @@ import {
   ActivatedRoute,
 } from '@angular/router';
 import { SettingAnalysisComponent } from './setting-analysis/setting-analysis.component';
-import { MoodStateService } from '../../core/services/mood-tracking.service';
-import { Mood } from '../../core/models/mood.model';
+import { MoodStateService } from '../../../core/services/mood-tracking.service';
+import { Mood } from '../../../core/models/mood.model';
 
 interface MoodDisplay {
   label: string;

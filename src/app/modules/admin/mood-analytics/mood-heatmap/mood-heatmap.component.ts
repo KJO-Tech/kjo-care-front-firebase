@@ -9,10 +9,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AnalyticsService } from '../../../core/services/analytics.service';
-import { MoodStateService } from '../../../core/services/mood-tracking.service';
-import { MoodEntry } from '../../../core/interfaces/mood-entry.interface';
-import { Mood } from '../../../core/models/mood.model';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { MoodEntry } from '../../../../core/interfaces/mood-entry.interface';
+import { Mood } from '../../../../core/models/mood.model';
 
 @Component({
   selector: 'mood-heatmap',

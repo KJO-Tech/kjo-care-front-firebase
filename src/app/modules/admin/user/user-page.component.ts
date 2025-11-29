@@ -7,10 +7,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { ToastService } from '../../core/services/toast.service';
-import { UserService } from '../../core/services/user.service';
-import { DialogComponent } from '../../shared/components/dialog/dialog.component';
-import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
+import { ToastService } from '../../../core/services/toast.service';
+import { UserService } from '../../../core/services/user.service';
+import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
+import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
 import { UserModalComponent } from './user-modal/user-modal.component';
 import { UserTableComponent } from './user-table/user-table.component';
 

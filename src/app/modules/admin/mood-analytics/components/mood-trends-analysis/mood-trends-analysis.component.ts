@@ -6,8 +6,8 @@ import {
   Input,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AnalyticsService } from '../../../../core/services/analytics.service';
-import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { AnalyticsService } from '../../../../../core/services/analytics.service';
+import { MoodStateService } from '../../../../../core/services/mood-tracking.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

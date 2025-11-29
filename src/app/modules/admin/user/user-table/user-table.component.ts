@@ -1,10 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, input, output } from '@angular/core';
-import {
-  UserResponse
-} from '../../../core/interfaces/user-http.interface';
-import { UserService } from '../../../core/services/user.service';
-import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
+import { UserResponse } from '../../../../core/interfaces/user-http.interface';
+import { UserService } from '../../../../core/services/user.service';
+import { ModalOpenButtonComponent } from '../../../../shared/components/modal-open-button/modal-open-button.component';
 
 @Component({
   selector: 'user-table',

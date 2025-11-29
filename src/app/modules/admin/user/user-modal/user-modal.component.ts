@@ -11,9 +11,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   UserRequest,
   UserResponse,
-} from '../../../core/interfaces/user-http.interface';
-import { UserService } from '../../../core/services/user.service';
-import { FormUtils } from '../../../shared/utils/form-utils';
+} from '../../../../core/interfaces/user-http.interface';
+import { UserService } from '../../../../core/services/user.service';
+import { FormUtils } from '../../../../shared/utils/form-utils';
 
 @Component({
   selector: 'user-modal',

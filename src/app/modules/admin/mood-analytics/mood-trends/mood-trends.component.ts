@@ -9,11 +9,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { AnalyticsService } from '../../../core/services/analytics.service';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { MoodStateService } from '../../../core/services/mood-tracking.service';
-import { Mood } from '../../../core/models/mood.model';
-import { MoodEntry } from '../../../core/interfaces/mood-entry.interface';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { Mood } from '../../../../core/models/mood.model';
+import { MoodEntry } from '../../../../core/interfaces/mood-entry.interface';
 
 interface TrendPoint {
   date: Date;

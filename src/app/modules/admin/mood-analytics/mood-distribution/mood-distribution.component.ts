@@ -8,11 +8,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { AnalyticsService } from '../../../core/services/analytics.service';
-import { MoodAnalyticsResponse } from '../../../core/interfaces/mood-analytics.response';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
+import { MoodAnalyticsResponse } from '../../../../core/interfaces/mood-analytics.response';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { MoodStateService } from '../../../core/services/mood-tracking.service';
-import { Mood } from '../../../core/models/mood.model';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { Mood } from '../../../../core/models/mood.model';
 import { effect } from '@angular/core';
 
 interface MoodData {

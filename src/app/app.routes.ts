@@ -26,7 +26,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-        loadComponent: () => import('./modules/user/user-page.component'),
+        loadComponent: () => import('./modules/admin/user/user-page.component'),
       },
       {
         path: 'emergency-resources',
@@ -40,7 +40,7 @@ export const routes: Routes = [
       {
         path: 'moods',
         loadChildren: () =>
-          import('./modules/mood-analytics/mood-analytics.routes'),
+          import('./modules/admin/mood-analytics/mood-analytics.routes'),
       },
       {
         path: 'settings',
