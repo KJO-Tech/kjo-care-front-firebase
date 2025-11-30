@@ -1,16 +1,25 @@
 <div class="p-4 md:p-8 max-w-6xl mx-auto">
   <!-- Header -->
   <div class="mb-8">
-    <button class="btn btn-ghost btn-sm mb-4" (click)="goBack()">
-      <span class="material-symbols-outlined">arrow_back</span>
-      Volver a Categorías
-    </button>
+    <div class="breadcrumbs text-sm mb-4">
+      <ul>
+        <li><a [routerLink]="['/app']">Inicio</a></li>
+        <li><a [routerLink]="['/app/exercises']">Ejercicios</a></li>
+        @if (categoryResource.value(); as category) {
+          <li>{{ category.localizedName["es"] }}</li>
+        }
+      </ul>
+    </div>
 
     <div class="text-center sm:text-left">
       <h1
         class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text inline-flex items-center gap-3"
       >
-        Ejercicios
+        @if (categoryResource.value(); as category) {
+          {{ category.localizedName["es"] }}
+        } @else {
+          Ejercicios
+        }
       </h1>
       <p class="text-base-content/70 mt-2">
         Selecciona un ejercicio para comenzar.

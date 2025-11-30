@@ -50,6 +50,23 @@ export class ActivityCategoryService {
     );
   }
 
+  getCategoryById(id: string): Observable<ActivityCategory | null> {
+    const docRef = doc(this.firestore, `${this.COLLECTION_NAME}/${id}`);
+    return from(getDoc(docRef)).pipe(
+      map((docSnap) => {
+        if (!docSnap.exists()) return null;
+        return {
+          id: docSnap.id,
+          ...(docSnap.data() as Omit<ActivityCategory, 'id'>),
+        };
+      }),
+      catchError((error) => {
+        console.error('Error al obtener categoría:', error);
+        return throwError(() => error);
+      }),
+    );
+  }
+
   createCategory(category: Omit<ActivityCategory, 'id'>): Observable<string> {
     return from(
       addDoc(collection(this.firestore, this.COLLECTION_NAME), category),

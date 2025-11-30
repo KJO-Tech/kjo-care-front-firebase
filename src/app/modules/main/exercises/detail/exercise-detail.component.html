@@ -47,11 +47,23 @@
         <div class="card bg-base-100 shadow-xl border border-base-300/50">
           <div class="card-body">
             <!--Encabezado con botón de regreso-->
+            <!--Encabezado con breadcrumbs-->
             <div class="mb-4">
-              <button class="btn btn-ghost btn-sm" (click)="goBack()">
-                <span class="material-symbols-outlined">arrow_back</span>
-                Volver
-              </button>
+              <div class="breadcrumbs text-sm">
+                <ul>
+                  <li><a [routerLink]="['/app']">Inicio</a></li>
+                  <li><a [routerLink]="['/app/exercises']">Ejercicios</a></li>
+                  @if (categoryResource.value(); as category) {
+                    <li>
+                      <a
+                        [routerLink]="['/app/exercises/category', category.id]"
+                        >{{ category.localizedName["es"] }}</a
+                      >
+                    </li>
+                  }
+                  <li>{{ exercise.localizedTitle["es"] }}</li>
+                </ul>
+              </div>
             </div>
 
             <!--Título y Metadatos-->

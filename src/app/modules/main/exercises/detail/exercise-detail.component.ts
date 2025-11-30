@@ -2,21 +2,23 @@ import { Location } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NEVER } from 'rxjs';
+import { ActivityCategoryService } from '../../../../core/services/activity-category.service';
 import { DailyExerciseService } from '../../../../core/services/daily-exercise.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-exercise-detail',
   templateUrl: './exercise-detail.component.html',
-  imports: [],
+  imports: [RouterLink],
 })
 export class ExerciseDetailComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private location = inject(Location);
   private exercisesService = inject(DailyExerciseService);
+  private categoryService = inject(ActivityCategoryService);
   private toastService = inject(ToastService);
   private sanitizer = inject(DomSanitizer);
 
@@ -27,6 +29,14 @@ export class ExerciseDetailComponent {
     request: () => this.id(),
     loader: ({ request: id }) =>
       id ? this.exercisesService.getExerciseById(id) : NEVER,
+  });
+
+  categoryId = computed(() => this.exerciseResource.value()?.categoryId);
+
+  categoryResource = rxResource({
+    request: () => this.categoryId(),
+    loader: ({ request: categoryId }) =>
+      categoryId ? this.categoryService.getCategoryById(categoryId) : NEVER,
   });
 
   constructor() {
