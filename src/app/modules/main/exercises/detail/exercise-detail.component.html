@@ -40,16 +40,15 @@
             El ejercicio que buscas no existe o no está disponible.
           </div>
         </div>
-        <a class="btn btn-sm" (click)="goBack()">Volver</a>
+        <a class="btn btn-sm" [routerLink]="['/app/exercises']">Volver</a>
       </div>
     } @else {
       @if (exerciseResource.value(); as exercise) {
         <div class="card bg-base-100 shadow-xl border border-base-300/50">
-          <div class="card-body">
-            <!--Encabezado con botón de regreso-->
+          <div class="card-body p-4 sm:p-8">
             <!--Encabezado con breadcrumbs-->
-            <div class="mb-4">
-              <div class="breadcrumbs text-sm">
+            <div class="mb-4 overflow-x-auto">
+              <div class="breadcrumbs text-xs sm:text-sm">
                 <ul>
                   <li><a [routerLink]="['/app']">Inicio</a></li>
                   <li><a [routerLink]="['/app/exercises']">Ejercicios</a></li>
@@ -57,44 +56,47 @@
                     <li>
                       <a
                         [routerLink]="['/app/exercises/category', category.id]"
+                        class="whitespace-nowrap"
                         >{{ category.localizedName["es"] }}</a
                       >
                     </li>
                   }
-                  <li>{{ exercise.localizedTitle["es"] }}</li>
+                  <li>
+                    <span class="opacity-70 whitespace-nowrap">{{
+                      exercise.localizedTitle["es"]
+                    }}</span>
+                  </li>
                 </ul>
               </div>
             </div>
 
             <!--Título y Metadatos-->
             <h1
-              class="card-title text-3xl md:text-4xl font-extrabold tracking-tight mb-2"
+              class="card-title text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-3"
             >
               {{ exercise.localizedTitle["es"] }}
             </h1>
-            <div class="flex flex-wrap gap-2 mb-4 text-sm">
-              <div class="badge badge-secondary badge-outline gap-2">
+            <div class="flex flex-wrap gap-2 mb-6 text-sm">
+              <div class="badge badge-secondary badge-outline gap-1.5 p-3">
                 <span class="material-symbols-outlined !text-base"
                   >signal_cellular_alt</span
                 >
                 {{ exercise.difficulty }}
               </div>
-              <div class="badge badge-accent badge-outline gap-2">
+              <div class="badge badge-accent badge-outline gap-1.5 p-3">
                 <span class="material-symbols-outlined !text-base">timer</span>
                 {{ exercise.durationMinutes || 0 }} min
               </div>
             </div>
 
-            <div class="divider"></div>
-
             <!--Contenido dinámico del ejercicio-->
-            <div class="">
+            <div class="w-full">
               @switch (exercise.contentType) {
                 @case ("VIDEO") {
                   <!-- Reproductor de Video -->
                   <div class="w-full max-w-3xl mx-auto">
                     <div
-                      class="relative w-full pt-[56.25%] rounded-xl overflow-hidden shadow-lg bg-black"
+                      class="relative w-full pt-[56.25%] rounded-xl overflow-hidden shadow-lg bg-black ring-1 ring-base-300"
                     >
                       @if (safeVideoUrl(); as videoUrl) {
                         <iframe
@@ -121,26 +123,28 @@
                       <img
                         [src]="exercise.thumbnailUrl"
                         [alt]="exercise.localizedTitle['es']"
-                        class="rounded-xl w-full max-h-96 object-cover shadow-md"
+                        class="rounded-xl w-full max-h-64 sm:max-h-96 object-cover shadow-md"
                       />
                     </figure>
                   }
-                  <div class="prose prose-lg max-w-none">
+                  <div class="prose prose-base sm:prose-lg max-w-none mb-6">
                     <p>{{ exercise.localizedContentText["es"] }}</p>
                   </div>
                 }
                 @case ("AUDIO") {
-                  <div class="card bg-base-200 shadow-inner max-w-2xl mx-auto">
-                    <div class="card-body items-center text-center">
+                  <div
+                    class="card bg-base-200 shadow-inner max-w-2xl mx-auto mb-6"
+                  >
+                    <div class="card-body items-center text-center p-6">
                       <div
-                        class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2"
+                        class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3"
                       >
                         <span
                           class="material-symbols-outlined text-4xl text-primary"
                           >headphones</span
                         >
                       </div>
-                      <h3 class="card-title text-xl mb-1">Reproducir Audio</h3>
+                      <h3 class="font-bold text-lg mb-1">Reproducir Audio</h3>
                       <p class="text-base-content/60 text-sm mb-4">
                         Escucha atentamente las instrucciones.
                       </p>
@@ -156,7 +160,7 @@
                   </div>
                 }
                 @case ("GAME") {
-                  <div class="alert alert-info shadow-md">
+                  <div class="alert alert-info shadow-md mb-6">
                     <span class="material-symbols-outlined"
                       >stadia_controller</span
                     >
@@ -173,17 +177,17 @@
 
             <!--Descripción adicional (si aplica)-->
             @if (exercise.contentType !== "TEXT") {
-              <div class="divider"></div>
-              <div class="prose max-w-none">
-                <h3 class="font-bold">Descripción</h3>
+              <div class="divider my-2"></div>
+              <div class="prose prose-base sm:prose-lg max-w-none mb-8">
+                <h3 class="font-bold text-lg sm:text-xl mb-2">Descripción</h3>
                 <p>{{ exercise.localizedDescription["es"] }}</p>
               </div>
             }
 
             <!--Acción-->
-            <div class="card-actions justify-center mt-8">
+            <div class="card-actions justify-center mt-auto">
               <button
-                class="btn btn-primary btn-wide"
+                class="btn btn-primary btn-wide shadow-lg hover:shadow-primary/30 transition-all"
                 (click)="markAsComplete()"
               >
                 <span class="material-symbols-outlined">check_circle</span>
