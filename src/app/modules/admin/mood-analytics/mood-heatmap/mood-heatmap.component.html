@@ -57,15 +57,18 @@
     </div>
   </div>
 
-  <div class="flex items-center gap-2 text-xs text-gray-500 mt-4">
-    <span>Less</span>
-    <div class="flex gap-1">
-      <div class="w-3 h-3 rounded-[2px] bg-[#ebedf0]"></div>
-      <div class="w-3 h-3 rounded-[2px] bg-[#9be9a8]"></div>
-      <div class="w-3 h-3 rounded-[2px] bg-[#40c463]"></div>
-      <div class="w-3 h-3 rounded-[2px] bg-[#30a14e]"></div>
-      <div class="w-3 h-3 rounded-[2px] bg-[#216e39]"></div>
-    </div>
-    <span>More</span>
+  <!-- Legend -->
+  <div class="flex flex-wrap items-center justify-center gap-3 mt-4 px-4">
+    @for (mood of moodDefinitions.value(); track mood.id) {
+      <div class="flex items-center gap-1.5">
+        <div
+          class="w-3 h-3 rounded-full shadow-sm"
+          [style.backgroundColor]="mood.color"
+        ></div>
+        <span class="text-xs text-gray-600 font-medium">{{
+          mood.name["es"] || mood.name["en"]
+        }}</span>
+      </div>
+    }
   </div>
 </div>

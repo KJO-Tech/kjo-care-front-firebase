@@ -16,7 +16,7 @@
     >
       @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
         <div
-          class="card bg-base-100 shadow-sm border border-base-200 h-48 animate-pulse"
+          class="card bg-base-100 shadow-sm border border-base-300 h-48 animate-pulse"
         >
           <div class="px-4 pt-6 flex justify-center">
             <div class="rounded-2xl h-28 w-28 bg-base-300"></div>
@@ -38,7 +38,7 @@
     >
       @for (category of categoriesResource.value() ?? []; track category.id) {
         <div
-          class="card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-base-200 hover:border-primary group relative overflow-hidden"
+          class="card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-base-300 hover:border-primary group relative overflow-hidden"
           (click)="selectCategory(category.id!)"
         >
           <div

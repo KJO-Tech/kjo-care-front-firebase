@@ -125,7 +125,7 @@ export class MoodHeatmapComponent {
         (e) => e.createdAt.toDate().toDateString() === dateStr,
       );
 
-      let color = '#ebedf0'; // GitHub empty cell color (light mode)
+      let color = 'var(--color-base-300)'; // GitHub empty cell color (light mode)
       // Or use base-200 from daisyUI if we want to match theme?
       // Let's use a variable or class, but here we return color string.
       // Better to use transparent or a specific gray.

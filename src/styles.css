@@ -99,8 +99,12 @@
   --tw-shadow-color: rgb(255 255 255 / 0.06);
 }
 
+[data-theme="cosmic-dark"] .shadow-sm,
+[data-theme="cosmic-dark"] .shadow-md,
 [data-theme="cosmic-dark"] .shadow-lg,
-[data-theme="cosmic-dark"] .shadow-xl {
+[data-theme="cosmic-dark"] .shadow-xl,
+[data-theme="cosmic-dark"] .shadow-2xl,
+[data-theme="cosmic-dark"] .shadow-3xl {
   --tw-shadow-color: rgb(255 255 255 / 0.06);
 }
 

@@ -129,7 +129,7 @@ export class UserMoodAnalyticsComponent {
         return d.toDateString() === dateStr;
       });
 
-      let color = '#ebedf0'; // Default empty color
+      let color = 'var(--color-base-300)'; // Default empty color
       let moodLabel = undefined;
       let value = undefined;
 
@@ -235,8 +235,12 @@ export class UserMoodAnalyticsComponent {
         trigger: 'item',
       },
       legend: {
+        type: 'scroll',
         bottom: '0%',
         left: 'center',
+        textStyle: {
+          color: '#6b7280',
+        },
       },
       series: [
         {

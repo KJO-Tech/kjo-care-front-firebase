@@ -35,10 +35,10 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Heatmap (Full Width) -->
     <div
-      class="col-span-1 lg:col-span-2 card bg-base-100 shadow-xl border border-base-200"
+      class="col-span-1 lg:col-span-2 card bg-base-100 shadow-lg border border-base-300"
     >
       <div class="card-body p-4">
-        <h4 class="card-title text-sm opacity-70">
+        <h4 class="card-title text-sm opacity-80">
           Frecuencia de Estados de Ánimo
         </h4>
 
@@ -131,9 +131,9 @@
     </div>
 
     <!-- Donut Chart -->
-    <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card bg-base-100 shadow-lg border border-base-300">
       <div class="card-body p-4">
-        <h4 class="card-title text-sm opacity-70">Distribución de Emociones</h4>
+        <h4 class="card-title text-sm opacity-80">Distribución de Emociones</h4>
         <div class="w-full h-64">
           @if (donutOption()) {
             <div echarts [options]="donutOption()!" class="w-full h-full"></div>
@@ -145,9 +145,9 @@
     </div>
 
     <!-- Radar Chart -->
-    <div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card bg-base-100 shadow-lg border border-base-300">
       <div class="card-body p-4">
-        <h4 class="card-title text-sm opacity-70">Perfil de Intensidad</h4>
+        <h4 class="card-title text-sm opacity-80">Perfil de Intensidad</h4>
         <div class="w-full h-64">
           @if (radarOption()) {
             <div echarts [options]="radarOption()!" class="w-full h-full"></div>
