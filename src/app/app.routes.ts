@@ -75,9 +75,8 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/main/home/home.component'),
       },
       {
-        path: 'exercises/:id',
-        loadComponent: () =>
-          import('./modules/main/exercises/exercises.component'),
+        path: 'exercises',
+        loadChildren: () => import('./modules/main/exercises/exercises.routes'),
       },
       {
         path: 'mood',

@@ -48,3 +48,7 @@ export interface AssignedExercise {
   completedAt?: Timestamp; // Timestamp
   isAdHoc?: boolean; // True if added by user, false if auto-assigned
 }
+
+export interface AssignedExerciseDetail extends AssignedExercise {
+  exercise: DailyExercise;
+}
