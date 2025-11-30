@@ -12,13 +12,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { Mood } from '../../../../../core/models/mood.model';
 
 @Component({
   selector: 'app-mood-modal',
-  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './mood-modal.component.html',
+  imports: [ReactiveFormsModule],
   styles: `
     .color-picker {
       display: flex;

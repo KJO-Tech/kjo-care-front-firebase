@@ -1,20 +1,20 @@
+import { DecimalPipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  signal,
   Input,
+  signal,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { AnalyticsService } from '../../../../../core/services/analytics.service';
 import { MoodStateService } from '../../../../../core/services/mood-tracking.service';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'trends-analysis',
-  imports: [CommonModule, FormsModule],
   templateUrl: './mood-trends-analysis.component.html',
+  imports: [FormsModule, DecimalPipe, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoodTrendsAnalysisComponent {

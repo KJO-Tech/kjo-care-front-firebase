@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,14 +16,13 @@ import { LogoComponent } from '../../../shared/components/logo.component';
 
 @Component({
   selector: 'auth-register',
+  templateUrl: './register.component.html',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterLink,
     LogoComponent,
     ThemeControllerComponent,
   ],
-  templateUrl: './register.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class RegisterComponent {

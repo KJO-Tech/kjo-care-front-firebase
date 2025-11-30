@@ -3,19 +3,22 @@ import {
   addDoc,
   collection,
   collectionData,
+  collectionGroup,
   deleteDoc,
   doc,
   Firestore,
+  getCountFromServer,
   orderBy,
   query,
   Timestamp,
   updateDoc,
-  getCountFromServer,
+  where,
 } from '@angular/fire/firestore';
-import { from, map, Observable, throwError } from 'rxjs';
+import { from, map, Observable, of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CommentRequest } from '../interfaces/blog-http.interface';
 import { Comment } from '../models/blog';
 import { AuthService } from './auth.service';
-import { CommentRequest } from '../interfaces/blog-http.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -121,6 +124,24 @@ export class CommentService {
     );
     return from(getCountFromServer(commentsRef)).pipe(
       map((snapshot) => snapshot.data().count),
+    );
+  }
+
+  countMyComments(): Observable<number> {
+    const user = this.authService.userData();
+    if (!user) return of(0);
+
+    const commentsQuery = query(
+      collectionGroup(this.firestore, 'comments'),
+      where('author.uid', '==', user.uid),
+    );
+
+    return from(getCountFromServer(commentsQuery)).pipe(
+      map((snapshot) => snapshot.data().count),
+      catchError((error) => {
+        console.error('Error counting comments:', error);
+        return of(0);
+      }),
     );
   }
 }

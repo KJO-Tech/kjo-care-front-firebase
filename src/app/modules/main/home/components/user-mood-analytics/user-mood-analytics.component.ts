@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { EChartsOption } from 'echarts';
@@ -11,7 +11,7 @@ import { MoodStateService } from '../../../../../core/services/mood-tracking.ser
 @Component({
   selector: 'user-mood-analytics',
   templateUrl: './user-mood-analytics.component.html',
-  imports: [CommonModule, NgxEchartsModule],
+  imports: [NgxEchartsModule, DatePipe],
   providers: [
     {
       provide: NGX_ECHARTS_CONFIG,

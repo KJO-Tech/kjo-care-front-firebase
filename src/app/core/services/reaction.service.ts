@@ -1,15 +1,17 @@
 import { inject, Injectable } from '@angular/core';
 import {
   collection,
+  collectionGroup,
   doc,
   docData,
   Firestore,
+  getCountFromServer,
   getDocs,
   increment,
   query,
   runTransaction,
   Timestamp,
-  where
+  where,
 } from '@angular/fire/firestore';
 import { from, Observable, of, switchMap, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -79,6 +81,24 @@ export class ReactionService {
             }),
           );
         }
+      }),
+    );
+  }
+
+  countMyReactions(): Observable<number> {
+    const user = this.authService.userData();
+    if (!user) return of(0);
+
+    const reactionsQuery = query(
+      collectionGroup(this.firestore, 'reaction'),
+      where('userId', '==', user.uid),
+    );
+
+    return from(getCountFromServer(reactionsQuery)).pipe(
+      map((snapshot) => snapshot.data().count),
+      catchError((error) => {
+        console.error('Error counting reactions:', error);
+        return of(0);
       }),
     );
   }

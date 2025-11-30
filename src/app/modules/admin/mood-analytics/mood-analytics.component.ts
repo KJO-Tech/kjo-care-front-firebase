@@ -1,26 +1,25 @@
+import { DecimalPipe, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   effect,
   inject,
   signal,
-  OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MoodAnalyticsResponse } from '../../../core/interfaces/mood-analytics.response';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AnalyticsService } from '../../../core/services/analytics.service';
+import { FormsModule } from '@angular/forms';
 import {
+  ActivatedRoute,
   Router,
-  RouterOutlet,
   RouterLink,
   RouterLinkActive,
-  ActivatedRoute,
+  RouterOutlet,
 } from '@angular/router';
-import { SettingAnalysisComponent } from './setting-analysis/setting-analysis.component';
-import { MoodStateService } from '../../../core/services/mood-tracking.service';
+import { MoodAnalyticsResponse } from '../../../core/interfaces/mood-analytics.response';
 import { Mood } from '../../../core/models/mood.model';
+import { AnalyticsService } from '../../../core/services/analytics.service';
+import { MoodStateService } from '../../../core/services/mood-tracking.service';
+import { SettingAnalysisComponent } from './setting-analysis/setting-analysis.component';
 
 interface MoodDisplay {
   label: string;
@@ -34,16 +33,17 @@ interface MoodDisplay {
 
 @Component({
   selector: 'mood-analytics',
+  templateUrl: './mood-analytics.component.html',
+  styleUrl: './mood-analytics.component.css',
   imports: [
-    CommonModule,
     FormsModule,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
     SettingAnalysisComponent,
+    NgClass,
+    DecimalPipe,
   ],
-  templateUrl: './mood-analytics.component.html',
-  styleUrl: './mood-analytics.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoodAnalyticsComponent {

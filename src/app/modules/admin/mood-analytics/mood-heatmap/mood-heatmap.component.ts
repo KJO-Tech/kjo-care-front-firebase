@@ -1,23 +1,22 @@
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
   inject,
   signal,
-  effect,
-  OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AnalyticsService } from '../../../../core/services/analytics.service';
-import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { ActivatedRoute } from '@angular/router';
 import { MoodEntry } from '../../../../core/interfaces/mood-entry.interface';
 import { Mood } from '../../../../core/models/mood.model';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
 
 @Component({
   selector: 'mood-heatmap',
-  imports: [CommonModule],
   templateUrl: './mood-heatmap.component.html',
+  imports: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoodHeatmapComponent {

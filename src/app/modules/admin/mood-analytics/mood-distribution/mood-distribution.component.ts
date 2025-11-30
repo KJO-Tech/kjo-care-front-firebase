@@ -1,19 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
-  signal,
+  effect,
   inject,
+  signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { AnalyticsService } from '../../../../core/services/analytics.service';
-import { MoodAnalyticsResponse } from '../../../../core/interfaces/mood-analytics.response';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { MoodStateService } from '../../../../core/services/mood-tracking.service';
+import { ActivatedRoute } from '@angular/router';
+import { MoodAnalyticsResponse } from '../../../../core/interfaces/mood-analytics.response';
 import { Mood } from '../../../../core/models/mood.model';
-import { effect } from '@angular/core';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
 
 interface MoodData {
   label: string;
@@ -26,9 +23,8 @@ interface MoodData {
 
 @Component({
   selector: 'mood-distribution',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './mood-distribution.component.html',
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoodDistributionComponent {

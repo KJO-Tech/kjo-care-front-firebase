@@ -1,19 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
-  OnInit,
-  signal,
   effect,
+  inject,
+  signal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { AnalyticsService } from '../../../../core/services/analytics.service';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { MoodStateService } from '../../../../core/services/mood-tracking.service';
-import { Mood } from '../../../../core/models/mood.model';
 import { MoodEntry } from '../../../../core/interfaces/mood-entry.interface';
+import { Mood } from '../../../../core/models/mood.model';
+import { AnalyticsService } from '../../../../core/services/analytics.service';
+import { MoodStateService } from '../../../../core/services/mood-tracking.service';
 
 interface TrendPoint {
   date: Date;
@@ -34,9 +32,8 @@ interface MoodTrend {
 
 @Component({
   selector: 'mood-trends',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './mood-trends.component.html',
+  imports: [FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoodTrendsComponent {

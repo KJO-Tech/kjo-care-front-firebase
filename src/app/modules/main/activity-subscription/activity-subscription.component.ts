@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +7,7 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-activity-subscription',
   templateUrl: './activity-subscription.component.html',
-  imports: [CommonModule],
+  imports: [],
 })
 export default class ActivitySubscriptionComponent implements OnInit {
   private categoryService = inject(ActivityCategoryService);

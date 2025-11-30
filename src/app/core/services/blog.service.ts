@@ -5,11 +5,13 @@ import {
   doc,
   docData,
   Firestore,
+  getCountFromServer,
   orderBy,
   query,
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import {
   catchError,
@@ -146,6 +148,26 @@ export class BlogService {
     return docData(reactionDocRef).pipe(
       map((doc) => !!doc),
       catchError(() => of(false)),
+    );
+  }
+
+  countMyBlogs(): Observable<number> {
+    const user = this.authService.userData();
+    if (!user) return of(0);
+
+    const blogsCollection = collection(this.firestore, this.collectionName);
+    const q = query(
+      blogsCollection,
+      where('author.uid', '==', user.uid),
+      where('status', '!=', BlogStatus.DELETED),
+    );
+
+    return from(getCountFromServer(q)).pipe(
+      map((snapshot) => snapshot.data().count),
+      catchError((error) => {
+        console.error('Error counting blogs:', error);
+        return of(0);
+      }),
     );
   }
 }

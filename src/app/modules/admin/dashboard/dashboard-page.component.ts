@@ -1,18 +1,17 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { DashboardService } from '../../../core/services/dashboard.service';
-import { DecimalPipe, CommonModule } from '@angular/common';
-import { NgxEchartsModule } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
+import { NgxEchartsModule } from 'ngx-echarts';
 import {
   DailyBlogsStats,
   UserMoodStats,
 } from '../../../core/interfaces/dashboard-http.interface';
+import { DashboardService } from '../../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
-  imports: [NgxEchartsModule, DecimalPipe, CommonModule],
   templateUrl: './dashboard-page.component.html',
+  imports: [NgxEchartsModule, DecimalPipe],
 })
 export default class DashboardPageComponent {
   private dashboardService = inject(DashboardService);

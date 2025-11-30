@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,15 +17,13 @@ import { ICONS } from '../../../shared/icons';
 
 @Component({
   selector: 'auth-login',
-  standalone: true,
+  templateUrl: './login.component.html',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterLink,
     LogoComponent,
     ThemeControllerComponent,
   ],
-  templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class LoginComponent {

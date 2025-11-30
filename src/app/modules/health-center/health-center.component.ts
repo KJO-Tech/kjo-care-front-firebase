@@ -1,13 +1,21 @@
-import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, signal, OnInit } from '@angular/core';
-import { MapCenterComponent, SearchEntry } from './map-center/map-center.component';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { CenterCardComponent } from './center-card/center-card.component';
-import { CommonModule } from '@angular/common';
+import {
+  MapCenterComponent,
+  SearchEntry,
+} from './map-center/map-center.component';
 
 @Component({
   selector: 'app-health-center',
-  standalone: true,
-  imports: [CommonModule, MapCenterComponent, CenterCardComponent],
   templateUrl: './health-center.component.html',
+  imports: [MapCenterComponent, CenterCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class HealthCenterComponent implements OnInit, AfterViewInit {
@@ -46,7 +54,7 @@ export default class HealthCenterComponent implements OnInit, AfterViewInit {
   // Recibe cada nueva búsqueda del MapCenterComponent
   onNewSearch(entry: SearchEntry) {
     // Usa la API de señales para actualizar la lista
-    this.history.update(current => {
+    this.history.update((current) => {
       const updated = [entry, ...current];
       // Limita el historial a 20 entradas para no saturar localStorage
       const limited = updated.slice(0, 20);
