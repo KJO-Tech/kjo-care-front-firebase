@@ -13,16 +13,16 @@ export class ThemeControllerComponent {
 
   constructor() {
     const savedTheme = localStorage.getItem(this.THEME_KEY);
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches;
+    // const prefersDark = window.matchMedia(
+    //   '(prefers-color-scheme: dark)',
+    // ).matches;
 
     // Determinar el tema inicial
-    if (savedTheme) {
+    // if (savedTheme) {
       this.isDark.set(savedTheme === 'dark');
-    } else {
-      this.isDark.set(prefersDark);
-    }
+    // } else {
+    //   this.isDark.set(prefersDark);
+    // }
 
     // Aplicar el tema inicial
     this.applyTheme();

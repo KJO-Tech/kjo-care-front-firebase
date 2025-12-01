@@ -11,16 +11,33 @@
 
 <div class="overflow-x-auto">
   <table class="table table-zebra">
-    <thead>
+    <thead class="bg-base-200">
       <tr>
-        <th>Nombre</th>
-        <th>Acciones</th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">category</i>
+            Nombre
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">description</i>
+            Descripción
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">image</i>
+            Imagen
+          </div>
+        </th>
+        <th class="text-center">Acciones</th>
       </tr>
     </thead>
     <tbody>
       @if (categoriesResource.isLoading()) {
         <tr>
-          <td colspan="2">
+          <td colspan="4">
             <div class="flex justify-center p-4">
               <span
                 class="loading loading-spinner loading-lg text-primary"
@@ -30,7 +47,7 @@
         </tr>
       } @else if (categoriesResource.error()) {
         <tr>
-          <td colspan="2">
+          <td colspan="4">
             <div class="alert alert-error mt-4">
               <i class="material-symbols-outlined !text-xl">error</i>
               <span>{{ categoriesResource.error() }}</span>
@@ -40,41 +57,70 @@
         </tr>
       } @else {
         @for (category of categoriesResource.value() ?? []; track category.id) {
-          <tr class="hover:bg-base-200">
-            <td>{{ category.localizedName["es"] || "Sin nombre" }}</td>
+          <tr class="hover">
             <td>
-              {{ category.localizedDescription["es"] || "Sin descripción" }}
+              <div class="font-medium">
+                {{ category.localizedName["es"] || "Sin nombre" }}
+              </div>
             </td>
             <td>
-              <img
-                [src]="category.imageUrl"
-                alt="Category Icon"
-                class="h-10 w-10 object-cover rounded-full"
-                onerror="this.src='assets/images/placeholder.png'"
-              />
+              <div class="text-sm opacity-70">
+                {{ category.localizedDescription["es"] || "Sin descripción" }}
+              </div>
             </td>
-            <td class="flex items-center gap-1">
-              <modal-open-button
-                [modalName]="'modal_activity_category'"
-                [type]="'icon'"
-                (click)="openEditModal(category)"
-              >
-                <i class="material-symbols-outlined !text-xl">edit_square</i>
-              </modal-open-button>
+            <td>
+              <div class="avatar">
+                <div class="w-8 h-8 rounded-full">
+                  <img
+                    [src]="category.imageUrl"
+                    alt="Category Icon"
+                    class="object-cover"
+                    onerror="this.src='assets/images/placeholder.png'"
+                  />
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="flex items-center justify-center gap-1">
+                <div class="tooltip" data-tip="Editar categoría">
+                  <modal-open-button
+                    [modalName]="'modal_activity_category'"
+                    [type]="'icon'"
+                    classes="btn btn-ghost btn-sm"
+                    (click)="openEditModal(category)"
+                  >
+                    <i class="material-icons-outlined text-lg text-primary"
+                      >edit</i
+                    >
+                  </modal-open-button>
+                </div>
 
-              <modal-open-button
-                [modalName]="'modal_activity_category_delete'"
-                [type]="'icon'"
-                (click)="deleteCategory(category)"
-              >
-                <i class="material-symbols-outlined !text-xl">delete</i>
-              </modal-open-button>
+                <div class="tooltip" data-tip="Eliminar categoría">
+                  <modal-open-button
+                    [modalName]="'modal_activity_category_delete'"
+                    [type]="'icon'"
+                    classes="btn btn-ghost btn-sm"
+                    (click)="deleteCategory(category)"
+                  >
+                    <i class="material-icons-outlined text-lg text-error"
+                      >delete</i
+                    >
+                  </modal-open-button>
+                </div>
+              </div>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="2" class="text-center">
-              <p>No se encontraron categorías.</p>
+            <td colspan="4" class="text-center py-8">
+              <div class="flex flex-col items-center gap-2">
+                <i class="material-icons-outlined text-4xl text-base-300"
+                  >category</i
+                >
+                <p class="text-base-content/70">
+                  No se encontraron categorías.
+                </p>
+              </div>
             </td>
           </tr>
         }

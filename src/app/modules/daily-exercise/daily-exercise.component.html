@@ -11,12 +11,27 @@
 
 <div class="overflow-x-auto">
   <table class="table table-zebra">
-    <thead>
+    <thead class="bg-base-200">
       <tr>
-        <th>Título</th>
-        <th>Categoría</th>
-        <th>Tipo</th>
-        <th>Acciones</th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">title</i>
+            Título
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">category</i>
+            Categoría
+          </div>
+        </th>
+        <th>
+          <div class="flex items-center gap-2">
+            <i class="material-icons-outlined text-sm">description</i>
+            Tipo
+          </div>
+        </th>
+        <th class="text-center">Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -42,32 +57,66 @@
         </tr>
       } @else {
         @for (exercise of exercisesResource.value(); track exercise.id) {
-          <tr class="hover:bg-base-200">
-            <td>{{ exercise.localizedTitle["es"] || "Sin título" }}</td>
-            <td>{{ exercise.categoryId }}</td>
-            <td>{{ exercise.contentType }}</td>
-            <td class="flex items-center gap-1">
-              <modal-open-button
-                [modalName]="'modal_exercise'"
-                [type]="'icon'"
-                (click)="openEditModal(exercise)"
-              >
-                <i class="material-symbols-outlined !text-xl">edit_square</i>
-              </modal-open-button>
+          <tr class="hover">
+            <td>
+              <div class="font-medium">
+                {{ exercise.localizedTitle["es"] || "Sin título" }}
+              </div>
+            </td>
+            <td>
+              <div class="badge badge-success">
+                {{
+                  categoriesMap().get(exercise.categoryId) ||
+                    exercise.categoryId
+                }}
+              </div>
+            </td>
+            <td>
+              <div class="badge badge-ghost">
+                {{ exercise.contentType }}
+              </div>
+            </td>
+            <td>
+              <div class="flex items-center justify-center gap-1">
+                <div class="tooltip" data-tip="Editar ejercicio">
+                  <modal-open-button
+                    [modalName]="'modal_exercise'"
+                    [type]="'icon'"
+                    classes="btn btn-ghost btn-sm"
+                    (click)="openEditModal(exercise)"
+                  >
+                    <i class="material-icons-outlined text-lg text-primary"
+                      >edit</i
+                    >
+                  </modal-open-button>
+                </div>
 
-              <modal-open-button
-                [modalName]="'modal_exercise_delete'"
-                [type]="'icon'"
-                (click)="deleteExercise(exercise)"
-              >
-                <i class="material-symbols-outlined !text-xl">delete</i>
-              </modal-open-button>
+                <div class="tooltip" data-tip="Eliminar ejercicio">
+                  <modal-open-button
+                    [modalName]="'modal_exercise_delete'"
+                    [type]="'icon'"
+                    classes="btn btn-ghost btn-sm"
+                    (click)="deleteExercise(exercise)"
+                  >
+                    <i class="material-icons-outlined text-lg text-error"
+                      >delete</i
+                    >
+                  </modal-open-button>
+                </div>
+              </div>
             </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="4" class="text-center">
-              <p>No hay ejercicios disponibles.</p>
+            <td colspan="4" class="text-center py-8">
+              <div class="flex flex-col items-center gap-2">
+                <i class="material-icons-outlined text-4xl text-base-300"
+                  >fitness_center</i
+                >
+                <p class="text-base-content/70">
+                  No hay ejercicios disponibles.
+                </p>
+              </div>
             </td>
           </tr>
         }
