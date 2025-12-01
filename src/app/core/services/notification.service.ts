@@ -138,6 +138,7 @@ export class NotificationService {
       }),
     ).pipe(
       switchMap((token) => {
+        localStorage.setItem('fcm_permission_requested', 'false');
         if (token && userId) {
           const tokenRef = doc(
             this.firestore,
