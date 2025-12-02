@@ -63,17 +63,8 @@ export class NotificationsComponent {
   showPermissionRequest = computed(() => {
     if (typeof window === 'undefined' || !('Notification' in window))
       return false;
-
-    if (Notification.permission === 'denied') return false;
-
-    if (Notification.permission === 'default') return true;
-
-    // If granted, show if not requested/enabled locally (e.g. after logout/login)
-    if (Notification.permission === 'granted') {
-      return !this._permissionRequested();
-    }
-
-    return false;
+    if (Notification.permission !== 'default') return false;
+    return !this._permissionRequested();
   });
 
   hasUnread = computed(() =>
