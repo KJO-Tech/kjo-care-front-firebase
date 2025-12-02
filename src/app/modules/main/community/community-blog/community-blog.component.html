@@ -124,7 +124,10 @@
       </div>
     </div>
 
-    <div class="rounded-xl shadow-lg card space-y-3 backdrop-blur-sm p-4">
+    <div
+      class="rounded-xl shadow-lg card space-y-3 backdrop-blur-sm p-4"
+      [style.view-transition-name]="'blog-actions-' + blogId()"
+    >
       <div class="card-actions justify-end">
         <div class="flex-1 flex gap-4 items-center">
           <button

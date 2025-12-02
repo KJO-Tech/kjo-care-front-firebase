@@ -134,9 +134,6 @@ export default class CommunityBlogsComponent {
     // Find the blog to pass it via state for view transitions
     const blog = this.filteredBlogs().find((b) => b.id === blogId);
 
-    // Scroll to top before navigation for better UX
-    window.scrollTo({ top: 0, behavior: 'instant' });
-
     this.router.navigate(['/app/community/post', blogId], {
       state: { blog }, // Pass blog data for instant rendering
     });

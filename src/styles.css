@@ -221,10 +221,35 @@ html {
 }
 
 /* View Transitions */
-::view-transition-old(root),
+/* View Transitions */
+::view-transition-old(root) {
+  animation: 0.3s cubic-bezier(0.4, 0, 0.2, 1) both zoom-fade-out;
+}
+
 ::view-transition-new(root) {
-  animation-duration: 0.3s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation: 0.3s cubic-bezier(0.4, 0, 0.2, 1) both zoom-fade-in;
+}
+
+@keyframes zoom-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
 }
 
 /* Blog card transitions */
@@ -266,5 +291,12 @@ html {
 ::view-transition-old(blog-content),
 ::view-transition-new(blog-content) {
   animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Actions transitions */
+::view-transition-old(blog-actions),
+::view-transition-new(blog-actions) {
+  animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
