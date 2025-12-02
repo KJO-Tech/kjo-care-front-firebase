@@ -1,15 +1,15 @@
 import { Component, signal, inject, computed } from '@angular/core';
-import { DailyExerciseService } from '../../core/services/daily-exercise.service';
-import { ToastService } from '../../core/services/toast.service';
+import { DailyExerciseService } from '../../../core/services/daily-exercise.service';
+import { ToastService } from '../../../core/services/toast.service';
 import {
   DailyExercise,
   ActivityCategory,
-} from '../../core/models/activity.model';
+} from '../../../core/models/activity.model';
 import { ExerciseModalComponent } from './exercise-modal/exercise-modal.component';
-import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
-import { DialogComponent } from '../../shared/components/dialog/dialog.component';
+import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
+import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { ActivityCategoryService } from '../../core/services/activity-category.service';
+import { ActivityCategoryService } from '../../../core/services/activity-category.service';
 
 @Component({
   selector: 'app-daily-exercises',

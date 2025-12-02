@@ -4,17 +4,13 @@ import {
   effect,
   inject,
   input,
-  output
+  output,
 } from '@angular/core';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
-import { ActivityCategory } from '../../../core/models/activity.model';
-import { ActivityCategoryService } from '../../../core/services/activity-category.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { FormUtils } from '../../../shared/utils/form-utils';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivityCategory } from '../../../../core/models/activity.model';
+import { ActivityCategoryService } from '../../../../core/services/activity-category.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { FormUtils } from '../../../../shared/utils/form-utils';
 
 @Component({
   selector: 'app-category-modal',

@@ -9,16 +9,16 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DailyExerciseService } from '../../../core/services/daily-exercise.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { FormUtils } from '../../../shared/utils/form-utils';
+import { DailyExerciseService } from '../../../../core/services/daily-exercise.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { FormUtils } from '../../../../shared/utils/form-utils';
 import {
   ActivityCategory,
   DailyExercise,
   ExerciseContentType,
   ExerciseDifficultyType,
-} from '../../../core/models/activity.model';
-import { ActivityCategoryService } from '../../../core/services/activity-category.service';
+} from '../../../../core/models/activity.model';
+import { ActivityCategoryService } from '../../../../core/services/activity-category.service';
 
 @Component({
   selector: 'app-exercise-modal',

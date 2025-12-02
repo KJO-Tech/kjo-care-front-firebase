@@ -55,12 +55,14 @@ export const routes: Routes = [
       {
         path: 'activity-category',
         loadComponent: () =>
-          import('./modules/activity-category/activity-category.component'),
+          import(
+            './modules/admin/activity-category/activity-category.component'
+          ),
       },
       {
         path: 'daily-exercise',
         loadComponent: () =>
-          import('./modules/daily-exercise/daily-exercise.component'),
+          import('./modules/admin/daily-exercise/daily-exercise.component'),
       },
       { path: '**', redirectTo: '' },
     ],

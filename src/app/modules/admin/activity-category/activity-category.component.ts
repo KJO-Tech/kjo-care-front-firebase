@@ -1,11 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ActivityCategory } from '../../core/models/activity.model';
-import { ActivityCategoryService } from '../../core/services/activity-category.service';
-import { ToastService } from '../../core/services/toast.service';
-import { DialogComponent } from '../../shared/components/dialog/dialog.component';
-import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
+import { ActivityCategory } from '../../../core/models/activity.model';
+import { ActivityCategoryService } from '../../../core/services/activity-category.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
+import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
 import { ActivityCategoryModalComponent } from './activity-category-modal/activity-category-modal.component';
 
 @Component({

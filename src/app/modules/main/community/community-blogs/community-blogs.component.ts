@@ -115,7 +115,8 @@ export default class CommunityBlogsComponent {
     if (!user || !user.fullName) return '??';
     const names = user.fullName.split(' ');
     const firstInitial = names[0]?.[0] ?? '?';
-    const lastInitial = names.length > 1 ? names[names.length - 1][0] : '';
+    const lastInitial =
+      names.length > 1 ? names[names.length - 1][0] || '' : '';
     return (firstInitial + lastInitial).toUpperCase();
   }
 
