@@ -31,7 +31,9 @@ export const routes: Routes = [
       {
         path: 'emergency-resources',
         loadComponent: () =>
-          import('./modules/emergency-resource/emergency-resource.component'),
+          import(
+            './modules/admin/emergency-resource/emergency-resource.component'
+          ),
       },
       {
         path: 'blog-management',

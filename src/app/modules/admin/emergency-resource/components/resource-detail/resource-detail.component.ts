@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { ModalOpenButtonComponent } from '../../../../shared/components/modal-open-button/modal-open-button.component';
-import { EmergencyResourceService } from '../../../../core/services/emergency-resource.service';
+import { ModalOpenButtonComponent } from '../../../../../shared/components/modal-open-button/modal-open-button.component';
+import { EmergencyResourceService } from '../../../../../core/services/emergency-resource.service';
 import { DatePipe } from '@angular/common';
 
 @Component({

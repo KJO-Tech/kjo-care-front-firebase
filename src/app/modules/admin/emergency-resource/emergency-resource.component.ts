@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { ModalOpenButtonComponent } from '../../shared/components/modal-open-button/modal-open-button.component';
+import { ModalOpenButtonComponent } from '../../../shared/components/modal-open-button/modal-open-button.component';
 import { EmergencyResourceTableComponent } from './components/emergency-resource-table/emergency-resource-table.component';
 import { ResourceStatsComponent } from './components/resource-stats/resource-stats.component';
-import { EmergencyResourceService } from '../../core/services/emergency-resource.service';
+import { EmergencyResourceService } from '../../../core/services/emergency-resource.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ResourceDetailComponent } from './components/resource-detail/resource-detail.component';
-import { DialogComponent } from '../../shared/components/dialog/dialog.component';
+import { DialogComponent } from '../../../shared/components/dialog/dialog.component';
 import { EmergencyResourceModalComponent } from './components/emergency-resource-modal/emergency-resource-modal.component';
-import { ToastService } from '../../core/services/toast.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-emergency-resource',

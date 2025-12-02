@@ -1,9 +1,9 @@
 import { Component, effect, inject, output, signal } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ToastService } from '../../../../core/services/toast.service';
-import { EmergencyResourceService } from '../../../../core/services/emergency-resource.service';
-import { FormUtils } from '../../../../shared/utils/form-utils';
+import { ToastService } from '../../../../../core/services/toast.service';
+import { EmergencyResourceService } from '../../../../../core/services/emergency-resource.service';
+import { FormUtils } from '../../../../../shared/utils/form-utils';
 
 @Component({
   selector: 'emergency-resource-modal',

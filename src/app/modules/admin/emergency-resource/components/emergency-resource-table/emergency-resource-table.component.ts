@@ -6,9 +6,9 @@ import {
   ResourceRef,
   signal,
 } from '@angular/core';
-import { ModalOpenButtonComponent } from '../../../../shared/components/modal-open-button/modal-open-button.component';
-import { EmergencyResourceService } from '../../../../core/services/emergency-resource.service';
-import { EmergencyResource } from '../../../../core/interfaces/emergency-resource-http.interface';
+import { ModalOpenButtonComponent } from '../../../../../shared/components/modal-open-button/modal-open-button.component';
+import { EmergencyResourceService } from '../../../../../core/services/emergency-resource.service';
+import { EmergencyResource } from '../../../../../core/interfaces/emergency-resource-http.interface';
 
 @Component({
   selector: 'emergency-resource-table',
