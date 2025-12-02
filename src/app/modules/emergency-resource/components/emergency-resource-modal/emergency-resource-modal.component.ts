@@ -5,16 +5,12 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { EmergencyResourceService } from '../../../../core/services/emergency-resource.service';
 import { FormUtils } from '../../../../shared/utils/form-utils';
 
-
 @Component({
   selector: 'emergency-resource-modal',
   templateUrl: './emergency-resource-modal.component.html',
-  imports: [
-    ReactiveFormsModule
-  ]
+  imports: [ReactiveFormsModule],
 })
 export class EmergencyResourceModalComponent {
-
   private fb = inject(FormBuilder);
   resourceService = inject(EmergencyResourceService);
   private toastService = inject(ToastService);
@@ -29,64 +25,109 @@ export class EmergencyResourceModalComponent {
   resourceForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', [Validators.required, Validators.minLength(5)]],
-    image: [null],
-    video: [null],
+    resourceUrl: [''],
     contacts: [[''], [Validators.required]],
-    links: [[''], [Validators.required]]
+    links: [[''], [Validators.required]],
   });
 
   constructor() {
-    // effect(() => {
-    //   this.title.set('Add new Emergency Resource');
-    //   this.nameButton.set('Save');
+    effect(() => {
+      const resource = this.resourceService.selectedResource();
 
-    //   if (this.resourceService.selectedResource().id > 0) {
-    //     this.title.set('Edit Emergency Resource');
-    //     this.nameButton.set('Update');
+      if (resource) {
+        this.title.set('Edit Emergency Resource');
+        this.nameButton.set('Update');
 
-    //     const resource = this.resourceService.selectedResource();
-
-    //     this.resourceForm.patchValue({
-    //       name: resource.name,
-    //       description: resource.description,
-    //       contacts: resource.contacts,
-    //       links: resource.links
-    //     });
-    //   }
-    // });
+        this.resourceForm.patchValue({
+          name: resource.name,
+          description: resource.description,
+          resourceUrl: resource.resourceUrl,
+          contacts:
+            resource.contacts && resource.contacts.length > 0
+              ? resource.contacts
+              : [''],
+          links:
+            resource.links && resource.links.length > 0 ? resource.links : [''],
+        });
+      } else {
+        this.title.set('Add new Emergency Resource');
+        this.nameButton.set('Save');
+        this.resourceForm.reset();
+        this.resourceForm.patchValue({
+          contacts: [''],
+          links: [''],
+        });
+      }
+    });
   }
 
   onSubmit() {
     if (this.resourceForm.invalid) {
       this.resourceForm.markAllAsTouched();
-      console.log('Form invalid');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('name', this.resourceForm.value.name!);
-    formData.append('description', this.resourceForm.value.description!);
-    formData.append('contacts', this.resourceForm.value.contacts!.toString());
-    formData.append('links', this.resourceForm.value.links!.toString());
+    const formValue = this.resourceForm.value;
+    const resourceData: any = {
+      name: formValue.name!,
+      description: formValue.description!,
+      resourceUrl: formValue.resourceUrl || undefined,
+      contacts: (formValue.contacts as string[]).filter((c) => c.trim() !== ''),
+      links: (formValue.links as string[]).filter((l) => l.trim() !== ''),
+      status: 'ACTIVE', // Default status
+      modifiedDate: new Date().toISOString(),
+      userId: 'CURRENT_USER_ID', // Placeholder, should get from auth service
+    };
 
-    const image: any = this.resourceForm.get('image')?.value;
-    const video: any = this.resourceForm.get('video')?.value;
+    const selectedResource = this.resourceService.selectedResource();
 
-    if (image instanceof File) {
-      formData.append('imageUrl', image);
+    if (selectedResource && selectedResource.id) {
+      this.resourceService.update(resourceData, selectedResource.id).subscribe({
+        next: () => {
+          this.toastService.addToast({
+            type: 'success',
+            message: 'Resource updated successfully',
+            duration: 3000,
+          });
+          this.reload.emit();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastService.addToast({
+            type: 'error',
+            message: 'Error updating resource',
+            duration: 3000,
+          });
+        },
+      });
+    } else {
+      resourceData.createdDate = new Date().toISOString();
+      this.resourceService.create(resourceData).subscribe({
+        next: () => {
+          this.toastService.addToast({
+            type: 'success',
+            message: 'Resource created successfully',
+            duration: 3000,
+          });
+          this.reload.emit();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastService.addToast({
+            type: 'error',
+            message: 'Error creating resource',
+            duration: 3000,
+          });
+        },
+      });
     }
-    if (video instanceof File) {
-      formData.append('videoUrl', video);
-    }
-
-
   }
 
   addInput(event: Event, field: 'contacts' | 'links') {
     const array = this.resourceForm.value[field] as string[];
     array.push('');
     this.resourceForm.patchValue({
-      [field]: array
+      [field]: array,
     });
     this.resourceForm.get(field)?.updateValueAndValidity();
   }
@@ -95,29 +136,17 @@ export class EmergencyResourceModalComponent {
     const array = this.resourceForm.value[field] as string[];
     array.splice(index, 1);
     this.resourceForm.patchValue({
-      [field]: array
+      [field]: array,
     });
     this.resourceForm.get(field)?.updateValueAndValidity();
   }
 
   updateInput(event: Event, index: number, field: 'contacts' | 'links') {
     const input = event.target as HTMLInputElement;
-    if (input.value && input.value.length > 0) {
-      const array = this.resourceForm.value[field] as string[];
-      array[index] = input.value;
-      this.resourceForm.get(field)?.setValue(array);
-      this.resourceForm.get(field)?.updateValueAndValidity();
-    }
-  }
-
-  onFileChange(event: Event, field: 'image' | 'video') {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      const file = input.files[0];
-      this.resourceForm.patchValue({
-        [field]: file
-      });
-      this.resourceForm.get(field)?.updateValueAndValidity();
-    }
+    // Allow empty string update to reflect typing, filtering happens on submit
+    const array = this.resourceForm.value[field] as string[];
+    array[index] = input.value;
+    this.resourceForm.get(field)?.setValue(array);
+    this.resourceForm.get(field)?.updateValueAndValidity();
   }
 }

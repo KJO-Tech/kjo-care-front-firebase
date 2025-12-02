@@ -1,42 +1,88 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { Observable } from 'rxjs';
-
-import { environment } from '../../../environments/environment';
-import { EmergencyResourceResponse, EmergencyResourceStats } from '../interfaces/emergency-resource-http.interface';
+import {
+  addDoc,
+  collection,
+  collectionData,
+  deleteDoc,
+  doc,
+  docData,
+  Firestore,
+  query,
+  updateDoc,
+  where,
+} from '@angular/fire/firestore';
+import { from, map, Observable } from 'rxjs';
+import {
+  EmergencyResource,
+  EmergencyResourceStats,
+} from '../interfaces/emergency-resource-http.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EmergencyResourceService {
-  private baseUrl: string = environment.apiUrl + '/api/mind/emergency/resources';
+  private firestore = inject(Firestore);
+  private collectionRef = collection(this.firestore, 'emergency-resources');
 
-  private http = inject(HttpClient);
+  selectedResource = signal<EmergencyResource | undefined>(undefined);
 
- 
+  getAll(): Observable<EmergencyResource[]> {
+    return collectionData(this.collectionRef, { idField: 'id' }) as Observable<
+      EmergencyResource[]
+    >;
+  }
 
-  getAll(): Observable<EmergencyResourceResponse[]> {
-    return this.http.get<EmergencyResourceResponse[]>(`${this.baseUrl}`);
+  getAllActive(): Observable<EmergencyResource[]> {
+    const activeQuery = query(
+      this.collectionRef,
+      where('status', '==', 'ACTIVE'),
+    );
+    return collectionData(activeQuery, { idField: 'id' }) as Observable<
+      EmergencyResource[]
+    >;
   }
 
   getStats(): Observable<EmergencyResourceStats> {
-    return this.http.get<EmergencyResourceStats>(`${this.baseUrl}/stats`);
+    // Calculating stats from the client side for now as requested/implied by lack of backend
+    return this.getAll().pipe(
+      map((resources) => {
+        const stats: EmergencyResourceStats = {
+          totalResources: resources.length,
+          activeEmergencies: resources.filter((r) => r.status === 'ACTIVE')
+            .length, // Assuming 'ACTIVE' status
+          totalContacts: resources.reduce(
+            (acc, r) => acc + (r.contacts?.length || 0),
+            0,
+          ),
+          totalLinks: resources.reduce(
+            (acc, r) => acc + (r.links?.length || 0),
+            0,
+          ),
+          totalAccesses: 0, // Not tracking accesses in this simple model yet
+        };
+        return stats;
+      }),
+    );
   }
 
-  getById(id: number): Observable<EmergencyResourceResponse> {
-    return this.http.get<EmergencyResourceResponse>(`${this.baseUrl}/${id}`);
+  getById(id: string): Observable<EmergencyResource> {
+    const docRef = doc(this.firestore, `emergency-resources/${id}`);
+    return docData(docRef, { idField: 'id' }) as Observable<EmergencyResource>;
   }
 
-  create(request: FormData): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}`, request);
+  create(resource: Omit<EmergencyResource, 'id'>): Observable<string> {
+    return from(addDoc(this.collectionRef, resource)).pipe(
+      map((docRef) => docRef.id),
+    );
   }
 
-  update(request: FormData, id: number): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${id}`, request);
+  update(resource: Partial<EmergencyResource>, id: string): Observable<void> {
+    const docRef = doc(this.firestore, `emergency-resources/${id}`);
+    return from(updateDoc(docRef, resource));
   }
 
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  delete(id: string): Observable<void> {
+    const docRef = doc(this.firestore, `emergency-resources/${id}`);
+    return from(deleteDoc(docRef));
   }
 }

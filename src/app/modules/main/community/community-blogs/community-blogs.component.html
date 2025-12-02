@@ -182,7 +182,7 @@
   } @else {
     @for (blog of filteredBlogs(); track blog.id) {
       <article
-        class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+        class="card bg-base-100 shadow-lg group/blog hover:shadow-xl transition-all duration-300 cursor-pointer"
         [style.view-transition-name]="'blog-card-' + blog.id"
         (click)="goToBlog(blog.id)"
       >
@@ -220,13 +220,13 @@
                 @if (blog.createdAt) {
                   <relative-time
                     [datetime]="blog.createdAt.toDate()"
-                    precision="day"
+                    tense="past"
                   ></relative-time>
                 } @else {
                   <span>No date</span>
                 }
                 <span>·</span>
-                <span class="badge badge-xs badge-ghost">
+                <span class="badge badge-xs badge-soft badge-primary">
                   {{ getCategoryName(blog.categoryId) }}
                 </span>
               </div>
@@ -236,7 +236,7 @@
           <!-- Content -->
           <div class="px-4 space-y-2">
             <h2
-              class="text-xl font-bold leading-tight hover:text-primary transition-colors"
+              class="text-xl font-bold leading-tight group-hover/blog:text-primary transition-colors"
               [style.view-transition-name]="'blog-title-' + blog.id"
             >
               {{ blog.title }}

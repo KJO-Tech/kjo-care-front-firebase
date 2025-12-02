@@ -22,7 +22,7 @@
           autocomplete="off"
         />
         <p class="validator-hint hidden">
-          {{ formUtils.getFieldError(resourceForm, 'name') }}
+          {{ formUtils.getFieldError(resourceForm, "name") }}
         </p>
       </fieldset>
 
@@ -37,44 +37,28 @@
           autocomplete="off"
         ></textarea>
         <p class="validator-hint hidden">
-          {{ formUtils.getFieldError(resourceForm, 'description') }}
+          {{ formUtils.getFieldError(resourceForm, "description") }}
         </p>
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Image</legend>
+        <legend class="fieldset-legend">Resource URL</legend>
         <input
-          type="file"
-          class="file-input validator w-full"
-          formControlName="image"
-          accept="image/*"
+          type="url"
+          class="input validator w-full"
+          formControlName="resourceUrl"
+          placeholder="https://example.com/image.png"
           autocomplete="off"
-          (change)="onFileChange($event, 'image')"
         />
         <p class="validator-hint hidden">
-          {{ formUtils.getFieldError(resourceForm, 'image') }}
-        </p>
-      </fieldset>
-
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Video</legend>
-        <input
-          type="file"
-          accept="video/*"
-          class="file-input validator w-full"
-          formControlName="video"
-          autocomplete="off"
-          (change)="onFileChange($event, 'video')"
-        />
-        <p class="validator-hint hidden">
-          {{ formUtils.getFieldError(resourceForm, 'video') }}
+          {{ formUtils.getFieldError(resourceForm, "resourceUrl") }}
         </p>
       </fieldset>
 
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Emergency Contacts</legend>
         <div class="flex flex-col gap-2">
-          @for (contact of resourceForm.value['contacts']; track $index; ) {
+          @for (contact of resourceForm.value["contacts"]; track $index) {
             <div class="flex flex-row gap-2">
               <label class="input validator w-full">
                 <i class="material-symbols-outlined !text-xl">phone</i>
@@ -109,7 +93,7 @@
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Resource Links</legend>
         <div class="flex flex-col gap-2">
-          @for (link of resourceForm.value['links']; track $index; ) {
+          @for (link of resourceForm.value["links"]; track $index) {
             <div class="flex flex-row gap-2">
               <label class="input validator w-full">
                 <i class="material-symbols-outlined !text-xl">link</i>
@@ -154,13 +138,10 @@
             {{ nameButton() }}
           </button>
         </form>
-
       </div>
     </form>
-
   </div>
   <form method="dialog" class="modal-backdrop">
     <button>close</button>
   </form>
 </dialog>
-

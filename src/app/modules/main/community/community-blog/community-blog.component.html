@@ -59,7 +59,7 @@
                 <relative-time
                   class="text-sm opacity-80"
                   datetime="{{ blog.value()?.createdAt?.toDate() }}"
-                  precision="day"
+                  tense="past"
                 ></relative-time>
               } @else {
                 <span class="text-xs opacity-80">No date</span>
