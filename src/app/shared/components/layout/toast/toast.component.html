@@ -1,12 +1,86 @@
 <div class="toast toast-top toast-end z-[9999]">
+  @for (notification of toastService.notifications(); track notification.id) {
+    <div role="alert" class="alert alert-vertical sm:alert-horizontal">
+      <i class="material-symbols-outlined text-3xl text-primary">{{
+        notificationIcons[notification.type]
+      }}</i>
+      <div class="max-w-56">
+        <h3 class="font-bold">
+          @switch (notification.type) {
+            @case (NotificationType.NEW_BLOG_POST) {
+              Nuevo Blog Publicado
+            }
+            @case (NotificationType.LIKE) {
+              Nuevo Me Gusta en tu Blog
+            }
+            @case (NotificationType.COMMENT) {
+              Nuevo Comentario en tu Blog
+            }
+            @case (NotificationType.MOOD_REMINDER) {
+              Recordatorio de estado de ánimo
+            }
+            @case (NotificationType.ACTIVITY_REMINDER) {
+              Recordatorio de actividad
+            }
+            @case (NotificationType.SYSTEM) {
+              Notificación del sistema
+            }
+            @default {
+              Notificación desconocida
+            }
+          }
+        </h3>
+        <div class="text-xs">
+          @switch (notification.type) {
+            @case (NotificationType.NEW_BLOG_POST) {
+              Un nuevo blog de {{ notification.args[0] }} ha sido publicado:
+              {{ notification.args[1] }}
+            }
+            @case (NotificationType.LIKE) {
+              {{ notification.args[0] }} le ha dado me gusta a tu blog:
+              {{ notification.args[1] }}
+            }
+            @case (NotificationType.COMMENT) {
+              {{ notification.args[0] }} ha comentado en tu blog:
+              {{ notification.args[1] }}
+            }
+            @case (NotificationType.MOOD_REMINDER) {
+              Es hora de registrar tu estado de ánimo. Tómate un momento para
+              reflexionar.
+            }
+            @case (NotificationType.ACTIVITY_REMINDER) {
+              No olvides realizar tu actividad diaria:
+              {{ notification.args[0] }}.
+            }
+            @case (NotificationType.SYSTEM) {
+              Hemos lanzado nuevas funciones. ¡Descúbrelas ahora!
+            }
+            @default {
+              Notificación desconocida
+            }
+          }
+        </div>
+      </div>
+      <button
+        class="btn btn-sm"
+        (click)="handleNotificationClick(notification)"
+      >
+        Ver
+      </button>
+    </div>
+  }
+
   @for (toast of toastService.toasts(); track $index) {
-    <div class="alert" [ngClass]="{
-      'alert-success': toast.type === 'success',
-      'alert-error': toast.type === 'error',
-      'alert-info': toast.type === 'info',
-      'alert-warning': toast.type === 'warning',
-    }">
-      <div class="flex-1">
+    <div
+      class="alert"
+      [ngClass]="{
+        'alert-success': toast.type === 'success',
+        'alert-error': toast.type === 'error',
+        'alert-info': toast.type === 'info',
+        'alert-warning': toast.type === 'warning',
+      }"
+    >
+      <div class="flex-1 max-w-56">
         <p class="text-sm font-medium">
           {{ toast.message }}
         </p>

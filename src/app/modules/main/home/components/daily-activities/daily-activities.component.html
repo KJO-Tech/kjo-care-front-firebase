@@ -1,71 +1,116 @@
-<!--<div id="daily-activities" class="p-4 rounded-xl shadow-xl card space-y-3">-->
-<!--  <div class="flex items-center gap-2">-->
-<!--    <div class="bg-gradient-to-r from-warning to-accent text-primary-content px-2 pt-1 rounded-2xl align-baseline">-->
-<!--      <i class="material-symbols-outlined !text-2xl h-fit">calendar_today</i>-->
-<!--    </div>-->
-<!--    <h2 class="text-2xl font-semibold bg-gradient-to-r from-warning to-accent text-transparent bg-clip-text">-->
-<!--      Actividades de hoy-->
-<!--    </h2>-->
-<!--  </div>-->
+<div
+  id="daily-activities"
+  class="p-4 rounded-xl shadow-xl card space-y-3 bg-base-100"
+>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div
+        class="bg-gradient-to-r from-warning to-accent text-primary-content px-2 pt-1 rounded-2xl align-baseline"
+      >
+        <span class="material-symbols-outlined !text-2xl h-fit"
+          >calendar_today</span
+        >
+      </div>
+      <h2
+        class="text-2xl font-semibold bg-gradient-to-r from-warning to-accent text-transparent bg-clip-text"
+      >
+        Actividades de hoy
+      </h2>
+    </div>
+    <button class="btn btn-ghost btn-sm text-primary" (click)="goToExercises()">
+      Ver todas
+    </button>
+  </div>
 
-<!--  <div class="flex flex-col items-center gap-3">-->
-<!--    @if (activities.isLoading()) {-->
-<!--      @for (item of [1, 2, 3]; track $index) {-->
-<!--        <div class="skeleton w-full min-h-20 rounded-xl flex-1 bg-base-200 border-base-300"></div>-->
-<!--      }-->
+  <div class="flex flex-col items-center gap-3">
+    @if (
+      userSubscriptionsResource.isLoading() ||
+      dailyAssignmentsResource.isLoading()
+    ) {
+      @for (item of [1, 2, 3]; track $index) {
+        <div
+          class="skeleton w-full min-h-20 rounded-xl flex-1 bg-base-200 border-base-300"
+        ></div>
+      }
+    } @else if (
+      userSubscriptionsResource.error() || dailyAssignmentsResource.error()
+    ) {
+      <div class="alert alert-error my-3 flex-1">
+        <span class="material-symbols-outlined !text-xl">error</span>
+        <span
+          >Error al cargar las actividades. Por favor intenta de nuevo.</span
+        >
+        <button
+          class="btn btn-sm btn-outline hover:btn-error"
+          (click)="reload()"
+        >
+          <span class="material-symbols-outlined !text-xl">refresh</span>
+        </button>
+      </div>
+    } @else {
+      @if ((userSubscriptionsResource.value()?.length ?? 0) === 0) {
+        <div class="card bg-base-200 w-full text-center p-6">
+          <div class="card-body items-center">
+            <span
+              class="material-symbols-outlined text-4xl text-base-content/40"
+              >subscriptions_off</span
+            >
+            <h3 class="card-title text-lg">Sin suscripciones activas</h3>
+            <p class="text-sm text-base-content/70">
+              Suscríbete a categorías para recibir actividades diarias.
+            </p>
+            <div class="card-actions mt-4">
+              <button class="btn btn-primary btn-sm" (click)="goToExercises()">
+                Explorar Ejercicios
+              </button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        @for (
+          assignment of dailyAssignmentsResource.value()?.exercises ?? [];
+          track assignment.exerciseId
+        ) {
+          <div
+            class="flex gap-3 flex-1 w-full items-center justify-between p-4 rounded-xl border-2 hover:shadow-md transition-all duration-300 hover:cursor-pointer"
+            [ngClass]="{
+              'border-base-300 hover:border-accent/50': !assignment.completed,
+              'border-success bg-success/5': assignment.completed,
+            }"
+            (click)="goToExercise(assignment.exerciseId)"
+          >
+            <div class="flex gap-4 items-center">
+              <img
+                [src]="getCategoryImage(assignment.exercise.categoryId)"
+                alt="Icono de actividad"
+                class="w-6 h-6"
+              />
+              <div>
+                <p class="font-medium text-lg">
+                  {{ assignment.exercise.localizedTitle["es"] }}
+                </p>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-base-content/60"
+                    >{{ assignment.exercise.durationMinutes || 0 }} mins</span
+                  >
+                </div>
+              </div>
+            </div>
 
-<!--    } @else if (activities.error()) {-->
-<!--      <div class="alert alert-error my-3 flex-1">-->
-<!--        <i class="material-symbols-outlined !text-xl">error</i>-->
-<!--        <span>Error al cargar las actividades. Por favor intenta de nuevo.</span>-->
-<!--        <button class="btn btn-sm btn-outline hover:btn-error" (click)="reload()">-->
-<!--          <i class="material-symbols-outlined !text-xl">refresh</i>-->
-<!--        </button>-->
-<!--      </div>-->
-<!--    } @else {-->
-<!--      @for (exercise of activities.value() ?? []; track exercise.id) {-->
-<!--        <div-->
-<!--          class="flex gap-3 flex-1 w-full items-center justify-between p-4 rounded-xl border-2 hover:shadow-md transition-all duration-300 hover:cursor-pointer"-->
-<!--          [ngClass]="{-->
-<!--          'border-base-300 hover:border-accent/50': !exercise.completed,-->
-<!--          'border-success bg-success/5': exercise.completed,-->
-<!--        }"-->
-<!--        (click)="goToExercise(exercise.id)">-->
-<!--          <div class="flex gap-4 items-center">-->
-
-<!--            @if (exercise.exercise.categoryName.includes("Meditación")) {-->
-<!--              <span class="text-2xl">🧘</span>-->
-<!--            } @else if (exercise.exercise.categoryName.includes("Ejercicio")) {-->
-<!--              <span class="text-2xl">🏃</span>-->
-<!--            } @else if (exercise.exercise.categoryName.includes("Respiración")) {-->
-<!--              <span class="text-2xl">🫁</span>-->
-<!--            } @else {-->
-<!--              <span class="text-2xl">🎯</span>-->
-<!--            }-->
-
-<!--            <div>-->
-<!--              <p class="font-medium text-lg">{{ exercise.exercise.title }}</p>-->
-<!--              <div class="flex items-center gap-2">-->
-<!--                <span>{{ exercise.exercise.durationMinutes }} mins</span>-->
-<!--                &lt;!&ndash;              @if (exercise.streak > 0) {&ndash;&gt;-->
-<!--                &lt;!&ndash;                <div class="badge badge-soft badge-accent">🔥{{ exercise.streak }}</div>&ndash;&gt;-->
-<!--                &lt;!&ndash;              }&ndash;&gt;-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-
-<!--          @if (exercise.completed) {-->
-<!--            <div-->
-<!--              class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 border-success bg-success text-success-content">-->
-<!--              <i class="material-symbols-outlined !text-xl">check</i>-->
-<!--            </div>-->
-<!--          } @else {-->
-<!--            <div-->
-<!--              class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 border-gray-300 "></div>-->
-<!--          }-->
-<!--        </div>-->
-<!--      }-->
-<!--    }-->
-<!--  </div>-->
-
-<!--</div>-->
+            @if (assignment.completed) {
+              <div
+                class="w-6 h-6 aspect-square rounded-full border-2 flex items-center justify-center transition-all duration-200 border-success bg-success text-success-content"
+              >
+                <span class="material-symbols-outlined !text-xl">check</span>
+              </div>
+            } @else {
+              <div
+                class="w-6 h-6 aspect-square rounded-full border-2 flex items-center justify-center transition-all duration-200 border-gray-300"
+              ></div>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+</div>

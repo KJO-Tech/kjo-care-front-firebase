@@ -8,12 +8,13 @@ export const environment = {
     authDomain: import.meta.env.NG_APP_FIREBASE_AUTH_DOMAIN,
     messagingSenderId: import.meta.env.NG_APP_FIREBASE_MESSAGING_SENDER_ID,
     measurementId: import.meta.env.NG_APP_FIREBASE_MEASUREMENT_ID,
-    storageBucket: import.meta.env.NG_APP_FIREBASE_STORAGE_BUCKET
+    storageBucket: import.meta.env.NG_APP_FIREBASE_STORAGE_BUCKET,
+    vapidKey: import.meta.env.NG_APP_FIREBASE_VAPID_KEY,
   },
   cloudinary: {
     cloudName: import.meta.env.NG_APP_CLOUDINARY_CLOUD_NAME,
     uploadPreset: import.meta.env.NG_APP_CLOUDINARY_UPLOAD_PRESET,
     apiKey: import.meta.env.NG_APP_CLOUDINARY_API_KEY,
-    apiSecret: import.meta.env.NG_APP_CLOUDINARY_API_SECRET
-  }
+    apiSecret: import.meta.env.NG_APP_CLOUDINARY_API_SECRET,
+  },
 };

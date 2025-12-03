@@ -1,21 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { AnalyticsService } from '../../../../../core/services/analytics.service';
 
 @Component({
   selector: 'home-achievements',
-  imports: [],
   templateUrl: './achievements.component.html',
 })
 export class AchievementsComponent {
-  //
-  // analyticsService = inject(AnalyticsService);
-  //
-  // stats = rxResource({
-  //   loader: () => this.analyticsService.getSummary().pipe(
-  //     map((response) => response.result)
-  //   )
-  // });
-  //
-  // reload() {
-  //   this.stats.reload();
-  // }
+  private analyticsService = inject(AnalyticsService);
+
+  stats = rxResource({
+    loader: () => this.analyticsService.getHomeStatistics(),
+  });
+
+  reload() {
+    this.stats.reload();
+  }
 }

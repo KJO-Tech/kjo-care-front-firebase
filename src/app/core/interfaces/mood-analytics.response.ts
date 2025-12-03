@@ -1,25 +1,21 @@
 export interface MoodAnalyticsResponse {
-  moodCounts:      MoodAnalytics;
-  moodPercentages: MoodAnalytics;
-  totalMoods:      number;
-  timePeriod:      string;
+  moodCounts: { [key: string]: number };
+  moodPercentages: { [key: string]: number };
+  totalEntries: number;
+  timePeriod?: string;
 }
 
 export interface MoodAnalytics {
-  Happy?:   number;
-  Neutral?:   number;
-  Sad? : number;
-  Anxious?: number;
-  Energetic?:number;
+  [key: string]: number;
 }
 
 export interface MoodTrendsAnalysis {
-  timePeriod:               string;
-  totalEntries:             number;
-  mostCommonMood:           string;
+  timePeriod: string;
+  totalEntries: number;
+  mostCommonMood: string;
   mostCommonMoodPercentage: number;
-  variabilityLevel:         string;
-  variabilityScore:         number;
-  trendDirection:           string;
-  weeklyTrendScore:         number;
+  variabilityLevel: string;
+  variabilityScore: number;
+  trendDirection: string;
+  weeklyTrendScore: number;
 }

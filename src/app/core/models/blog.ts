@@ -43,7 +43,7 @@ export interface Comment {
   createdAt: Timestamp;
   isMine: boolean;
   parentCommentId?: string | null;
-  blogId?: string;
+  blogId: string;
   replies: Comment[];
 }
 

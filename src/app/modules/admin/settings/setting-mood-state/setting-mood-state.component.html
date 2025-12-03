@@ -1,0 +1,118 @@
+<div class="p-6">
+  <h2 class="text-2xl font-bold mb-4">
+    Configuración de los Estados de Ánimos
+  </h2>
+
+  @defer (on viewport) {
+    @if (loadMoodTracking.isLoading()) {
+      <div class="flex justify-center p-8">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    } @else if (loadMoodTracking.error()) {
+      <div class="alert alert-error">
+        <i class="material-symbols-outlined !text-xl">error</i>
+        <span
+          >Error al cargar los estados de ánimo. Por favor intenta de
+          nuevo.</span
+        >
+        <button class="btn btn-sm" (click)="loadMoodTracking.reload()">
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      @for (mood of loadMoodTracking.value(); track mood.id; let i = $index) {
+        <div
+          class="flex items-center justify-between bg-base-100 rounded p-4 mb-2 shadow hover:shadow-md transition-shadow"
+        >
+          <div class="flex items-center gap-4">
+            <span class="rounded-full p-2" [style.backgroundColor]="mood.color">
+              <img
+                [src]="mood.image"
+                alt="Icono de estado de ánimo"
+                class="w-6 h-6 object-cover"
+              />
+            </span>
+            <div class="flex flex-col">
+              <span class="font-bold">{{ mood.name["es"] }}</span>
+              <span class="text-xs opacity-70">Valor: {{ mood.value }}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="form-control">
+              <label class="label cursor-pointer gap-2">
+                <span class="label-text text-xs">{{
+                  mood.isActive ? "Activo" : "Inactivo"
+                }}</span>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  [checked]="mood.isActive"
+                  (change)="toggleMoodState(mood.id)"
+                />
+              </label>
+            </div>
+
+            <button
+              class="btn btn-ghost btn-sm btn-circle"
+              (click)="editMood(i)"
+            >
+              <i class="material-symbols-outlined !text-xl">edit</i>
+            </button>
+
+            <modal-open-button
+              [modalName]="'delete_confirmation_modal'"
+              [type]="'icon'"
+              [classes]="'btn-ghost text-error'"
+              (click)="deleteMood(mood.id)"
+            >
+              <i class="material-symbols-outlined !text-xl">delete</i>
+            </modal-open-button>
+          </div>
+        </div>
+      } @empty {
+        <div class="alert alert-info">
+          <i class="material-symbols-outlined !text-xl">add</i>
+          <span>Ningún estado de ánimo. Añade un estado de ánimo.</span>
+        </div>
+      }
+    }
+  } @placeholder (minimum 500ms) {
+    <div class="animate-pulse space-y-4">
+      <div class="h-12 bg-base-200 rounded w-full"></div>
+      <div class="h-12 bg-base-200 rounded w-full"></div>
+    </div>
+  } @loading {
+    <div class="flex justify-center p-4">
+      <span class="loading loading-spinner loading-md text-primary"></span>
+    </div>
+  }
+
+  <div class="flex gap-2 mt-4">
+    <button class="btn btn-outline btn-primary" (click)="addMoodState()">
+      <i class="material-symbols-outlined !text-xl">add</i>
+      Añadir Nuevo Estado de Ánimo
+    </button>
+  </div>
+</div>
+
+@defer (when editingMood(); prefetch on idle) {
+  <app-mood-modal
+    [modalId]="'mood_editor_modal'"
+    [mood]="editingMood()!"
+    [isNewMood]="isNewMood()"
+    (save)="handleSaveMood($event)"
+    (cancel)="cancelEdit()"
+  ></app-mood-modal>
+}
+
+@defer (when showDeleteModal()) {
+  <app-dialog
+    [title]="'Confirmar eliminación'"
+    [message]="
+      '¿Estás seguro que deseas eliminar este estado de ánimo? Esta acción no se puede deshacer.'
+    "
+    [modalName]="'delete_confirmation_modal'"
+    [buttonText]="'Eliminar'"
+    (callback)="confirmDelete()"
+  ></app-dialog>
+}

@@ -13,12 +13,24 @@ export class ThemeControllerComponent {
 
   constructor() {
     const savedTheme = localStorage.getItem(this.THEME_KEY);
-    this.isDark.set(savedTheme === 'dark');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    // const prefersDark = window.matchMedia(
+    //   '(prefers-color-scheme: dark)',
+    // ).matches;
 
-    if (prefersDark) {
-      this.themeName.set('cosmic-light')
-    }
+    // Determinar el tema inicial
+    // if (savedTheme) {
+      this.isDark.set(savedTheme === 'dark');
+    // } else {
+    //   this.isDark.set(prefersDark);
+    // }
+
+    // Aplicar el tema inicial
+    this.applyTheme();
+
+    // Efecto para aplicar el tema cuando cambie
+    effect(() => {
+      this.applyTheme();
+    });
   }
 
   toggleTheme() {
@@ -27,4 +39,11 @@ export class ThemeControllerComponent {
     localStorage.setItem(this.THEME_KEY, newTheme ? 'dark' : 'light');
   }
 
+  private applyTheme() {
+    const theme = this.isDark() ? 'cosmic-dark' : 'cosmic-light';
+    this.themeName.set(theme);
+
+    // Aplicar el atributo data-theme al elemento HTML
+    document.documentElement.setAttribute('data-theme', theme);
+  }
 }
