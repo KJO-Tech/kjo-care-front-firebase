@@ -231,6 +231,39 @@ export class AuthService {
     );
   }
 
+  updateProfile(uid: string, data: Partial<UserModel>): Observable<void> {
+    return from(
+      setDoc(doc(this.firestore, 'users', uid), data, { merge: true }),
+    ).pipe(
+      tap(() => {
+        // Update local state
+        this.state.update((state) => {
+          if (state.userData) {
+            return {
+              ...state,
+              userData: { ...state.userData, ...data },
+            };
+          }
+          return state;
+        });
+
+        this.toastService.addToast({
+          message: 'Perfil actualizado correctamente',
+          type: 'success',
+          duration: 3000,
+        });
+      }),
+      catchError((error) => {
+        this.toastService.addToast({
+          message: 'Error al actualizar el perfil',
+          type: 'error',
+          duration: 3000,
+        });
+        return throwError(() => error);
+      }),
+    );
+  }
+
   private setLoading(isLoading: boolean): void {
     this.state.update((state) => ({
       ...state,

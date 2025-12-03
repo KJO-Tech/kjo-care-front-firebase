@@ -96,7 +96,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        loadComponent: () => import('./modules/main/profile/profile.component'),
+        loadChildren: () => import('./modules/main/profile/profile.routes'),
       },
       {
         path: 'notifications',

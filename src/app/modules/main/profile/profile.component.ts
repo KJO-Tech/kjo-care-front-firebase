@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-profile',
-  imports: [],
   templateUrl: './profile.component.html',
+  imports: [],
 })
 export default class ProfileComponent {
   private authService = inject(AuthService);
@@ -14,8 +14,7 @@ export default class ProfileComponent {
   userProfile = this.authService.userData;
 
   editProfile(): void {
-    // Placeholder for edit profile logic
-    console.log('Edit profile clicked');
+    this.router.navigate(['/app/profile/edit']);
   }
 
   manageSubscriptions(): void {

@@ -73,13 +73,13 @@
             <td>
               <div class="flex items-center gap-1">
                 <i class="material-symbols-outlined !text-xl">phone</i>
-                <span>{{ resource.contacts?.at(0) || "No contacts" }}</span>
+                <span>{{ resource.contacts.at(0) || "No contacts" }}</span>
               </div>
             </td>
             <td>
               <div class="flex items-center gap-1 max-w-54">
                 <i class="material-symbols-outlined !text-xl">link</i>
-                @if (resource.links?.at(0)) {
+                @if (resource.links.at(0)) {
                   <a
                     class="truncate link"
                     [href]="resource.links.at(0)"
