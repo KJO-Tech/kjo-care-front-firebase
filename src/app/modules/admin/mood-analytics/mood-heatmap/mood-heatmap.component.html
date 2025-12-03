@@ -1,0 +1,74 @@
+<div class="flex flex-col items-center w-full">
+  <div class="w-full overflow-x-auto pb-4">
+    <div class="min-w-fit mx-auto">
+      <!-- Month Labels -->
+      <div class="flex mb-2 pl-8 text-xs text-gray-400 relative h-4">
+        @for (month of monthLabels(); track month.label + month.offset) {
+          <div class="absolute" [style.left.px]="month.offset * 16">
+            {{ month.label }}
+          </div>
+        }
+      </div>
+
+      <div class="flex gap-1">
+        <!-- Day Labels (Mon, Wed, Fri) -->
+        <div class="flex flex-col gap-1 text-[10px] text-gray-400 pr-2 pt-4">
+          <div class="h-3"></div>
+          <!-- Sun -->
+          <div class="h-3 flex items-center">Mon</div>
+          <div class="h-3"></div>
+          <!-- Tue -->
+          <div class="h-3 flex items-center">Wed</div>
+          <div class="h-3"></div>
+          <!-- Thu -->
+          <div class="h-3 flex items-center">Fri</div>
+          <div class="h-3"></div>
+          <!-- Sat -->
+        </div>
+
+        <!-- Heatmap Grid -->
+        <div class="flex gap-1">
+          @for (week of weeks(); track $index) {
+            <div class="flex flex-col gap-1">
+              @for (day of week.days; track day.date) {
+                <div
+                  class="w-3 h-3 rounded-[2px] transition-all hover:ring-1 hover:ring-gray-400 relative group cursor-pointer"
+                  [style.background-color]="day.color"
+                >
+                  <!-- Tooltip -->
+                  <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 transition-opacity"
+                  >
+                    <div class="font-semibold">
+                      {{ day.date | date: "mediumDate" }}
+                    </div>
+                    @if (day.mood) {
+                      <div>{{ day.mood }}</div>
+                    } @else {
+                      <div class="text-gray-400">No entry</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="flex flex-wrap items-center justify-center gap-3 mt-4 px-4">
+    @for (mood of moodDefinitions.value(); track mood.id) {
+      <div class="flex items-center gap-1.5">
+        <div
+          class="w-3 h-3 rounded-full shadow-sm"
+          [style.backgroundColor]="mood.color"
+        ></div>
+        <span class="text-xs text-gray-600 font-medium">{{
+          mood.name["es"] || mood.name["en"]
+        }}</span>
+      </div>
+    }
+  </div>
+</div>

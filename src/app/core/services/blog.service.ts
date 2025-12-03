@@ -5,11 +5,13 @@ import {
   doc,
   docData,
   Firestore,
+  getCountFromServer,
   orderBy,
   query,
   setDoc,
   Timestamp,
   updateDoc,
+  where,
 } from '@angular/fire/firestore';
 import {
   catchError,
@@ -45,16 +47,6 @@ export class BlogService {
 
   findAll(): Observable<Blog[]> {
     const blogsCollection = collection(this.firestore, this.collectionName);
-
-    // Admin sees all, others see only non-deleted
-    // Note: This requires a complex query or client-side filtering if we want to show DRAFTs to authors
-    // For now, let's fetch all and filter client-side based on role for simplicity,
-    // or use a basic query.
-
-    // Since we need to check isAdmin, we can switchMap from auth state
-    // But for simplicity and performance, we can just fetch and filter.
-    // Ideally, we should use Firestore security rules and queries.
-
     const q = query(blogsCollection, orderBy('createdAt', 'desc'));
 
     return collectionData(q, { idField: 'id' }).pipe(
@@ -63,21 +55,12 @@ export class BlogService {
         const isAdmin = user?.role === 'admin';
 
         return blogs
-          .map((blog) => {
-            // Convert Timestamp to Date if needed, or keep as Timestamp
-            // The model expects Timestamp, so we cast
-            return blog as Blog;
-          })
+          .map((blog) => blog as Blog)
           .filter((blog) => {
             if (isAdmin) return true;
             return blog.status !== BlogStatus.DELETED;
           });
       }),
-      // We need to populate isLiked for each blog.
-      // This is expensive if we do it for all blogs.
-      // Android app likely does it.
-      // Optimization: Only fetch likes for visible blogs or do it in component.
-      // For now, let's map it.
       switchMap((blogs) => {
         if (blogs.length === 0) return of([]);
 
@@ -106,6 +89,7 @@ export class BlogService {
 
   getById(id: string): Observable<Blog | null> {
     const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
+
     return docData(docRef, { idField: 'id' }).pipe(
       switchMap((blogData: any) => {
         if (!blogData) return of(null);
@@ -114,7 +98,6 @@ export class BlogService {
         const user = this.authService.userData();
 
         const likes$ = user ? this.checkIfLiked(blog.id, user.uid) : of(false);
-
         const commentsCount$ = this.commentService.getCommentCount(blog.id);
 
         return combineLatest([likes$, commentsCount$]).pipe(
@@ -160,11 +143,31 @@ export class BlogService {
   private checkIfLiked(blogId: string, userId: string): Observable<boolean> {
     const reactionDocRef = doc(
       this.firestore,
-      `${this.collectionName}/${blogId}/reactions/${userId}`,
+      `${this.collectionName}/${blogId}/reaction/${userId}`,
     );
     return docData(reactionDocRef).pipe(
       map((doc) => !!doc),
       catchError(() => of(false)),
+    );
+  }
+
+  countMyBlogs(): Observable<number> {
+    const user = this.authService.userData();
+    if (!user) return of(0);
+
+    const blogsCollection = collection(this.firestore, this.collectionName);
+    const q = query(
+      blogsCollection,
+      where('author.uid', '==', user.uid),
+      where('status', '!=', BlogStatus.DELETED),
+    );
+
+    return from(getCountFromServer(q)).pipe(
+      map((snapshot) => snapshot.data().count),
+      catchError((error) => {
+        console.error('Error counting blogs:', error);
+        return of(0);
+      }),
     );
   }
 }

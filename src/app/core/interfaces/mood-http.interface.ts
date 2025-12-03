@@ -1,16 +1,18 @@
 export interface MoodStateRequest {
-  name: string,
-  description: string,
-  image?: string,
-  color: string
-  materialIcon: string
+  name: { [key: string]: string };
+  description: { [key: string]: string };
+  image?: string;
+  color: string;
+  materialIcon: string;
+  value: number;
 }
 
 export interface MoodStateResponse {
-  id: string,
-  name: string,
-  description: string,
-  image: string,
-  color: string,
-  isActive: boolean
+  id: string;
+  name: { [key: string]: string };
+  description: { [key: string]: string };
+  image: string;
+  color: string;
+  isActive: boolean;
+  value: number;
 }

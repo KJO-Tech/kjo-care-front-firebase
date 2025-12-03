@@ -5,19 +5,19 @@ import { switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 export function httpTokenInterceptor(
   request: HttpRequest<unknown>,
-  next: HttpHandlerFn
+  next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> {
   const authService = inject(AuthService);
   const currentUser = authService.currentUser();
 
-  if (currentUser) {
+  if (currentUser && !request.url.includes('cloudinary.com')) {
     return from(currentUser.getIdToken()).pipe(
-      switchMap(token => {
+      switchMap((token) => {
         const authReq = request.clone({
-          headers: request.headers.set('Authorization', `Bearer ${token}`)
+          headers: request.headers.set('Authorization', `Bearer ${token}`),
         });
         return next(authReq);
-      })
+      }),
     );
   }
 

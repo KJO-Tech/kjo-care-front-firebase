@@ -14,6 +14,7 @@ declare interface Env {
   NG_APP_FIREBASE_MESSAGING_SENDER_ID: string;
   NG_APP_FIREBASE_MEASUREMENT_ID: string;
   NG_APP_FIREBASE_STORAGE_BUCKET: string;
+  NG_APP_FIREBASE_VAPID_KEY: string;
 
   NG_APP_CLOUDINARY_CLOUD_NAME: string;
   NG_APP_CLOUDINARY_UPLOAD_PRESET: string;
@@ -38,5 +39,5 @@ declare const _NGX_ENV_: Env;
 
 // 3. Use process.env.YOUR_ENV_VAR in your code. (deprecated)
 declare namespace NodeJS {
-  export interface ProcessEnv extends Env { }
+  export interface ProcessEnv extends Env {}
 }

@@ -1,8 +1,10 @@
+import { Timestamp } from 'firebase/firestore';
+
 export interface ActivityCategory {
   id?: string;
   localizedName: { [key: string]: string };
   localizedDescription: { [key: string]: string };
-  iconResName: string;
+  imageUrl: string;
   order: number;
 }
 
@@ -31,4 +33,22 @@ export enum ExerciseDifficultyType {
   BEGINNER = 'Beginner',
   INTERMEDIATE = 'Intermediate',
   ADVANCED = 'Advanced',
+}
+
+export interface DailyAssignment {
+  id?: string;
+  userId: string;
+  date: string; // ISO date string YYYY-MM-DD
+  exercises: AssignedExercise[];
+}
+
+export interface AssignedExercise {
+  exerciseId: string;
+  completed: boolean;
+  completedAt?: Timestamp; // Timestamp
+  isAdHoc?: boolean; // True if added by user, false if auto-assigned
+}
+
+export interface AssignedExerciseDetail extends AssignedExercise {
+  exercise: DailyExercise;
 }

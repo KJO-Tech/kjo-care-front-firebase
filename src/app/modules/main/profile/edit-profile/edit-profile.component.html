@@ -1,0 +1,157 @@
+<div class="p-4 pb-20 max-w-2xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <button
+      (click)="cancel()"
+      class="btn btn-ghost btn-sm gap-2 pl-0 hover:bg-transparent text-base-content/60 mb-4"
+    >
+      <span class="material-symbols-outlined">arrow_back</span>
+      Volver
+    </button>
+    <h1
+      class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text"
+    >
+      Editar Perfil
+    </h1>
+    <p class="text-base-content/70 mt-2">Actualiza tu información personal</p>
+  </div>
+
+  <div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body">
+      <form
+        [formGroup]="profileForm"
+        (ngSubmit)="save()"
+        class="flex flex-col gap-6"
+      >
+        <!-- Image Preview & Input -->
+        <div class="flex flex-col items-center gap-4">
+          <div class="avatar placeholder relative group">
+            <div
+              class="bg-primary text-primary-content rounded-full w-32 h-32 ring ring-primary ring-offset-base-100 ring-offset-2 shadow-md overflow-hidden"
+            >
+              @if (isUploading()) {
+                <div
+                  class="absolute inset-0 bg-black/50 flex items-center justify-center z-10"
+                >
+                  <span class="loading loading-spinner text-white"></span>
+                </div>
+              }
+
+              @if (profileForm.get("profileImage")?.value) {
+                <img
+                  [src]="profileForm.get('profileImage')?.value"
+                  alt="Avatar Preview"
+                  class="object-cover w-full h-full"
+                />
+              } @else {
+                <span
+                  class="text-5xl font-bold w-full h-full inline-flex items-center justify-center"
+                >
+                  {{
+                    profileForm
+                      .get("fullName")
+                      ?.value?.charAt(0)
+                      ?.toUpperCase() || "U"
+                  }}
+                </span>
+              }
+            </div>
+
+            <!-- Edit Overlay (Desktop) -->
+            <div
+              class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+              (click)="fileInput.click()"
+            >
+              <span class="material-symbols-outlined text-white">edit</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              class="hidden"
+              (change)="onFileSelected($event)"
+            />
+
+            <button
+              type="button"
+              class="btn btn-sm btn-outline gap-2"
+              (click)="fileInput.click()"
+              [disabled]="isUploading()"
+            >
+              <span class="material-symbols-outlined text-sm">upload</span>
+              Cambiar Foto
+            </button>
+
+            @if (profileForm.get("profileImage")?.value) {
+              <button
+                type="button"
+                class="btn btn-sm btn-outline btn-error gap-2"
+                (click)="removeImage()"
+                [disabled]="isUploading()"
+              >
+                <span class="material-symbols-outlined text-sm">delete</span>
+                Quitar
+              </button>
+            }
+          </div>
+
+          <div class="text-xs text-base-content/60 text-center">
+            Máximo 2MB. Formatos: JPG, PNG, WEBP
+          </div>
+        </div>
+
+        <!-- Name Input -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-medium">Nombre Completo</span>
+          </label>
+          <input
+            type="text"
+            formControlName="fullName"
+            placeholder="Tu nombre completo"
+            class="input input-bordered w-full"
+            [class.input-error]="
+              profileForm.get('fullName')?.invalid &&
+              profileForm.get('fullName')?.touched
+            "
+          />
+          @if (
+            profileForm.get("fullName")?.invalid &&
+            profileForm.get("fullName")?.touched
+          ) {
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >El nombre es requerido (mínimo 3 caracteres)</span
+              >
+            </label>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-4 mt-4">
+          <button
+            type="button"
+            class="btn btn-outline flex-1"
+            (click)="cancel()"
+            [disabled]="isLoading()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary flex-1"
+            [disabled]="profileForm.invalid || isLoading()"
+          >
+            @if (isLoading()) {
+              <span class="loading loading-spinner"></span>
+            }
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

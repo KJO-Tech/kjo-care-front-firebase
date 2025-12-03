@@ -18,7 +18,7 @@
   --color-base-content: oklch(22% 0.04 290);
 
   /* Colores principales */
-  --color-primary: oklch(65% 0.20 290);
+  --color-primary: oklch(65% 0.2 290);
   --color-primary-content: oklch(98% 0.01 20);
   --color-secondary: oklch(72% 0.18 230);
   --color-secondary-content: oklch(98% 0.01 18);
@@ -36,7 +36,7 @@
   --color-warning-content: oklch(15% 0.01 70);
   --color-error: oklch(72% 0.18 350);
   --color-error-content: oklch(98% 0.01 15);
-  --color-info: oklch(70% 0.20 220);
+  --color-info: oklch(70% 0.2 220);
   --color-info-content: oklch(98% 0.01 230);
 
   /* Geometría juvenil */
@@ -53,8 +53,8 @@
 @plugin "daisyui/theme" {
   name: "cosmic-dark";
   default: false;
-  prefersdark: true;
-  color-scheme: "dark";
+  /* prefersdark: true; */
+  /* color-scheme: "dark"; */
 
   /* Fondos */
   --color-base-100: oklch(8% 0.03 290);
@@ -67,7 +67,7 @@
   --color-primary-content: oklch(98% 0.01 25);
   --color-secondary: oklch(80% 0.22 230);
   --color-secondary-content: oklch(98% 0.01 22);
-  --color-accent: oklch(85% 0.20 340);
+  --color-accent: oklch(85% 0.2 340);
   --color-accent-content: oklch(15% 0.01 20);
 
   /* Neutral */
@@ -75,7 +75,7 @@
   --color-neutral-content: oklch(88% 0.02 280);
 
   /* Estados */
-  --color-success: oklch(82% 0.20 170);
+  --color-success: oklch(82% 0.2 170);
   --color-success-content: oklch(98% 0.01 150);
   --color-warning: oklch(86% 0.22 50);
   --color-warning-content: oklch(15% 0.01 70);
@@ -95,8 +95,26 @@
   --noise: 1;
 }
 
+[data-theme="cosmic-dark"] {
+  --tw-shadow-color: rgb(255 255 255 / 0.06);
+}
+
+[data-theme="cosmic-dark"] .shadow-sm,
+[data-theme="cosmic-dark"] .shadow-md,
+[data-theme="cosmic-dark"] .shadow-lg,
+[data-theme="cosmic-dark"] .shadow-xl,
+[data-theme="cosmic-dark"] .shadow-2xl,
+[data-theme="cosmic-dark"] .shadow-3xl {
+  --tw-shadow-color: rgb(255 255 255 / 0.06);
+}
+
+[data-theme="cosmic-dark"] .card {
+  /* border: 1px solid oklch(20% 0.05 280); */
+}
+
 /* Estilos específicos para el mapa de Leaflet */
-#map, .leaflet-container {
+#map,
+.leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 1;
@@ -177,7 +195,6 @@
   }
 }
 
-
 /*Quitar los scrollbar de la pagina principal*/
 :root {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
@@ -201,4 +218,85 @@ html {
   gap: 0.5rem; /* space-y-2 */
   transition: all 0.5s ease-in-out;
   will-change: transform, opacity, z-index;
+}
+
+/* View Transitions */
+/* View Transitions */
+::view-transition-old(root) {
+  animation: 0.3s cubic-bezier(0.4, 0, 0.2, 1) both zoom-fade-out;
+}
+
+::view-transition-new(root) {
+  animation: 0.3s cubic-bezier(0.4, 0, 0.2, 1) both zoom-fade-in;
+}
+
+@keyframes zoom-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+/* Blog card transitions */
+::view-transition-old(blog-card),
+::view-transition-new(blog-card) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Title transitions */
+::view-transition-old(blog-title),
+::view-transition-new(blog-title) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Media transitions */
+::view-transition-old(blog-media),
+::view-transition-new(blog-media) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Avatar transitions */
+::view-transition-old(blog-avatar),
+::view-transition-new(blog-avatar) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Author name transitions */
+::view-transition-old(blog-author),
+::view-transition-new(blog-author) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Content transitions */
+::view-transition-old(blog-content),
+::view-transition-new(blog-content) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Actions transitions */
+::view-transition-old(blog-actions),
+::view-transition-new(blog-actions) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

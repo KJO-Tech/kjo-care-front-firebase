@@ -1,13 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import {
   collection,
-  deleteDoc,
+  collectionGroup,
   doc,
   docData,
   Firestore,
+  getCountFromServer,
   getDocs,
+  increment,
   query,
-  setDoc,
+  runTransaction,
   Timestamp,
   where,
 } from '@angular/fire/firestore';
@@ -27,7 +29,7 @@ export class ReactionService {
   checkIfLiked(blogId: string, userId: string): Observable<boolean> {
     const reactionDocRef = doc(
       this.firestore,
-      `${this.collectionName}/${blogId}/reactions/${userId}`,
+      `${this.collectionName}/${blogId}/reaction/${userId}`,
     );
     return docData(reactionDocRef).pipe(
       map((doc) => !!doc),
@@ -41,15 +43,17 @@ export class ReactionService {
 
     const reactionRef = doc(
       this.firestore,
-      `${this.collectionName}/${blogId}/reactions/${user.uid}`,
+      `${this.collectionName}/${blogId}/reaction/${user.uid}`,
     );
+
+    const blogRef = doc(this.firestore, `${this.collectionName}/${blogId}`);
 
     return from(
       getDocs(
         query(
           collection(
             this.firestore,
-            `${this.collectionName}/${blogId}/reactions`,
+            `${this.collectionName}/${blogId}/reaction`,
           ),
           where('userId', '==', user.uid),
         ),
@@ -57,16 +61,44 @@ export class ReactionService {
     ).pipe(
       switchMap((snapshot) => {
         if (!snapshot.empty) {
-          // Unlike
-          return from(deleteDoc(reactionRef));
+          // Unlike: Delete reaction and decrement counter
+          return from(
+            runTransaction(this.firestore, async (transaction) => {
+              transaction.delete(reactionRef);
+              transaction.update(blogRef, { reaction: increment(-1) });
+            }),
+          );
         } else {
-          // Like
+          // Like: Add reaction and increment counter
           const reaction: Reaction = {
             userId: user.uid,
             timestamp: Timestamp.now(),
           };
-          return from(setDoc(reactionRef, reaction));
+          return from(
+            runTransaction(this.firestore, async (transaction) => {
+              transaction.set(reactionRef, reaction);
+              transaction.update(blogRef, { reaction: increment(1) });
+            }),
+          );
         }
+      }),
+    );
+  }
+
+  countMyReactions(): Observable<number> {
+    const user = this.authService.userData();
+    if (!user) return of(0);
+
+    const reactionsQuery = query(
+      collectionGroup(this.firestore, 'reaction'),
+      where('userId', '==', user.uid),
+    );
+
+    return from(getCountFromServer(reactionsQuery)).pipe(
+      map((snapshot) => snapshot.data().count),
+      catchError((error) => {
+        console.error('Error counting reactions:', error);
+        return of(0);
       }),
     );
   }

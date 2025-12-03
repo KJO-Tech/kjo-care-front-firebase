@@ -3,16 +3,20 @@ import {
   addDoc,
   collection,
   collectionData,
+  collectionGroup,
   deleteDoc,
   doc,
   Firestore,
+  getCountFromServer,
   orderBy,
   query,
   Timestamp,
   updateDoc,
-  getCountFromServer,
+  where,
 } from '@angular/fire/firestore';
-import { from, map, Observable, throwError } from 'rxjs';
+import { from, map, Observable, of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CommentRequest } from '../interfaces/blog-http.interface';
 import { Comment } from '../models/blog';
 import { AuthService } from './auth.service';
 
@@ -24,13 +28,13 @@ export class CommentService {
   private authService = inject(AuthService);
   private collectionName = 'blogs';
 
-  readonly _selectedComment = signal<Comment | null>(null);
+  readonly _selectedComment = signal<CommentRequest | null>(null);
 
-  get selectedComment(): Comment | null {
+  get selectedComment(): CommentRequest | null {
     return this._selectedComment();
   }
 
-  set selectedComment(comment: Comment | null) {
+  set selectedComment(comment: CommentRequest | null) {
     this._selectedComment.set(comment);
   }
 
@@ -39,7 +43,7 @@ export class CommentService {
       this.firestore,
       `${this.collectionName}/${blogId}/comments`,
     );
-    const q = query(commentsRef, orderBy('createdAt', 'asc'));
+    const q = query(commentsRef, orderBy('createdAt', 'desc'));
 
     return collectionData(q, { idField: 'id' }).pipe(
       map((comments: any[]) => {
@@ -120,6 +124,24 @@ export class CommentService {
     );
     return from(getCountFromServer(commentsRef)).pipe(
       map((snapshot) => snapshot.data().count),
+    );
+  }
+
+  countMyComments(): Observable<number> {
+    const user = this.authService.userData();
+    if (!user) return of(0);
+
+    const commentsQuery = query(
+      collectionGroup(this.firestore, 'comments'),
+      where('author.uid', '==', user.uid),
+    );
+
+    return from(getCountFromServer(commentsQuery)).pipe(
+      map((snapshot) => snapshot.data().count),
+      catchError((error) => {
+        console.error('Error counting comments:', error);
+        return of(0);
+      }),
     );
   }
 }

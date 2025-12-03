@@ -1,0 +1,107 @@
+<div class="p-4 md:p-8 max-w-6xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="breadcrumbs text-sm mb-4">
+      <ul>
+        <li><a [routerLink]="['/app']">Inicio</a></li>
+        <li><a [routerLink]="['/app/exercises']">Ejercicios</a></li>
+        @if (categoryResource.value(); as category) {
+          <li>{{ category.localizedName["es"] }}</li>
+        }
+      </ul>
+    </div>
+
+    <div class="sm:text-center text-left">
+      <h1
+        class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text inline-flex items-center gap-3"
+      >
+        @if (categoryResource.value(); as category) {
+          {{ category.localizedName["es"] }}
+        } @else {
+          Ejercicios
+        }
+      </h1>
+      <p class="text-base-content/70 mt-2">
+        Selecciona un ejercicio para comenzar.
+      </p>
+    </div>
+  </div>
+
+  @if (exercisesResource.isLoading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div
+          class="card bg-base-100 shadow-sm border border-base-300 h-40 animate-pulse"
+        >
+          <div class="card-body">
+            <div class="h-6 w-3/4 bg-base-300 rounded mb-4"></div>
+            <div class="h-4 w-1/2 bg-base-300 rounded"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (exercisesResource.error()) {
+    <div class="alert alert-error shadow-lg">
+      <span class="material-symbols-outlined">error</span>
+      <span>Error al cargar los ejercicios. Por favor intenta de nuevo.</span>
+    </div>
+  } @else {
+    @if (exercisesResource.value()?.length === 0) {
+      <div class="text-center py-12">
+        <span
+          class="material-symbols-outlined text-6xl text-base-content/20 mb-4"
+          >fitness_center</span
+        >
+        <h3 class="text-xl font-bold text-base-content/60">
+          No hay ejercicios disponibles
+        </h3>
+        <p class="text-base-content/50">Intenta con otra categoría.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (exercise of exercisesResource.value() ?? []; track exercise.id) {
+          <div
+            class="card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer border border-base-300 hover:border-primary group"
+            (click)="selectExercise(exercise.id!)"
+          >
+            <div class="card-body">
+              <div class="flex flex-col justify-between items-start gap-2">
+                <h2
+                  class="card-title leading-6 text-lg group-hover:text-primary transition-colors"
+                >
+                  {{ exercise.localizedTitle["es"] }}
+                </h2>
+                <div
+                  class="badge badge-outline"
+                  [ngClass]="{
+                    'badge-primary':
+                      exercise.difficulty === ExerciseDifficultyType.BEGINNER,
+                    'badge-secondary':
+                      exercise.difficulty ===
+                      ExerciseDifficultyType.INTERMEDIATE,
+                    'badge-error':
+                      exercise.difficulty === ExerciseDifficultyType.ADVANCED,
+                  }"
+                >
+                  {{ exercise.difficulty }}
+                </div>
+              </div>
+              <p class="text-base-content/70 line-clamp-2 text-sm mt-2">
+                {{ exercise.localizedDescription["es"] }}
+              </p>
+              <div
+                class="flex items-center gap-4 mt-4 text-xs text-base-content/60"
+              >
+                <div class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">timer</span>
+                  {{ exercise.durationMinutes || 0 }} min
+                </div>
+                <!-- Category name is not directly available in DailyExercise, might need to fetch or pass it -->
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

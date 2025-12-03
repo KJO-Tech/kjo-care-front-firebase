@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import LandingComponent from './modules/landing/landing.component';
 
@@ -22,16 +22,18 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
-          import('./modules/dashboard/dashboard-page.component'),
+          import('./modules/admin/dashboard/dashboard-page.component'),
       },
       {
         path: 'users',
-        loadComponent: () => import('./modules/user/user-page.component'),
+        loadComponent: () => import('./modules/admin/user/user-page.component'),
       },
       {
         path: 'emergency-resources',
         loadComponent: () =>
-          import('./modules/emergency-resource/emergency-resource.component'),
+          import(
+            './modules/admin/emergency-resource/emergency-resource.component'
+          ),
       },
       {
         path: 'blog-management',
@@ -40,11 +42,11 @@ export const routes: Routes = [
       {
         path: 'moods',
         loadChildren: () =>
-          import('./modules/mood-analytics/mood-analytics.routes'),
+          import('./modules/admin/mood-analytics/mood-analytics.routes'),
       },
       {
         path: 'settings',
-        loadChildren: () => import('./modules/settings/settings.routes'),
+        loadChildren: () => import('./modules/admin/settings/settings.routes'),
       },
       // { path: 'health-centers', loadComponent: () => import('./modules/health-center/health-center.component') },
       {
@@ -55,12 +57,14 @@ export const routes: Routes = [
       {
         path: 'activity-category',
         loadComponent: () =>
-          import('./modules/activity-category/activity-category.component'),
+          import(
+            './modules/admin/activity-category/activity-category.component'
+          ),
       },
       {
         path: 'daily-exercise',
         loadComponent: () =>
-          import('./modules/daily-exercise/daily-exercise.component'),
+          import('./modules/admin/daily-exercise/daily-exercise.component'),
       },
       { path: '**', redirectTo: '' },
     ],
@@ -75,9 +79,8 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/main/home/home.component'),
       },
       {
-        path: 'exercises/:id',
-        loadComponent: () =>
-          import('./modules/main/exercises/exercises.component'),
+        path: 'exercises',
+        loadChildren: () => import('./modules/main/exercises/exercises.routes'),
       },
       {
         path: 'mood',
@@ -93,12 +96,19 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        loadComponent: () => import('./modules/main/profile/profile.component'),
+        loadChildren: () => import('./modules/main/profile/profile.routes'),
       },
       {
         path: 'notifications',
         loadComponent: () =>
           import('./modules/main/notifications/notifications-page.component'),
+      },
+      {
+        path: 'activity-subscription',
+        loadComponent: () =>
+          import(
+            './modules/main/activity-subscription/activity-subscription.component'
+          ),
       },
       { path: '**', redirectTo: '' },
     ],

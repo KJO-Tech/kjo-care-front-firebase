@@ -9,3 +9,10 @@ export interface CommentSummary {
   modifiedDate: string;
   childrenComments: CommentSummary[];
 }
+
+export interface CommentRequest {
+  id: string;
+  content: string;
+  blogId: string;
+  parentCommentId: string | null;
+}
