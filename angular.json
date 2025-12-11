@@ -84,7 +84,14 @@
             }
           },
           "defaultConfiguration": "development",
-          "options": {}
+          "options": {
+            "allowedHosts": [
+              "localhost",
+              "127.0.0.1",
+              "::1",
+              "roentgenologic-sentiently-carroll.ngrok-free.dev"
+            ]
+          }
         },
         "extract-i18n": {
           "builder": "@ngx-env/builder:extract-i18n",

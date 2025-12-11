@@ -1,8 +1,9 @@
-import { Location } from '@angular/common';
+import { DOCUMENT, Location } from '@angular/common';
 import {
   Component,
   computed,
   CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
   effect,
   inject,
   signal,
@@ -38,6 +39,8 @@ export default class CommunityBlogComponent {
   private route = inject(ActivatedRoute);
   public router = inject(Router); // Make public for template access
   private location = inject(Location);
+  private document = inject(DOCUMENT);
+  private destroyRef = inject(DestroyRef);
 
   private authService = inject(AuthService);
   blogService = inject(BlogService);
@@ -56,6 +59,7 @@ export default class CommunityBlogComponent {
 
   // Get blog from navigation state if available (for view transitions)
   private initialBlogState = signal<Blog | null>(null);
+  private jsonLdScript: HTMLScriptElement | null = null;
 
   readonly blog = rxResource({
     request: () => ({
@@ -119,6 +123,8 @@ export default class CommunityBlogComponent {
         this.blogId.set(params.get('id') ?? '');
       });
     });
+
+    this.destroyRef.onDestroy(() => this.removeJsonLd());
   }
 
   private updateSEO(blog: Blog) {
@@ -129,16 +135,83 @@ export default class CommunityBlogComponent {
       ? `${countMatch[0]}${blog.title} | KJO Mind Care`
       : `${blog.title} | KJO Mind Care`;
 
+    const description = blog.content.substring(0, 150) + '...';
+    const url = this.document.location.href;
+
     this.titleService.setTitle(newTitle);
+
+    // Standard Meta
+    this.metaService.updateTag({ name: 'description', content: description });
+
+    // Open Graph
+    this.metaService.updateTag({ property: 'og:title', content: newTitle });
     this.metaService.updateTag({
-      name: 'description',
-      content: blog.content.substring(0, 150) + '...',
+      property: 'og:description',
+      content: description,
     });
+    this.metaService.updateTag({ property: 'og:type', content: 'article' });
+    this.metaService.updateTag({ property: 'og:url', content: url });
+
     if (blog.mediaUrl) {
       this.metaService.updateTag({
         property: 'og:image',
         content: blog.mediaUrl,
       });
+      this.metaService.updateTag({
+        name: 'twitter:image',
+        content: blog.mediaUrl,
+      });
+    }
+
+    // Twitter Card
+    this.metaService.updateTag({
+      name: 'twitter:card',
+      content: 'summary_large_image',
+    });
+    this.metaService.updateTag({ name: 'twitter:title', content: newTitle });
+    this.metaService.updateTag({
+      name: 'twitter:description',
+      content: description,
+    });
+
+    this.updateJsonLd(blog);
+  }
+
+  private updateJsonLd(blog: Blog) {
+    this.removeJsonLd();
+
+    let datePublished = new Date().toISOString();
+    if (blog.createdAt && typeof blog.createdAt.toDate === 'function') {
+      datePublished = blog.createdAt.toDate().toISOString();
+    } else if (blog.createdAt && (blog.createdAt as any).seconds) {
+      datePublished = new Date(
+        (blog.createdAt as any).seconds * 1000,
+      ).toISOString();
+    }
+
+    const script = this.document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: blog.title,
+      image: blog.mediaUrl ? [blog.mediaUrl] : [],
+      datePublished: datePublished,
+      author: {
+        '@type': 'Person',
+        name: blog.author?.fullName || 'Anonymous',
+      },
+      articleBody: blog.content,
+      url: this.document.location.href,
+    });
+    this.document.head.appendChild(script);
+    this.jsonLdScript = script;
+  }
+
+  private removeJsonLd() {
+    if (this.jsonLdScript) {
+      this.document.head.removeChild(this.jsonLdScript);
+      this.jsonLdScript = null;
     }
   }
 

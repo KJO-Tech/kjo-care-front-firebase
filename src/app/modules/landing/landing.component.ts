@@ -4,11 +4,13 @@ import {
   ElementRef,
   inject,
   OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core';
 import { ThemeControllerComponent } from '../../shared/components/layout/theme-controller/theme-controller.component';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-landing',
@@ -16,12 +18,20 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./landing.component.css'],
   imports: [ThemeControllerComponent, NgClass, RouterLink],
 })
-export default class LandingComponent implements AfterViewInit, OnDestroy {
+export default class LandingComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   private elementRef = inject(ElementRef);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
   private observer?: IntersectionObserver;
   private cardInterval: any;
 
   activeIndex = signal(0);
+
+  ngOnInit() {
+    this.updateSEO();
+  }
 
   ngAfterViewInit() {
     this.initAnimations();
@@ -31,6 +41,41 @@ export default class LandingComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.observer?.disconnect();
     clearInterval(this.cardInterval);
+  }
+
+  private updateSEO() {
+    const title = 'KJO Mind Care | Bienestar Mental para Jóvenes';
+    const description =
+      'Descubre KJO Mind Care, tu espacio seguro para el bienestar mental. Diario de ánimo, ejercicios guiados, comunidad de apoyo y recursos profesionales para jóvenes.';
+    const url = 'https://kjomindcare.netlify.app/';
+    const image = 'https://kjomindcare.netlify.app/thumbnail.png';
+
+    this.titleService.setTitle(title);
+
+    // Standard Meta
+    this.metaService.updateTag({ name: 'description', content: description });
+
+    // Open Graph
+    this.metaService.updateTag({ property: 'og:title', content: title });
+    this.metaService.updateTag({
+      property: 'og:description',
+      content: description,
+    });
+    this.metaService.updateTag({ property: 'og:type', content: 'website' });
+    this.metaService.updateTag({ property: 'og:url', content: url });
+    this.metaService.updateTag({ property: 'og:image', content: image });
+
+    // Twitter Card
+    this.metaService.updateTag({
+      name: 'twitter:card',
+      content: 'summary_large_image',
+    });
+    this.metaService.updateTag({ name: 'twitter:title', content: title });
+    this.metaService.updateTag({
+      name: 'twitter:description',
+      content: description,
+    });
+    this.metaService.updateTag({ name: 'twitter:image', content: image });
   }
 
   private initAnimations() {
@@ -82,7 +127,6 @@ export default class LandingComponent implements AfterViewInit, OnDestroy {
 
     return '';
   }
-
 
   heroCards = [
     { icon: '🧠', text: 'Entiéndete' },

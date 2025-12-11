@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Allow: /app/community/post/*
+
+Sitemap: https://kjomindcare.netlify.app/sitemap.xml
