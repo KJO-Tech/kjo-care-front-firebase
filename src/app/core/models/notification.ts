@@ -7,6 +7,8 @@ export enum NotificationType {
   ACTIVITY_REMINDER = 'ACTIVITY_REMINDER',
   SYSTEM = 'SYSTEM',
   NEW_BLOG_POST = 'NEW_BLOG_POST',
+  BLOG_APPROVED = 'BLOG_APPROVED',
+  BLOG_REJECTED = 'BLOG_REJECTED',
   UNKNOWN = 'UNKNOWN',
 }
 
@@ -30,6 +32,8 @@ export const NOTIFICATION_TYPE_ICON: Record<NotificationType, string> = {
   [NotificationType.LIKE]: 'favorite',
   [NotificationType.COMMENT]: 'comment',
   [NotificationType.NEW_BLOG_POST]: 'article',
+  [NotificationType.BLOG_APPROVED]: 'check_circle',
+  [NotificationType.BLOG_REJECTED]: 'cancel',
   // [NotificationType.BLOG_REJECTED]: 'unpublished',
   // Health & System Icons
   [NotificationType.SYSTEM]: 'info',

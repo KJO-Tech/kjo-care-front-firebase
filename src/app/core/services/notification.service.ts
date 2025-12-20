@@ -180,12 +180,38 @@ export class NotificationService {
     return from(batch.commit());
   }
 
+  sendNotification(
+    userId: string,
+    notification: Partial<Notification>,
+  ): Observable<void> {
+    const notificationsRef = collection(
+      this.firestore,
+      `users/${userId}/notifications`,
+    );
+    const id = doc(notificationsRef).id;
+
+    const newNotification: Notification = {
+      timestamp: Timestamp.now(),
+      status: NotificationStatus.NEW,
+      args: [],
+      targetRoute: 'notifications_screen',
+      targetId: null,
+      ...notification,
+      id,
+    } as Notification;
+
+    return from(setDoc(doc(notificationsRef, id), newNotification));
+  }
+
   getRoute(notification: Notification): any[] {
     switch (notification.type) {
       case NotificationType.LIKE:
       case NotificationType.COMMENT:
       case NotificationType.NEW_BLOG_POST:
+      case NotificationType.BLOG_APPROVED:
         return ['/app/community/post', notification.targetId];
+      case NotificationType.BLOG_REJECTED:
+        return ['/app/notifications'];
       case NotificationType.MOOD_REMINDER:
         return ['/app/mood'];
       case NotificationType.ACTIVITY_REMINDER:

@@ -78,7 +78,7 @@ export default class BlogPageComponent {
     const selectedBlog = this.blogService.selectedBlog;
     if (!selectedBlog) return;
 
-    this.blogService.delete(selectedBlog.id).subscribe({
+    this.blogService.reject(selectedBlog).subscribe({
       next: () => {
         this.toastService.addToast({
           message: 'Blog deleted successfully',
@@ -91,6 +91,30 @@ export default class BlogPageComponent {
       error: (error) => {
         this.toastService.addToast({
           message: 'Error deleting blog',
+          type: 'error',
+          duration: 4000,
+        });
+      },
+    });
+  }
+
+  approveBlog() {
+    const selectedBlog = this.blogService.selectedBlog;
+    if (!selectedBlog) return;
+
+    this.blogService.approve(selectedBlog).subscribe({
+      next: () => {
+        this.toastService.addToast({
+          message: 'Blog approved successfully',
+          type: 'success',
+          duration: 4000,
+        });
+
+        this.reload();
+      },
+      error: (error) => {
+        this.toastService.addToast({
+          message: 'Error approving blog',
           type: 'error',
           duration: 4000,
         });
