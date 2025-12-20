@@ -79,6 +79,16 @@
 ></blog-modal>
 
 <app-dialog
+  [title]="'Approve blog'"
+  [message]="
+    'Are you sure you want to approve this blog? A notification will be sent to the author.'
+  "
+  [modalName]="'modal_blog_approve'"
+  [buttonText]="'Approve'"
+  (callback)="approveBlog()"
+></app-dialog>
+
+<app-dialog
   [title]="'Delete blog'"
   [message]="'Are you sure you want to delete this blog?'"
   [modalName]="'modal_blog_delete'"
