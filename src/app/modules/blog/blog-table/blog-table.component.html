@@ -53,13 +53,33 @@
               <i class="material-symbols-outlined !text-xl">edit_square</i>
             </modal-open-button>
 
-            <modal-open-button
-              [modalName]="'modal_blog_delete'"
-              [type]="'icon'"
-              (click)="blogService.selectedBlog = blog"
-            >
-              <i class="material-symbols-outlined !text-xl">delete</i>
-            </modal-open-button>
+            <!-- Approve Button: Show for PENDING and DELETED -->
+            @if (
+              blog.status === Status.PENDING || blog.status === Status.DELETED
+            ) {
+              <modal-open-button
+                [modalName]="'modal_blog_approve'"
+                [type]="'icon'"
+                [classes]="'text-success btn-ghost'"
+                (click)="blogService.selectedBlog = blog"
+              >
+                <i class="material-symbols-outlined !text-xl">check_circle</i>
+              </modal-open-button>
+            }
+
+            <!-- Delete Button: Show for PENDING and PUBLISHED -->
+            @if (
+              blog.status === Status.PENDING || blog.status === Status.PUBLISHED
+            ) {
+              <modal-open-button
+                [modalName]="'modal_blog_delete'"
+                [type]="'icon'"
+                [classes]="'text-error btn-ghost'"
+                (click)="blogService.selectedBlog = blog"
+              >
+                <i class="material-symbols-outlined !text-xl">delete</i>
+              </modal-open-button>
+            }
           </td>
         </tr>
       } @empty {

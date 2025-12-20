@@ -98,6 +98,14 @@ self.addEventListener("push", (event) => {
           title = "Hora de moverse";
           body = "¡No olvides realizar tus ejercicios de hoy!";
           break;
+        case "BLOG_APPROVED":
+          title = "Post Aprobado";
+          body = `Tu publicación "${args[0] || "..."}" ha sido aprobada.`;
+          break;
+        case "BLOG_REJECTED":
+          title = "Post Rechazado";
+          body = `Tu publicación "${args[0] || "..."}" no ha sido aprobada.`;
+          break;
         default:
           title = "Kjo Care";
           body = "Tienes una nueva notificación en la aplicación.";
@@ -139,9 +147,13 @@ self.addEventListener("notificationclick", (event) => {
       case "LIKE":
       case "COMMENT":
       case "NEW_BLOG_POST":
+      case "BLOG_APPROVED":
         if (targetId) {
           url = `/app/community/post/${targetId}`;
         }
+        break;
+      case "BLOG_REJECTED":
+        url = "/app/community";
         break;
       case "MOOD_REMINDER":
         url = "/app/mood";

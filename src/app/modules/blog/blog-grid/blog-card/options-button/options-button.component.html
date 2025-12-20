@@ -1,6 +1,9 @@
 <div class="dropdown dropdown-end">
   <div tabindex="0" role="button" class="btn btn-square btn-ghost">...</div>
-  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 shadow-sm w-36 space-y-1">
+  <ul
+    tabindex="0"
+    class="dropdown-content menu bg-base-100 rounded-box z-1 shadow-sm w-36 space-y-1"
+  >
     <li>
       <modal-open-button
         [modalName]="'modal_blog_detail'"
@@ -24,15 +27,36 @@
       </modal-open-button>
     </li>
     <li>
-      <modal-open-button
-        [modalName]="'modal_blog_delete'"
-        [label]="'Delete'"
-        [type]="'dropdown'"
-        class="p-0 w-full flex text-error"
-        (click)="blogService.selectedBlog = blog()"
-      >
-        <i class="material-symbols-outlined !text-xl mr-2">delete</i>
-      </modal-open-button>
+      <!-- Approve Button: Show for PENDING and DELETED -->
+      @if (
+        blog().status === Status.PENDING || blog().status === Status.DELETED
+      ) {
+        <modal-open-button
+          [modalName]="'modal_blog_approve'"
+          [label]="'Approve'"
+          [type]="'dropdown'"
+          class="p-0 w-full flex text-success"
+          (click)="blogService.selectedBlog = blog()"
+        >
+          <i class="material-symbols-outlined !text-xl mr-2">check_circle</i>
+        </modal-open-button>
+      }
+    </li>
+    <li>
+      <!-- Delete Button: Show for PENDING and PUBLISHED -->
+      @if (
+        blog().status === Status.PENDING || blog().status === Status.PUBLISHED
+      ) {
+        <modal-open-button
+          [modalName]="'modal_blog_delete'"
+          [label]="'Delete'"
+          [type]="'dropdown'"
+          class="p-0 w-full flex text-error"
+          (click)="blogService.selectedBlog = blog()"
+        >
+          <i class="material-symbols-outlined !text-xl mr-2">delete</i>
+        </modal-open-button>
+      }
     </li>
   </ul>
 </div>

@@ -21,10 +21,13 @@ import {
   Observable,
   of,
   switchMap,
+  tap,
 } from 'rxjs';
 import { Blog, BlogStatus } from '../models/blog';
 import { AuthService } from './auth.service';
 import { CommentService } from './comment.service';
+import { NotificationService } from './notification.service';
+import { NotificationType } from '../models/notification';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +36,7 @@ export class BlogService {
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
   private commentService = inject(CommentService);
+  private notificationService = inject(NotificationService);
   private collectionName = 'blogs';
 
   private _selectedBlog = signal<Blog | null>(null);
@@ -137,6 +141,47 @@ export class BlogService {
   delete(id: string): Observable<void> {
     const docRef = doc(this.firestore, `${this.collectionName}/${id}`);
     return from(updateDoc(docRef, { status: BlogStatus.DELETED }));
+  }
+
+  approve(blog: Blog): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${blog.id}`);
+    return from(
+      updateDoc(docRef, {
+        status: BlogStatus.PUBLISHED,
+        updatedAt: Timestamp.now(),
+      }),
+    ).pipe(
+      tap(() => {
+        if (blog.author?.uid) {
+          this.notificationService.sendNotification(blog.author.uid, {
+            type: NotificationType.BLOG_APPROVED,
+            targetRoute: `blog_post_detail/${blog.id}`,
+            targetId: blog.id,
+            args: [blog.title],
+          });
+        }
+      }),
+    );
+  }
+
+  reject(blog: Blog): Observable<void> {
+    const docRef = doc(this.firestore, `${this.collectionName}/${blog.id}`);
+    return from(
+      updateDoc(docRef, {
+        status: BlogStatus.DELETED,
+        updatedAt: Timestamp.now(),
+      }),
+    ).pipe(
+      tap(() => {
+        if (blog.author?.uid) {
+          this.notificationService.sendNotification(blog.author.uid, {
+            type: NotificationType.BLOG_REJECTED,
+            targetId: blog.id,
+            args: [blog.title],
+          });
+        }
+      }),
+    );
   }
 
   // Reactions
