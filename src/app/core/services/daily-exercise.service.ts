@@ -14,7 +14,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import {
   AssignedExercise,
   AssignedExerciseDetail,
@@ -33,6 +33,12 @@ export class DailyExerciseService {
   private readonly COLLECTION_NAME = 'dailyExercises';
   private readonly DAILY_ASSIGNMENTS_COLLECTION = 'dailyAssignments';
   private readonly SUBSCRIPTIONS_COLLECTION = 'activitySubscriptions';
+
+  // Cache to store ongoing/completed assignment requests per user + date
+  private assignmentsCache: Map<
+    string,
+    Observable<DailyAssignment & { exercises: AssignedExerciseDetail[] }>
+  > = new Map();
 
   constructor() {}
 
@@ -134,6 +140,12 @@ export class DailyExerciseService {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const today = `${year}-${month}-${day}`;
+    const cacheKey = `${userId}_${today}`;
+
+    if (this.assignmentsCache.has(cacheKey)) {
+      return this.assignmentsCache.get(cacheKey)!;
+    }
+
     const assignmentsRef = collection(
       this.firestore,
       this.DAILY_ASSIGNMENTS_COLLECTION,
@@ -144,7 +156,7 @@ export class DailyExerciseService {
       where('date', '==', today),
     );
 
-    return from(getDocs(q)).pipe(
+    const obs$ = from(getDocs(q)).pipe(
       switchMap((snapshot) => {
         let assignment$: Observable<DailyAssignment>;
 
@@ -222,11 +234,23 @@ export class DailyExerciseService {
           }),
         );
       }),
+
+      tap({
+        error: (err) => {
+          // If an error occurs, remove from cache so we can retry
+          console.error('Error occurring in getDailyAssignments stream:', err);
+          this.assignmentsCache.delete(cacheKey);
+        },
+      }),
       catchError((error) => {
         console.error('Error getting daily assignments:', error);
         return throwError(() => error);
       }),
+      shareReplay(1),
     );
+
+    this.assignmentsCache.set(cacheKey, obs$);
+    return obs$;
   }
 
   completeAssignment(
